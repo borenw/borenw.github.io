@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>borenw · GitHub Projects</title>
+<style>
+  /* GitHub Light exact tokens */
+  :root {
+    --color-canvas-default: #ffffff;
+    --color-canvas-subtle: #f6f8fa;
+    --color-canvas-inset: #f6f8fa;
+    --color-border-default: #d0d7de;
+    --color-border-muted: #d8dee4;
+    --color-fg-default: #1f2328;
+    --color-fg-muted: #636c76;
+    --color-fg-subtle: #6e7781;
+    --color-accent-fg: #0969da;
+    --color-accent-emphasis: #0969da;
+    --color-success-fg: #1a7f37;
+    --color-success-muted: #dafbe1;
+    --color-danger-fg: #d1242f;
+    --color-attention-fg: #9a6700;
+    --color-done-fg: #8250df;
+    --color-done-muted: #fbefff;
+    --color-neutral-muted: rgba(175,184,193,0.2);
+    --color-btn-bg: #f6f8fa;
+    --color-btn-border: rgba(31,35,40,0.15);
+    --color-btn-hover-bg: #f3f4f6;
+    --color-btn-primary-bg: #1a7f37;
+    --color-btn-primary-hover-bg: #1f8b3b;
+    --color-btn-primary-text: #ffffff;
+    --color-header-bg: #24292f;
+    --color-header-fg: #ffffff;
+    --color-input-bg: #ffffff;
+    --color-input-border: #d0d7de;
+    --color-shadow-small: 0 1px 0 rgba(31,35,40,0.04);
+    --color-shadow-medium: 0 3px 6px rgba(140,149,159,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--color-canvas-default);
+    color: var(--color-fg-default);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  a { color: var(--color-accent-fg); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── TOP NAV ── */
+  .gh-nav {
+    background: var(--color-header-bg);
+    padding: 0 32px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .gh-nav-logo { display: flex; align-items: center; color: #fff; flex-shrink: 0; }
+  .gh-nav-logo svg { fill: #fff; }
+  .gh-nav-crumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+  .gh-nav-crumb a { color: #ffffff; font-weight: 600; }
+  .gh-nav-crumb a:hover { text-decoration: none; opacity: 0.8; }
+  .gh-nav-crumb .sep { color: rgba(255,255,255,0.4); font-weight: 300; margin: 0 2px; }
+  .gh-nav-spacer { flex: 1; }
+  .gh-nav-btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 5px 12px;
+    background: var(--color-btn-primary-bg);
+    color: var(--color-btn-primary-text);
+    border: 1px solid rgba(31,35,40,0.15);
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.12s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .gh-nav-btn:hover { background: var(--color-btn-primary-hover-bg); }
+  .gh-nav-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ── PAGE ── */
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 32px 80px;
+  }
+
+  /* ── PROFILE ROW ── */
+  .profile-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border-muted);
+  }
+  .avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-canvas-subtle);
+    overflow: hidden; flex-shrink: 0;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .profile-info h1 {
+    font-size: 20px; font-weight: 600;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .profile-info h1 a { color: var(--color-fg-default); }
+  .profile-info h1 a:hover { color: var(--color-accent-fg); text-decoration: none; }
+  .profile-info h1 .slash { color: var(--color-fg-muted); font-weight: 300; }
+  .profile-info h1 .section { color: var(--color-fg-muted); font-weight: 300; font-size: 20px; }
+  .profile-sub { font-size: 13px; color: var(--color-fg-muted); margin-top: 2px; }
+
+  /* ── TABS ── */
+  .counter-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--color-border-default);
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .tab-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 16px;
+    font-size: 14px; font-weight: 400;
+    color: var(--color-fg-default);
+    border: none; border-bottom: 2px solid transparent;
+    background: transparent; cursor: pointer;
+    white-space: nowrap; font-family: inherit;
+    transition: color 0.12s; position: relative; bottom: -1px;
+  }
+  .tab-item:hover { color: var(--color-fg-default); border-bottom-color: var(--color-fg-muted); }
+  .tab-item.active { font-weight: 600; border-bottom-color: #fd8c73; }
+  .tab-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 6px; min-width: 20px; height: 20px;
+    font-size: 12px; font-weight: 500;
+    background: var(--color-neutral-muted);
+    border-radius: 999px; color: var(--color-fg-default);
+  }
+
+  /* ── CONTROLS ROW ── */
+  .controls-row {
+    display: flex; gap: 10px; margin-bottom: 16px;
+    flex-wrap: wrap; align-items: center; justify-content: space-between;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 340px; }
+  .search-wrap svg {
+    position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+    fill: var(--color-fg-muted); pointer-events: none;
+  }
+  .search-input {
+    width: 100%;
+    padding: 5px 12px 5px 30px;
+    background: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    border-radius: 6px;
+    color: var(--color-fg-default);
+    font-size: 14px; font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-shadow: var(--color-shadow-small);
+  }
+  .search-input::placeholder { color: var(--color-fg-subtle); }
+  .search-input:focus { border-color: var(--color-accent-emphasis); box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+  .progress-inline {
+    font-size: 12px; color: var(--color-fg-muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--color-border-default);
+    border-top-color: var(--color-accent-fg);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite; display: none;
+  }
+  .spinner.visible { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    font-size: 14px; font-weight: 600;
+    color: var(--color-fg-default);
+    padding: 8px 0 12px;
+    border-bottom: 1px solid var(--color-border-muted);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .gh-count {
+    font-size: 12px; font-weight: 500;
+    background: var(--color-neutral-muted);
+    padding: 0 6px; border-radius: 999px;
+    color: var(--color-fg-muted);
+  }
+
+  /* ── CARD GRID (live pages) ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px; margin-bottom: 32px;
+  }
+  .card {
+    background: var(--color-canvas-default);
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px; overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: box-shadow 0.15s;
+  }
+  .card:hover { box-shadow: var(--color-shadow-medium); }
+  .card-thumb {
+    position: relative; height: 140px;
+    background: var(--color-canvas-subtle);
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border-muted);
+    flex-shrink: 0;
+  }
+  .card-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: top;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .card-thumb img.loaded { opacity: 1; }
+  .thumb-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px; color: var(--color-fg-subtle); font-size: 11px;
+  }
+  .thumb-placeholder svg { fill: var(--color-fg-subtle); opacity: 0.4; }
+  .card-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .card-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--color-accent-fg);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    text-decoration: none;
+  }
+  .card-name:hover { text-decoration: underline; }
+  .card-desc {
+    font-size: 12px; color: var(--color-fg-muted);
+    flex: 1; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between; margin-top: 8px;
+  }
+
+  /* ── REPO LIST ROWS ── */
+  .repo-list { display: flex; flex-direction: column; }
+  .repo-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border-muted);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 16px; align-items: start;
+  }
+  .repo-item:last-child { border-bottom: none; }
+  .repo-item-left { min-width: 0; }
+  .repo-item-right {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 8px; flex-shrink: 0;
+  }
+  .repo-name-row {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; margin-bottom: 4px;
+  }
+  .repo-name {
+    font-size: 16px; font-weight: 600;
+    color: var(--color-accent-fg); text-decoration: none;
+  }
+  .repo-name:hover { text-decoration: underline; }
+  .repo-desc { font-size: 14px; color: var(--color-fg-muted); margin-bottom: 8px; max-width: 600px; }
+  .repo-meta {
+    display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap; font-size: 12px; color: var(--color-fg-muted);
+  }
+  .repo-meta-item { display: flex; align-items: center; gap: 4px; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px; border-radius: 999px;
+    font-size: 12px; font-weight: 500;
+    border: 1px solid transparent;
+  }
+  .badge.live {
+    background: var(--color-success-muted);
+    color: var(--color-success-fg);
+    border-color: rgba(26,127,55,0.2);
+  }
+  .badge.readme {
+    background: var(--color-done-muted);
+    color: var(--color-done-fg);
+    border-color: rgba(130,80,223,0.2);
+  }
+  .badge.checking {
+    background: var(--color-neutral-muted);
+    color: var(--color-fg-muted);
+    animation: pulse 1.4s infinite;
+  }
+  .badge.none {
+    background: var(--color-neutral-muted);
+    color: var(--color-fg-muted);
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── BUTTONS ── */
+  .repo-btn {
+    font-size: 12px; font-weight: 500;
+    padding: 4px 10px;
+    background: var(--color-btn-bg);
+    color: var(--color-fg-default);
+    border: 1px solid var(--color-btn-border);
+    border-radius: 6px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+    text-decoration: none; font-family: inherit;
+    box-shadow: var(--color-shadow-small);
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .repo-btn:hover { background: var(--color-btn-hover-bg); border-color: var(--color-border-default); text-decoration: none; }
+  .repo-btn svg { fill: var(--color-fg-muted); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center; color: var(--color-fg-muted);
+    padding: 80px 0; font-size: 14px;
+  }
+  .empty-state svg { display: block; margin: 0 auto 16px; fill: var(--color-fg-muted); opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<!-- GitHub light nav -->
+<nav class="gh-nav">
+  <a class="gh-nav-logo" href="https://github.com/borenw" target="_blank">
+    <svg width="32" height="32" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+    </svg>
+  </a>
+  <div class="gh-nav-crumb">
+    <a href="https://github.com/borenw" target="_blank">borenw</a>
+    <span class="sep">/</span>
+    <span style="color:rgba(255,255,255,0.9);font-weight:600">repositories</span>
+  </div>
+  <div class="gh-nav-spacer"></div>
+  <button class="gh-nav-btn" id="scanBtn" disabled onclick="startScan()">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="white"><path d="M8 2.5a5.487 5.487 0 00-4.131 1.869l1.204 1.204A.25.25 0 014.896 6H1.25A.25.25 0 011 5.75V2.104a.25.25 0 01.427-.177l1.38 1.38A7.001 7.001 0 0114.95 7.16a.75.75 0 11-1.49.178A5.501 5.501 0 008 2.5zM1.705 8.005a.75.75 0 01.834.656 5.501 5.501 0 009.592 2.97l-1.204-1.204a.25.25 0 01.177-.427h3.646a.25.25 0 01.25.25v3.646a.25.25 0 01-.427.177l-1.38-1.38A7.001 7.001 0 011.05 8.84a.75.75 0 01.656-.834z"/></svg>
+    Refresh
+  </button>
+</nav>
+
+<div class="page">
+
+  <!-- Profile -->
+  <div class="profile-row">
+    <div class="avatar">
+      <img src="https://avatars.githubusercontent.com/borenw" alt="borenw" onerror="this.style.display='none'">
+    </div>
+    <div class="profile-info">
+      <h1>
+        <a href="https://github.com/borenw" target="_blank">borenw</a>
+        <span class="slash">/</span>
+        <span class="section">repositories</span>
+      </h1>
+      <div class="profile-sub" id="headerSub">Scanning repositories…</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="counter-tabs">
+    <button class="tab-item active" onclick="setFilter('all',this)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8z"/></svg>
+      Repositories <span class="tab-count" id="tabAll">–</span>
+    </button>
+    <button class="tab-item" onclick="setFilter('live',this)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="#1a7f37"><path d="M8 3a5 5 0 100 10A5 5 0 008 3zm0 1.5a3.5 3.5 0 110 7 3.5 3.5 0 010-7z"/><circle cx="8" cy="8" r="2"/></svg>
+      Live Pages <span class="tab-count" id="tabLive">0</span>
+    </button>
+    <button class="tab-item" onclick="setFilter('readme',this)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75A.75.75 0 01.75 1h4.253c1.227 0 2.317.59 3 1.501A3.744 3.744 0 0111.006 1h4.245a.75.75 0 01.75.75v10.5a.75.75 0 01-.75.75h-4.507a2.25 2.25 0 00-1.591.659l-.622.621a.75.75 0 01-1.06 0l-.622-.621A2.25 2.25 0 005.258 13H.75a.75.75 0 01-.75-.75zm7.251 10.324l.004-5.073-.002-2.253A2.25 2.25 0 005.003 2.5H1.5v9h3.757a3.75 3.75 0 011.994.574zM8.755 4.75l-.004 7.322a3.752 3.752 0 011.992-.572H14.5v-9h-3.495a2.25 2.25 0 00-2.25 2.25z"/></svg>
+      README only <span class="tab-count" id="tabReadme">0</span>
+    </button>
+    <button class="tab-item" onclick="setFilter('none',this)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 011.06 0L8 6.94l3.22-3.22a.749.749 0 011.275.326.749.749 0 01-.215.734L9.06 8l3.22 3.22a.749.749 0 01-.326 1.275.749.749 0 01-.734-.215L8 9.06l-3.22 3.22a.751.751 0 01-1.042-.018.751.751 0 01-.018-1.042L6.94 8 3.72 4.78a.75.75 0 010-1.06z"/></svg>
+      No content <span class="tab-count" id="tabNone">0</span>
+    </button>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-row">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M10.68 11.74a6 6 0 01-7.922-8.982 6 6 0 018.982 7.922l3.04 3.04a.749.749 0 01-.326 1.275.749.749 0 01-.734-.215zm-1.17-1.17a4.5 4.5 0 10-6.318-6.318 4.5 4.5 0 006.318 6.318z"/>
+      </svg>
+      <input class="search-input" id="searchInput" type="search" placeholder="Find a repository…" oninput="renderAll()" disabled>
+    </div>
+    <div class="progress-inline">
+      <div class="spinner visible" id="spinner"></div>
+      <span id="progressLabel">Fetching repos…</span>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="gridWrap"></div>
+
+</div>
+
+<script>
+const USERNAME = 'borenw';
+let allCards = [];
+let currentFilter = 'all';
+let scanning = false;
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+function updateStats() {
+  const live   = allCards.filter(c => c.status === 'live').length;
+  const readme = allCards.filter(c => c.status === 'readme').length;
+  const none   = allCards.filter(c => c.status === 'none').length;
+  const total  = allCards.length;
+  const done   = allCards.filter(c => c.status !== 'checking').length;
+
+  document.getElementById('tabAll').textContent    = total || '–';
+  document.getElementById('tabLive').textContent   = live;
+  document.getElementById('tabReadme').textContent = readme;
+  document.getElementById('tabNone').textContent   = none;
+  document.getElementById('progressLabel').textContent = done < total
+    ? `Checking ${done} / ${total}…`
+    : `${total} repositories`;
+
+  if (done === total && total > 0) {
+    document.getElementById('spinner').classList.remove('visible');
+    document.getElementById('headerSub').textContent = `${total} public repositories · ${live} with GitHub Pages`;
+    document.getElementById('scanBtn').disabled = false;
+    document.getElementById('searchInput').disabled = false;
+  }
+}
+
+function badgeHTML(status) {
+  if (status === 'live')     return '<span class="badge live">● GitHub Pages</span>';
+  if (status === 'readme')   return '<span class="badge readme">README</span>';
+  if (status === 'checking') return '<span class="badge checking">checking…</span>';
+  return '<span class="badge none">no content</span>';
+}
+
+function cardHTML(card) {
+  const url   = card.rootSite ? `https://${USERNAME}.github.io/` : `https://${USERNAME}.github.io/${card.name}/`;
+  const thumb = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
+  return `
+    <div class="card">
+      <div class="card-thumb">
+        <div class="thumb-placeholder">
+          <svg width="24" height="24" viewBox="0 0 16 16"><path d="M1.5 1h13l.5.5v13l-.5.5h-13l-.5-.5v-13l.5-.5zM2 14h12V2H2v12zm3.5-8h5a.5.5 0 010 1h-5a.5.5 0 010-1zm0 3h5a.5.5 0 010 1h-5a.5.5 0 010-1z"/></svg>
+          loading preview
+        </div>
+        <img src="${thumb}" alt="${card.name}" onload="this.classList.add('loaded')">
+      </div>
+      <div class="card-body">
+        <a class="card-name" href="${url}" target="_blank" rel="noopener" title="${card.name}">${card.name}</a>
+        <div class="card-desc">${card.desc || '<span style="font-style:italic;color:var(--color-fg-subtle)">No description</span>'}</div>
+        <div class="card-footer">
+          <span class="badge live" style="font-size:11px">● live</span>
+          <a class="repo-btn" href="${url}" target="_blank" rel="noopener">
+            <svg width="12" height="12" viewBox="0 0 16 16"><path d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.751.751 0 01-1.042-.018.751.751 0 01-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"/></svg>
+            Visit site
+          </a>
+        </div>
+      </div>
+    </div>`;
+}
+
+function repoRowHTML(card) {
+  const isReadme  = card.status === 'readme';
+  const ghUrl     = `https://github.com/${USERNAME}/${card.name}`;
+  const pagesUrl  = `https://${USERNAME}.github.io/${card.name}/`;
+  return `
+    <div class="repo-item">
+      <div class="repo-item-left">
+        <div class="repo-name-row">
+          <a class="repo-name" href="${ghUrl}" target="_blank" rel="noopener">${card.name}</a>
+          <span class="badge" style="background:var(--color-canvas-subtle);border:1px solid var(--color-border-default);color:var(--color-fg-muted);font-size:11px;padding:1px 7px;border-radius:999px">Public</span>
+          ${badgeHTML(card.status)}
+        </div>
+        ${card.desc ? `<div class="repo-desc">${card.desc}</div>` : ''}
+        <div class="repo-meta">
+          <span class="repo-meta-item">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.751.751 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+            ${isReadme ? '<a href="'+ghUrl+'#readme" target="_blank" rel="noopener" style="color:var(--color-fg-muted)">README</a>' : 'Repository'}
+          </span>
+        </div>
+      </div>
+      <div class="repo-item-right">
+        ${card.status === 'live'
+          ? `<a class="repo-btn" href="${pagesUrl}" target="_blank" rel="noopener">
+               <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.751.751 0 01-1.042-.018.751.751 0 01-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"/></svg>
+               Visit site
+             </a>`
+          : `<a class="repo-btn" href="${ghUrl}" target="_blank" rel="noopener">
+               <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+               View on GitHub
+             </a>`}
+      </div>
+    </div>`;
+}
+
+function renderAll() {
+  const wrap  = document.getElementById('gridWrap');
+  const query = (document.getElementById('searchInput').value || '').toLowerCase();
+  let cards   = currentFilter === 'all' ? allCards : allCards.filter(c => c.status === currentFilter);
+  if (query)  cards = cards.filter(c => c.name.toLowerCase().includes(query) || (c.desc||'').toLowerCase().includes(query));
+
+  if (cards.length === 0) {
+    wrap.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 16 16"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8z"/></svg>
+      No repositories found.
+    </div>`;
+    return;
+  }
+
+  const liveCards  = cards.filter(c => c.status === 'live');
+  const otherCards = cards.filter(c => c.status !== 'live');
+  let html = '';
+
+  if (liveCards.length > 0 && (currentFilter === 'all' || currentFilter === 'live')) {
+    html += `<div class="section-header">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="#1a7f37"><circle cx="8" cy="8" r="4"/></svg>
+      Live GitHub Pages
+      <span class="gh-count">${liveCards.length}</span>
+    </div>`;
+    html += '<div class="cards-grid">' + liveCards.map(cardHTML).join('') + '</div>';
+  }
+
+  if (otherCards.length > 0) {
+    if (liveCards.length > 0 && currentFilter === 'all') {
+      html += `<div class="section-header" style="margin-top:8px">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8z"/></svg>
+        All repositories
+        <span class="gh-count">${otherCards.length}</span>
+      </div>`;
+    }
+    html += '<div class="repo-list">' + otherCards.map(repoRowHTML).join('') + '</div>';
+  }
+
+  wrap.innerHTML = html;
+}
+
+async function startScan() {
+  if (scanning) return;
+  scanning = true;
+  allCards = [];
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('searchInput').disabled = true;
+  document.getElementById('searchInput').value = '';
+  document.getElementById('gridWrap').innerHTML = '';
+  document.getElementById('spinner').classList.add('visible');
+  document.getElementById('progressLabel').textContent = 'Fetching repo list…';
+  document.getElementById('headerSub').textContent = 'Scanning repositories…';
+  document.getElementById('tabAll').textContent = '–';
+
+  let repos = [], page = 1;
+  while (true) {
+    try {
+      const r = await fetch(`https://api.github.com/users/${USERNAME}/repos?per_page=100&page=${page}`);
+      if (!r.ok) {
+        document.getElementById('gridWrap').innerHTML = `<div class="empty-state">GitHub API error ${r.status}. You may be rate-limited — try again in a minute.</div>`;
+        scanning = false; document.getElementById('scanBtn').disabled = false; return;
+      }
+      const batch = await r.json();
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      repos = repos.concat(batch);
+      if (batch.length < 100) break;
+      page++;
+    } catch(e) {
+      document.getElementById('gridWrap').innerHTML = `<div class="empty-state">Network error: ${e.message}</div>`;
+      scanning = false; document.getElementById('scanBtn').disabled = false; return;
+    }
+  }
+
+  allCards = repos.map(r => ({
+    name: r.name, desc: r.description || '',
+    status: r.has_pages ? 'live' : 'checking',
+    rootSite: r.name === `${USERNAME}.github.io`
+  }));
+
+  updateStats();
+  renderAll();
+
+  const toCheck = allCards.filter(c => c.status === 'checking');
+  const BATCH = 8;
+  for (let i = 0; i < toCheck.length; i += BATCH) {
+    await Promise.all(toCheck.slice(i, i + BATCH).map(async card => {
+      try {
+        const r = await fetch(`https://api.github.com/repos/${USERNAME}/${card.name}/readme`,
+          { headers: { Accept: 'application/vnd.github+json' } });
+        card.status = r.ok ? 'readme' : 'none';
+      } catch { card.status = 'none'; }
+      updateStats();
+      renderAll();
+    }));
+  }
+
+  scanning = false;
+}
+
+window.addEventListener('DOMContentLoaded', startScan);
+</script>
+</body>
+</html>
