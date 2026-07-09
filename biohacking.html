@@ -111,9 +111,11 @@
   tr[data-tier="med"] .stars .on{color:var(--warn);}
   tr[data-tier="low"] .stars .on{color:var(--tier-low);}
   .note{color:var(--muted);font-size:13.5px;line-height:1.5;max-width:52ch;}
-  .note sup{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700;}
-  .note sup a{color:inherit;text-decoration:none;}
-  .note sup a:hover{text-decoration:underline;}
+  .note sup{font-family:var(--mono);font-size:11px;font-weight:700;}
+  .note sup a,.trap .fix sup a{color:var(--accent);text-decoration:underline;
+    text-decoration-thickness:.08em;text-underline-offset:2px;
+    padding:0 2px;border-radius:3px;cursor:pointer;}
+  .note sup a:hover,.trap .fix sup a:hover{background:var(--accent-soft);}
 
   /* ---- section ---- */
   .section-h{margin:56px 0 6px;font-family:var(--serif);font-weight:600;
@@ -134,12 +136,14 @@
   .trap .fix{font-size:13px;color:var(--ink);border-top:1px dashed var(--line);
     padding-top:9px;margin:0;}
   .trap .fix b{color:var(--accent);font-weight:600;}
-  .trap .fix sup{font-family:var(--mono);font-size:9.5px;color:var(--accent);font-weight:700;}
+  .trap .fix sup{font-family:var(--mono);font-size:11px;font-weight:700;}
 
   /* ---- references ---- */
   .refs{list-style:none;padding:0;margin:24px 0 0;counter-reset:r;}
-  .refs li{position:relative;padding:14px 0 14px 44px;border-bottom:1px solid var(--line);
-    font-size:13.5px;color:var(--muted);line-height:1.5;}
+  .refs li{position:relative;padding:14px 10px 14px 44px;border-bottom:1px solid var(--line);
+    font-size:13.5px;color:var(--muted);line-height:1.5;scroll-margin-top:16px;
+    border-radius:8px;transition:background .5s ease;}
+  .refs li:target{background:var(--accent-soft);}
   .refs li::before{counter-increment:r;content:"["counter(r)"]";position:absolute;left:0;top:14px;
     font-family:var(--mono);font-weight:700;color:var(--accent);font-size:12.5px;}
   .refs .cite{color:var(--ink);font-weight:600;}
@@ -251,16 +255,16 @@
   <h2 class="section-h">Top 10 popular — but they're traps</h2>
   <p class="section-sub">Widely evangelized online, low actual yield (or actively counterproductive). Ordered by how much attention they steal relative to what they return.</p>
   <div class="traps">
-    <div class="trap"><p class="tnum">TRAP 01</p><h3>NMN / NAD⁺ boosters for longevity</h3><p>Dramatic results are from mice. Human trials raise NAD⁺ markers but show no gain in strength, muscle, or lifespan.</p><p class="fix"><b>Instead:</b> creatine + sleep + lifting — proven, and cheaper.<sup>[9]</sup></p></div>
+    <div class="trap"><p class="tnum">TRAP 01</p><h3>NMN / NAD⁺ boosters for longevity</h3><p>Dramatic results are from mice. Human trials raise NAD⁺ markers but show no gain in strength, muscle, or lifespan.</p><p class="fix"><b>Instead:</b> creatine + sleep + lifting — proven, and cheaper.<sup><a href="#r9">[9]</a></sup></p></div>
     <div class="trap"><p class="tnum">TRAP 02</p><h3>Semen retention for "energy"</h3><p>No physiological mechanism supports it. Regular ejaculation has some protective data. The "power" felt is placebo + discipline.</p><p class="fix"><b>Instead:</b> keep the discipline, drop the biology claim.</p></div>
     <div class="trap"><p class="tnum">TRAP 03</p><h3>Lemon-water "detox"</h3><p>Your liver and kidneys already detox. Lemon water is just flavored water with trace vitamin C.</p><p class="fix"><b>Instead:</b> plain hydration + electrolytes on keto.</p></div>
-    <div class="trap"><p class="tnum">TRAP 04</p><h3>Extreme OMAD (protein-starved)</h3><p>One meal makes hitting 1.6–2.2 g/kg protein nearly impossible — so you lose muscle while thinking you're optimizing.</p><p class="fix"><b>Instead:</b> keep the fast, front-load protein.<sup>[2]</sup></p></div>
+    <div class="trap"><p class="tnum">TRAP 04</p><h3>Extreme OMAD (protein-starved)</h3><p>One meal makes hitting 1.6–2.2 g/kg protein nearly impossible — so you lose muscle while thinking you're optimizing.</p><p class="fix"><b>Instead:</b> keep the fast, front-load protein.<sup><a href="#r2">[2]</a></sup></p></div>
     <div class="trap"><p class="tnum">TRAP 05</p><h3>Keto as a moral rule</h3><p>A useful tool for some, dogma for none. Food quality and protein matter more than macro purity.</p><p class="fix"><b>Instead:</b> judge by bloodwork, not ideology.</p></div>
     <div class="trap"><p class="tnum">TRAP 06</p><h3>Ice bath right after lifting</h3><p>Cold immediately post-strength blunts the hypertrophy signal — you pay for the plunge with lost gains.</p><p class="fix"><b>Instead:</b> separate cold from lifting by 4–6h.</p></div>
     <div class="trap"><p class="tnum">TRAP 07</p><h3>Red-light / infrared as cure-all</h3><p>Narrow real effects (skin, some recovery) get sold as whole-body optimization. Mostly marketing gloss.</p><p class="fix"><b>Instead:</b> treat as a nice-to-have, not a pillar.</p></div>
-    <div class="trap"><p class="tnum">TRAP 08</p><h3>15-pill supplement stacks</h3><p>Cost and complexity balloon; evidence for most is thin. The stack becomes identity, not medicine.</p><p class="fix"><b>Instead:</b> creatine, omega-3, D/Mg if low. Stop.<sup>[7]</sup></p></div>
+    <div class="trap"><p class="tnum">TRAP 08</p><h3>15-pill supplement stacks</h3><p>Cost and complexity balloon; evidence for most is thin. The stack becomes identity, not medicine.</p><p class="fix"><b>Instead:</b> creatine, omega-3, D/Mg if low. Stop.<sup><a href="#r7">[7]</a></sup></p></div>
     <div class="trap"><p class="tnum">TRAP 09</p><h3>"Cleanse" / juice programs</h3><p>No toxin is removed that your organs don't already handle. Often just under-eating with a story attached.</p><p class="fix"><b>Instead:</b> fiber + whole food, permanently.</p></div>
-    <div class="trap"><p class="tnum">TRAP 10</p><h3>Chasing biohacks over basics</h3><p>Tape, plunges and gadgets feel productive while sleep, alcohol and protein — the real levers — go unmanaged.</p><p class="fix"><b>Instead:</b> fix #1–9 before buying anything.<sup>[1][4]</sup></p></div>
+    <div class="trap"><p class="tnum">TRAP 10</p><h3>Chasing biohacks over basics</h3><p>Tape, plunges and gadgets feel productive while sleep, alcohol and protein — the real levers — go unmanaged.</p><p class="fix"><b>Instead:</b> fix #1–9 before buying anything.<sup><a href="#r1">[1]</a><a href="#r4">[4]</a></sup></p></div>
   </div>
 
   <h2 class="section-h">References</h2>
