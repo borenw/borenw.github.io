@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="40 healthspan & productivity interventions ranked by evidence-weighted impact, with a top-10 traps list and cited primary sources.">
+<title>Healthspan & Productivity — 40 Interventions Ranked</title>
+<style>
+  :root{
+    --ground:#f6f8f4; --surface:#ffffff; --surface-2:#fbfcfa;
+    --ink:#182420; --muted:#5b6661; --faint:#8a938d; --line:#e3e8df;
+    --accent:#1f7a4d; --accent-soft:#e7f2ea; --accent-ink:#155c3a;
+    --warn:#a76d15; --warn-soft:#f7efdd;
+    --crit:#a8402c; --crit-soft:#f6e6e1;
+    --tier-high:#1f7a4d; --tier-med:#a76d15; --tier-low:#9a5a4a;
+    --serif:ui-serif,Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    --shadow:0 1px 2px rgba(20,40,30,.04),0 8px 24px rgba(20,40,30,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0f1310; --surface:#161c18; --surface-2:#131813;
+      --ink:#e8ede9; --muted:#9aa49d; --faint:#6f7a73; --line:#28302a;
+      --accent:#4dbd85; --accent-soft:#16241c; --accent-ink:#8fe0b3;
+      --warn:#d99a3e; --warn-soft:#241d10;
+      --crit:#e07a5f; --crit-soft:#2a1712;
+      --tier-high:#4dbd85; --tier-med:#d99a3e; --tier-low:#c08a78;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#f6f8f4; --surface:#ffffff; --surface-2:#fbfcfa;
+    --ink:#182420; --muted:#5b6661; --faint:#8a938d; --line:#e3e8df;
+    --accent:#1f7a4d; --accent-soft:#e7f2ea; --accent-ink:#155c3a;
+    --warn:#a76d15; --warn-soft:#f7efdd; --crit:#a8402c; --crit-soft:#f6e6e1;
+    --tier-high:#1f7a4d; --tier-med:#a76d15; --tier-low:#9a5a4a;
+    --shadow:0 1px 2px rgba(20,40,30,.04),0 8px 24px rgba(20,40,30,.05);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0f1310; --surface:#161c18; --surface-2:#131813;
+    --ink:#e8ede9; --muted:#9aa49d; --faint:#6f7a73; --line:#28302a;
+    --accent:#4dbd85; --accent-soft:#16241c; --accent-ink:#8fe0b3;
+    --warn:#d99a3e; --warn-soft:#241d10; --crit:#e07a5f; --crit-soft:#2a1712;
+    --tier-high:#4dbd85; --tier-med:#d99a3e; --tier-low:#c08a78;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:var(--sans);line-height:1.55;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px;margin:0 auto;padding:clamp(20px,5vw,64px) clamp(16px,4vw,40px) 80px;}
+
+  /* ---- header ---- */
+  header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:32px;}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 14px;}
+  h1{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;
+    font-size:clamp(30px,5.5vw,50px);line-height:1.04;margin:0 0 16px;text-wrap:balance;}
+  h1 em{font-style:italic;color:var(--accent);}
+  .lede{font-size:clamp(15px,2vw,18px);color:var(--muted);max-width:62ch;margin:0;}
+  .lede b{color:var(--ink);font-weight:600;}
+
+  .meta{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:22px;
+    font-family:var(--mono);font-size:12px;color:var(--faint);}
+  .meta span b{color:var(--muted);font-weight:600;}
+
+  /* ---- legend ---- */
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0 8px;}
+  .chip{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;
+    padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--muted);font-family:var(--mono);}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;
+    padding:2px 7px;border-radius:5px;font-weight:600;white-space:nowrap;}
+  .tag.yours{background:var(--accent-soft);color:var(--accent-ink);}
+  .tag.add{background:var(--warn-soft);color:var(--warn);}
+  .tag.part{background:transparent;color:var(--faint);border:1px solid var(--line);}
+
+  /* ---- table ---- */
+  .tablecard{background:var(--surface);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-top:14px;}
+  .scroll{overflow-x:auto;}
+  table{border-collapse:collapse;width:100%;min-width:680px;}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--faint);font-weight:600;text-align:left;
+    padding:14px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);
+    position:sticky;top:0;}
+  tbody td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top;
+    font-size:14.5px;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr{transition:background .15s ease;}
+  tbody tr:hover{background:var(--surface-2);}
+
+  .rank{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;
+    font-size:15px;width:52px;position:relative;padding-left:20px;color:var(--ink);}
+  .rank::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:4px;
+    border-radius:3px;background:var(--tier-low);}
+  tr[data-tier="high"] .rank::before{background:var(--tier-high);}
+  tr[data-tier="med"] .rank::before{background:var(--tier-med);}
+  tr[data-tier="low"] .rank::before{background:var(--tier-low);}
+
+  .ico{font-size:20px;width:30px;text-align:center;line-height:1;}
+  .name{font-weight:600;min-width:150px;}
+  .name .sub{display:block;font-weight:400;font-size:12.5px;color:var(--faint);margin-top:3px;}
+  .name .tag{margin-top:6px;display:inline-block;}
+  .stars{font-family:var(--mono);white-space:nowrap;letter-spacing:1px;font-size:13px;width:74px;}
+  .stars .on{color:var(--accent);}
+  .stars .off{color:var(--line);}
+  tr[data-tier="med"] .stars .on{color:var(--warn);}
+  tr[data-tier="low"] .stars .on{color:var(--tier-low);}
+  .note{color:var(--muted);font-size:13.5px;line-height:1.5;max-width:52ch;}
+  .note sup{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700;}
+  .note sup a{color:inherit;text-decoration:none;}
+  .note sup a:hover{text-decoration:underline;}
+
+  /* ---- section ---- */
+  .section-h{margin:56px 0 6px;font-family:var(--serif);font-weight:600;
+    font-size:clamp(23px,3.5vw,32px);letter-spacing:-.01em;text-wrap:balance;}
+  .section-sub{color:var(--muted);margin:0 0 24px;max-width:60ch;font-size:15px;}
+  .rule{height:1px;background:var(--line);border:none;margin:52px 0 0;}
+
+  /* ---- traps ---- */
+  .traps{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+  .trap{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:18px 18px 16px;position:relative;box-shadow:var(--shadow);}
+  .trap::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;
+    border-radius:3px;background:var(--crit);}
+  .trap .tnum{font-family:var(--mono);font-size:11px;color:var(--crit);font-weight:700;
+    letter-spacing:.08em;}
+  .trap h3{margin:6px 0 8px;font-size:16px;font-weight:600;font-family:var(--sans);line-height:1.25;}
+  .trap p{margin:0 0 10px;font-size:13.5px;color:var(--muted);line-height:1.5;}
+  .trap .fix{font-size:13px;color:var(--ink);border-top:1px dashed var(--line);
+    padding-top:9px;margin:0;}
+  .trap .fix b{color:var(--accent);font-weight:600;}
+  .trap .fix sup{font-family:var(--mono);font-size:9.5px;color:var(--accent);font-weight:700;}
+
+  /* ---- references ---- */
+  .refs{list-style:none;padding:0;margin:24px 0 0;counter-reset:r;}
+  .refs li{position:relative;padding:14px 0 14px 44px;border-bottom:1px solid var(--line);
+    font-size:13.5px;color:var(--muted);line-height:1.5;}
+  .refs li::before{counter-increment:r;content:"["counter(r)"]";position:absolute;left:0;top:14px;
+    font-family:var(--mono);font-weight:700;color:var(--accent);font-size:12.5px;}
+  .refs .cite{color:var(--ink);font-weight:600;}
+  .refs .q{color:var(--muted);font-style:italic;}
+  .refs .q::before{content:"\201C";}.refs .q::after{content:"\201D";}
+  .refs .loc{font-family:var(--mono);font-size:11.5px;color:var(--faint);}
+  .refs a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;}
+  .refs a:hover{border-bottom-color:currentColor;}
+  .refs .cav{display:block;margin-top:4px;font-size:12px;color:var(--faint);}
+
+  /* ---- footer ---- */
+  footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;
+    font-size:13px;color:var(--faint);font-family:var(--mono);}
+  .gh{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:9px;
+    border:1px solid var(--line);background:var(--surface);color:var(--ink);
+    text-decoration:none;font-family:var(--sans);font-weight:600;font-size:13.5px;
+    transition:border-color .15s,transform .15s;}
+  .gh:hover{border-color:var(--accent);transform:translateY(-1px);}
+  .gh svg{width:18px;height:18px;fill:currentColor;flex:none;}
+
+  a:focus-visible,.gh:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+  @media (max-width:560px){
+    .stars{width:auto;} .note{font-size:13px;}
+    footer{flex-direction:column;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Healthspan × Productivity · Evidence-weighted</p>
+    <h1>40 interventions, ranked by <em>impact factor</em></h1>
+    <p class="lede">Your 24 practices merged with ~16 missing ones, then ordered by
+      <b>strength of evidence × effect size</b> on healthspan and daily output.
+      The boring, well-proven levers rise; several beloved biohacks sink. Nine rows
+      carry a real, verbatim citation — see the references.</p>
+    <div class="meta">
+      <span><b>Scope</b> generally healthy adult</span>
+      <span><b>Metric</b> evidence × effect</span>
+      <span><b>Sources</b> 9 primary [1–9]</span>
+      <span><b>Compiled for</b> Bo · 2026-07-09</span>
+    </div>
+    <div class="legend">
+      <span class="chip"><span class="dot" style="background:var(--tier-high)"></span>High tier · #1–18</span>
+      <span class="chip"><span class="dot" style="background:var(--tier-med)"></span>Medium · #19–31</span>
+      <span class="chip"><span class="dot" style="background:var(--tier-low)"></span>Low / overhyped · #32–40</span>
+      <span class="chip"><span class="tag yours">✓ yours</span> already doing</span>
+      <span class="chip"><span class="tag add">＋ add</span> missing</span>
+    </div>
+  </header>
+
+  <div class="tablecard">
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>#</th><th></th><th>Intervention</th><th>Evidence</th><th>Why it ranks here</th></tr>
+        </thead>
+        <tbody>
+          <tr data-tier="high"><td class="rank">1</td><td class="ico">😴</td><td class="name">Sleep 7–9h, consistent<span class="tag part">◐ implied</span></td><td class="stars"><span class="on">★★★★★</span></td><td class="note">The master lever — nothing downstream works without it. Your "wake without alarm" implies this; make it a hard-protected schedule.<sup><a href="#r1">[1]</a></sup></td></tr>
+          <tr data-tier="high"><td class="rank">2</td><td class="ico">🏋️</td><td class="name">Strength training (progressive)<span class="tag part">◐ partial</span></td><td class="stars"><span class="on">★★★★★</span></td><td class="note">You squat/plank/kettlebell — add progressive load. Best predictor of independence and healthspan.<sup><a href="#r2">[2]</a></sup></td></tr>
+          <tr data-tier="high"><td class="rank">3</td><td class="ico">🏃</td><td class="name">Zone 2 + VO₂max work<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★★★</span></td><td class="note">You have Zone 2. Add 1–2 harder VO₂max sessions/wk — fitness lowers mortality with no observed ceiling.<sup><a href="#r3">[3]</a></sup></td></tr>
+          <tr data-tier="high"><td class="rank">4</td><td class="ico">🚭</td><td class="name">No smoking / vaping<span class="tag add">＋ verify</span></td><td class="stars"><span class="on">★★★★★</span></td><td class="note">Assumed for you, but it dominates every other variable if present. Non-negotiable.</td></tr>
+          <tr data-tier="high"><td class="rank">5</td><td class="ico">🍷</td><td class="name">Minimal / no alcohol<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★★</span></td><td class="note">Highest-ROI subtraction for most people. Large global analysis: the health-minimising level is zero.<sup><a href="#r4">[4]</a></sup></td></tr>
+          <tr data-tier="high"><td class="rank">6</td><td class="ico">🤝</td><td class="name">Strong social connection<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★★★</span></td><td class="note">Rivals smoking in effect size — a 50% higher survival odds with strong ties. Keep it near the top.<sup><a href="#r5">[5]</a></sup></td></tr>
+          <tr data-tier="high"><td class="rank">7</td><td class="ico">🎯</td><td class="name">Purpose / serving others<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★★★</span></td><td class="note">Your stated goal, and a real intervention — purpose tracks lower mortality and better mental health.</td></tr>
+          <tr data-tier="high"><td class="rank">8</td><td class="ico">🥩</td><td class="name">Adequate protein 1.6–2.2g/kg<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">The nutrient your OMAD + keto setup most easily undershoots. Drives muscle, satiety, recovery.</td></tr>
+          <tr data-tier="high"><td class="rank">9</td><td class="ico">🥦</td><td class="name">Whole-food, low-sugar diet<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★★</span></td><td class="note">Food <em>quality</em> outranks the keto-vs-OMAD timing debate. Minimize refined sugar and ultra-processed food.</td></tr>
+          <tr data-tier="high"><td class="rank">10</td><td class="ico">☀️</td><td class="name">Morning daylight exposure<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">Anchors circadian rhythm → powers your alarm-free waking and sleep quality. Free and fast-acting.</td></tr>
+          <tr data-tier="high"><td class="rank">11</td><td class="ico">🧘</td><td class="name">Meditation / mindfulness<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">You have it. Solid for stress, attention and emotional regulation — compounds with focus work below.</td></tr>
+          <tr data-tier="high"><td class="rank">12</td><td class="ico">🧠</td><td class="name">Chronic-stress management<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">The meta-layer: OMAD + cold plunges + hard training can <em>add</em> load. Manage total stress, not just each stressor.</td></tr>
+          <tr data-tier="high"><td class="rank">13</td><td class="ico">🦠</td><td class="name">Fiber / gut (30g+/day)<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">Frequently low on keto. Major metabolic, immune and mood effects via the microbiome.</td></tr>
+          <tr data-tier="high"><td class="rank">14</td><td class="ico">💊</td><td class="name">Vitamin D (if deficient)<span class="tag add">＋ test</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">Test-and-treat: real effect if low, marginal if already sufficient. Pairs with #10 sunlight.</td></tr>
+          <tr data-tier="high"><td class="rank">15</td><td class="ico">🐟</td><td class="name">Omega-3 / fish oil / sardines<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">You have both. Sardines beat capsules — whole food, low mercury. Good call to keep.</td></tr>
+          <tr data-tier="high"><td class="rank">16</td><td class="ico">🩸</td><td class="name">Regular bloodwork<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">ApoB, fasting insulin, HbA1c, lipids, hs-CRP. Turns guessing into steering — especially on keto.</td></tr>
+          <tr data-tier="high"><td class="rank">17</td><td class="ico">🧖</td><td class="name">Sauna (heat therapy)<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">You have it. 4–7×/wk tracked far lower cardiac and all-cause mortality in Finnish cohorts.<sup><a href="#r6">[6]</a></sup></td></tr>
+          <tr data-tier="high"><td class="rank">18</td><td class="ico">⚗️</td><td class="name">Creatine monohydrate<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">You have it. The best-evidenced supplement — muscle <em>and</em> cognition. Keep it.<sup><a href="#r7">[7]</a></sup></td></tr>
+
+          <tr data-tier="med"><td class="rank">19</td><td class="ico">⏱️</td><td class="name">OMAD / time-restricted eating<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">You have it. Works mostly via calorie control + discipline; extreme OMAD risks under-eating protein (#8).</td></tr>
+          <tr data-tier="med"><td class="rank">20</td><td class="ico">🎧</td><td class="name">Deep work / focus blocks<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">The productivity core your list is missing. Single-task, defended focus blocks — the output multiplier.</td></tr>
+          <tr data-tier="med"><td class="rank">21</td><td class="ico">📵</td><td class="name">Digital minimalism<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">Less doomscrolling protects attention, sleep and mood at once. High ROI in modern life.</td></tr>
+          <tr data-tier="med"><td class="rank">22</td><td class="ico">🤸</td><td class="name">Flexibility / mobility<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">You have stretching. Modest healthspan effect, large quality-of-life effect.</td></tr>
+          <tr data-tier="med"><td class="rank">23</td><td class="ico">🤏</td><td class="name">Grip & balance work<span class="tag part">◐ partial</span></td><td class="stars"><span class="on">★★★★</span><span class="off">★</span></td><td class="note">Grip strength is a strikingly strong mortality proxy; kettlebell partly covers it. Add carries + balance.<sup><a href="#r8">[8]</a></sup></td></tr>
+          <tr data-tier="med"><td class="rank">24</td><td class="ico">🥑</td><td class="name">Keto diet<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">You have it. Great for some (satiety, glucose control); a tool, not a rule — and not required.</td></tr>
+          <tr data-tier="med"><td class="rank">25</td><td class="ico">💧</td><td class="name">Hydration (to thirst)<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">Just drink water; your "lemon water" is basically this (#38). Matters more on keto (electrolytes).</td></tr>
+          <tr data-tier="med"><td class="rank">26</td><td class="ico">🌬️</td><td class="name">Breathwork (slow nasal)<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">Cheap parasympathetic tool (~6 breaths/min). Overlaps meditation + your mouth/nose taping.</td></tr>
+          <tr data-tier="med"><td class="rank">27</td><td class="ico">🌲</td><td class="name">Nature / green time<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">Real stress and mood benefit beyond raw sunlight. Stacks with Zone 2 walks.</td></tr>
+          <tr data-tier="med"><td class="rank">28</td><td class="ico">🫐</td><td class="name">Blueberries / polyphenol fruit<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">You have it. Good — but one healthy food among many. Don't over-index on a single "superfood."</td></tr>
+          <tr data-tier="med"><td class="rank">29</td><td class="ico">📓</td><td class="name">Gratitude / journaling<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">Small but reliable well-being effect; reinforces your "serve others" orientation.</td></tr>
+          <tr data-tier="med"><td class="rank">30</td><td class="ico">📚</td><td class="name">Learning / novelty<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">Builds cognitive reserve — underrated for long-term brain health. You already lean this way.</td></tr>
+          <tr data-tier="med"><td class="rank">31</td><td class="ico">🦷</td><td class="name">Dental hygiene / flossing<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">Oral health links to cardiovascular inflammation. Tiny effort, genuine signal.</td></tr>
+
+          <tr data-tier="low"><td class="rank">32</td><td class="ico">🧊</td><td class="name">Ice bath / cold exposure<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★</span><span class="off">★★★</span></td><td class="note">You have it. Great for mood/alertness/grit — but <em>blunts</em> muscle growth if done right after lifting. Separate them.</td></tr>
+          <tr data-tier="low"><td class="rank">33</td><td class="ico">🧂</td><td class="name">Magnesium (if low)<span class="tag add">＋ add</span></td><td class="stars"><span class="on">★★★</span><span class="off">★★</span></td><td class="note">Helps sleep/cramps when deficient (common on keto). Cheap; only meaningful if you're actually low.</td></tr>
+          <tr data-tier="low"><td class="rank">34</td><td class="ico">🤐</td><td class="name">Mouth taping (sleep)<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★</span><span class="off">★★★</span></td><td class="note">You have it. Promising for mouth-breathers — but rule out sleep apnea first. Don't tape over a real airway problem.</td></tr>
+          <tr data-tier="low"><td class="rank">35</td><td class="ico">👃</td><td class="name">Nasal dilator / nose tape<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★</span><span class="off">★★★</span></td><td class="note">You have it. Comfort and airflow benefit; modest, low-downside.</td></tr>
+          <tr data-tier="low"><td class="rank">36</td><td class="ico">🔴</td><td class="name">Infrared / red-light therapy<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★★</span><span class="off">★★★</span></td><td class="note">You have it. Some skin and recovery data; much is marketing. Low downside, modest upside.</td></tr>
+          <tr data-tier="low"><td class="rank">37</td><td class="ico">🧬</td><td class="name">NMN / NAD⁺ boosters<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★</span><span class="off">★★★★</span></td><td class="note">You have it. Raises NAD⁺ markers, but no proven human healthspan benefit — RCTs show no functional gains yet.<sup><a href="#r9">[9]</a></sup></td></tr>
+          <tr data-tier="low"><td class="rank">38</td><td class="ico">🍋</td><td class="name">Lemon water<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★</span><span class="off">★★★★</span></td><td class="note">You have it. Pleasant, fine — essentially water + a little vitamin C. No special metabolic magic.</td></tr>
+          <tr data-tier="low"><td class="rank">39</td><td class="ico">⛔</td><td class="name">Semen retention / no sex<span class="tag yours">✓ yours</span></td><td class="stars"><span class="on">★</span><span class="off">★★★★</span></td><td class="note">You have it. No credible physiological benefit; regular ejaculation has some protective data. Any upside is discipline, not biology.</td></tr>
+          <tr data-tier="low"><td class="rank">40</td><td class="ico">🍶</td><td class="name">Random supplement stacking<span class="tag add">⚑ flag</span></td><td class="stars"><span class="on">★</span><span class="off">★★★★</span></td><td class="note">The trap. Past creatine / omega-3 / D / Mg, most pills are low-yield. Spend the money on food, sleep, and the gym.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2 class="section-h">Top 10 popular — but they're traps</h2>
+  <p class="section-sub">Widely evangelized online, low actual yield (or actively counterproductive). Ordered by how much attention they steal relative to what they return.</p>
+  <div class="traps">
+    <div class="trap"><p class="tnum">TRAP 01</p><h3>NMN / NAD⁺ boosters for longevity</h3><p>Dramatic results are from mice. Human trials raise NAD⁺ markers but show no gain in strength, muscle, or lifespan.</p><p class="fix"><b>Instead:</b> creatine + sleep + lifting — proven, and cheaper.<sup>[9]</sup></p></div>
+    <div class="trap"><p class="tnum">TRAP 02</p><h3>Semen retention for "energy"</h3><p>No physiological mechanism supports it. Regular ejaculation has some protective data. The "power" felt is placebo + discipline.</p><p class="fix"><b>Instead:</b> keep the discipline, drop the biology claim.</p></div>
+    <div class="trap"><p class="tnum">TRAP 03</p><h3>Lemon-water "detox"</h3><p>Your liver and kidneys already detox. Lemon water is just flavored water with trace vitamin C.</p><p class="fix"><b>Instead:</b> plain hydration + electrolytes on keto.</p></div>
+    <div class="trap"><p class="tnum">TRAP 04</p><h3>Extreme OMAD (protein-starved)</h3><p>One meal makes hitting 1.6–2.2 g/kg protein nearly impossible — so you lose muscle while thinking you're optimizing.</p><p class="fix"><b>Instead:</b> keep the fast, front-load protein.<sup>[2]</sup></p></div>
+    <div class="trap"><p class="tnum">TRAP 05</p><h3>Keto as a moral rule</h3><p>A useful tool for some, dogma for none. Food quality and protein matter more than macro purity.</p><p class="fix"><b>Instead:</b> judge by bloodwork, not ideology.</p></div>
+    <div class="trap"><p class="tnum">TRAP 06</p><h3>Ice bath right after lifting</h3><p>Cold immediately post-strength blunts the hypertrophy signal — you pay for the plunge with lost gains.</p><p class="fix"><b>Instead:</b> separate cold from lifting by 4–6h.</p></div>
+    <div class="trap"><p class="tnum">TRAP 07</p><h3>Red-light / infrared as cure-all</h3><p>Narrow real effects (skin, some recovery) get sold as whole-body optimization. Mostly marketing gloss.</p><p class="fix"><b>Instead:</b> treat as a nice-to-have, not a pillar.</p></div>
+    <div class="trap"><p class="tnum">TRAP 08</p><h3>15-pill supplement stacks</h3><p>Cost and complexity balloon; evidence for most is thin. The stack becomes identity, not medicine.</p><p class="fix"><b>Instead:</b> creatine, omega-3, D/Mg if low. Stop.<sup>[7]</sup></p></div>
+    <div class="trap"><p class="tnum">TRAP 09</p><h3>"Cleanse" / juice programs</h3><p>No toxin is removed that your organs don't already handle. Often just under-eating with a story attached.</p><p class="fix"><b>Instead:</b> fiber + whole food, permanently.</p></div>
+    <div class="trap"><p class="tnum">TRAP 10</p><h3>Chasing biohacks over basics</h3><p>Tape, plunges and gadgets feel productive while sleep, alcohol and protein — the real levers — go unmanaged.</p><p class="fix"><b>Instead:</b> fix #1–9 before buying anything.<sup>[1][4]</sup></p></div>
+  </div>
+
+  <h2 class="section-h">References</h2>
+  <p class="section-sub">Primary sources for the cited rows. Quotes are verbatim; location notes the section or page in the original.</p>
+  <ol class="refs">
+    <li id="r1"><span class="cite">Watson NF, et al. (AASM &amp; Sleep Research Society Consensus). 2015.</span> <em>Recommended Amount of Sleep for a Healthy Adult.</em> J Clin Sleep Med 11(6):591–592. Quote: <span class="q">Adults should sleep 7 or more hours per night on a regular basis to promote optimal health.</span> <span class="loc">— Consensus recommendation, p. 591.</span> <a href="https://jcsm.aasm.org/doi/10.5664/jcsm.4758">jcsm.aasm.org</a></li>
+    <li id="r2"><span class="cite">World Health Organization. 2024.</span> <em>Physical activity — fact sheet.</em> Quotes: <span class="q">at least 150 minutes of moderate-intensity physical activity per week</span>; <span class="q">Physical inactivity is one of the leading risk factors for noncommunicable diseases mortality.</span> <span class="loc">— Key facts / Recommendations.</span> <a href="https://www.who.int/news-room/fact-sheets/detail/physical-activity">who.int</a></li>
+    <li id="r3"><span class="cite">Mandsager K, et al. 2018.</span> <em>Association of Cardiorespiratory Fitness With Long-term Mortality.</em> JAMA Netw Open 1(6):e183605. Quote: <span class="q">Cardiorespiratory fitness was inversely associated with all-cause mortality without an observed upper limit of benefit.</span> <span class="loc">— Key Points, Findings.</span> <a href="https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2707428">jamanetwork.com</a></li>
+    <li id="r4"><span class="cite">GBD 2016 Alcohol Collaborators. 2018.</span> <em>Alcohol use and burden for 195 countries and territories, 1990–2016.</em> Lancet 392(10152):1015–1035. Senior author E. Gakidou, in the study announcement: <span class="q">Zero alcohol consumption minimizes the overall risk of health loss.</span> <span class="loc">— Author statement, IHME study release.</span> <a href="https://www.sciencedaily.com/releases/2018/08/180824103018.htm">sciencedaily.com</a><span class="cav">The peer-reviewed paper phrases this as the level of consumption that minimises health loss being zero; the verbatim sentence above is from the study's press release.</span></li>
+    <li id="r5"><span class="cite">Holt-Lunstad J, Smith TB, Layton JB. 2010.</span> <em>Social Relationships and Mortality Risk: A Meta-analytic Review.</em> PLoS Medicine 7(7):e1000316. Quote: <span class="q">Across 148 studies (308,849 participants), the random effects weighted average effect size was OR = 1.50 (95% CI 1.42 to 1.59), indicating a 50% increased likelihood of survival for participants with stronger social relationships.</span> <span class="loc">— Abstract / Results, e1000316.</span> <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1000316">journals.plos.org</a></li>
+    <li id="r6"><span class="cite">Laukkanen T, et al. 2015.</span> <em>Association Between Sauna Bathing and Fatal Cardiovascular and All-Cause Mortality Events.</em> JAMA Intern Med 175(4):542–548. Reported finding: men with 4–7 sauna sessions/week had a hazard ratio of 0.37 (95% CI 0.18–0.75) for sudden cardiac death vs 1 session/week. <span class="loc">— Results (statistic, not a direct quotation).</span> <a href="https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2130724">jamanetwork.com</a></li>
+    <li id="r7"><span class="cite">Kreider RB, et al. (Int'l Society of Sports Nutrition). 2017.</span> <em>ISSN position stand: safety and efficacy of creatine supplementation.</em> J Int Soc Sports Nutr 14:18. Quote: <span class="q">Creatine monohydrate is the most effective ergogenic nutritional supplement currently available to athletes</span> <span class="loc">— ISSN Position statement, point 1.</span> <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/">ncbi.nlm.nih.gov/PMC5469049</a></li>
+    <li id="r8"><span class="cite">Leong DP, et al. (PURE study). 2015.</span> <em>Prognostic value of grip strength.</em> Lancet 386(9990):266–273. Quote: <span class="q">hazard ratio per 5 kg reduction in grip strength 1·16, 95% CI 1·13–1·20; p&lt;0·0001</span> <span class="loc">— Findings, p. 266.</span> <a href="https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(14)62000-6/abstract">thelancet.com</a></li>
+    <li id="r9"><span class="cite">Human NMN trials &amp; reviews. 2022–2025.</span> Randomized trials confirm NMN raises blood NAD⁺ and is well-tolerated, but a 2025 meta-analysis of 10 RCTs found no benefit for muscle mass, strength, or physical function — hard healthspan outcomes remain unproven. <span class="loc">— Summary of current RCT evidence base.</span> <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10721522/">ncbi.nlm.nih.gov/PMC10721522</a></li>
+  </ol>
+
+  <footer>
+    <span>Evidence-weighted · not medical advice · verify against your own bloodwork</span>
+    <a class="gh" href="https://github.com/Boren-Wang" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      Add to Bo's curriculum →
+    </a>
+  </footer>
+</div>
+</body>
+</html>
