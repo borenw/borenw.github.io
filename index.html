@@ -373,8 +373,21 @@
 
   <footer>
     Bo Wang · <a href="https://github.com/borenw">github.com/borenw</a> · full flat list at <a href="https://borenw.github.io/Repo-Summary/">Repo-Summary</a>
+    <br><span id="lastmod" style="color:var(--text-sub);font-size:12px"></span>
   </footer>
 </div>
 
+<script>
+  (function(){
+    var el = document.getElementById('lastmod');
+    if (!el) return;
+    var d = new Date(document.lastModified);
+    var txt = isNaN(d.getTime())
+      ? document.lastModified
+      : d.toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'})
+        + ' ' + d.toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit'});
+    el.textContent = 'Last updated: ' + txt;
+  })();
+</script>
 </body>
 </html>
