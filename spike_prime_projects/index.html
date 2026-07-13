@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEGO SPIKE Prime — Project Ideas Gallery</title>
+<style>
+  :root{--blue:#0052CC;--blue-dark:#0747A6;--blue-light:#DEEBFF;--ink:#172B4D;--muted:#5E6C84;--line:#DFE1E6;}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px 60px}
+  .banner{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;padding:24px 30px;border-radius:0 0 6px 6px}
+  .banner h1{margin:0;font-size:23px}
+  .banner .sub{margin-top:6px;font-size:14px;opacity:.92}
+  .banner .pill{display:inline-block;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:12px;font-size:12.5px;margin-top:10px}
+  .index{background:#F4F5F7;border:1px solid var(--line);border-radius:6px;padding:14px 20px;margin-top:16px}
+  .index h2{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .index ul{margin:0;padding-left:20px}
+  .index a{color:var(--blue);text-decoration:none}
+  .index a:hover{text-decoration:underline}
+  h2.sec{background:var(--blue-light);color:var(--blue-dark);padding:9px 14px;border-left:4px solid var(--blue);border-radius:3px;font-size:17px;margin:32px 0 6px}
+  .note{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+  .grid-big{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+  .grid-big .thumb{aspect-ratio:1/1}
+  .grid-big .title{font-size:15.5px}
+  a.imglink{display:block;width:100%;height:100%}
+  .card{border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;background:#fff;transition:box-shadow .15s}
+  .card:hover{box-shadow:0 4px 14px rgba(9,30,66,.12)}
+  .thumb{position:relative;width:100%;aspect-ratio:4/3;background:#F4F5F7;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:contain;background:#fff}
+  .thumb .fallback{display:none;text-align:center;padding:14px;color:var(--muted);font-size:13px}
+  .card.noimg .thumb img{display:none}
+  .card.noimg .thumb .fallback{display:block}
+  .card .body{padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .card .title{font-weight:600;font-size:14.5px}
+  .card .tag{font-size:11px;color:var(--muted)}
+  .card a.btn{margin-top:auto;display:inline-block;font-size:12.5px;color:#fff;background:var(--blue);text-decoration:none;padding:5px 10px;border-radius:5px;text-align:center}
+  .card a.btn:hover{background:var(--blue-dark)}
+  footer{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  footer a{color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="banner">
+  <h1>🤖 LEGO® SPIKE™ Prime — Project Ideas Gallery</h1>
+  <div class="sub">A one-page pick-your-build board for Ryan — official robot designs + advanced builds, each with a link to instructions.</div>
+  <span class="pill">🧱 25 projects · tap a card for build instructions</span>
+</div>
+
+<div class="wrap">
+  <nav class="index">
+    <h2>📑 Sections</h2>
+    <ul>
+      <li><a href="#starter">1. Robot designs &amp; build instructions (great starting points)</a></li>
+      <li><a href="#advanced">2. Advanced / show-off builds</a></li>
+      <li><a href="#profbricks">3. More builds — Prof Bricks (themed &amp; advanced)</a></li>
+    </ul>
+  </nav>
+
+  <h2 class="sec" id="starter">1. Robot designs &amp; build instructions</h2>
+  <p class="note">Free step-by-step PDFs from primelessons.org — click <strong>Build it →</strong> for the instructions.</p>
+  <div class="grid" id="grid1"></div>
+
+  <h2 class="sec" id="advanced">2. Advanced / show-off builds</h2>
+  <p class="note">Cooler, harder projects from Pybricks — good "wow" goals to work toward.</p>
+  <div class="grid" id="grid2"></div>
+
+  <h2 class="sec" id="profbricks">3. More builds — Prof Bricks (themed &amp; advanced)</h2>
+  <p class="note">Big-icon board of themed builds (medical, animals, arms) from Prof Bricks / Benedettelli — tap any picture to open its build page.</p>
+  <div class="grid grid-big" id="grid3"></div>
+
+  <footer>
+    Images are linked live from their source sites and may take a moment to load (or show a placeholder if a site blocks hotlinking — the <em>Build it →</em> link still works).<br>
+    Sources: <a href="https://primelessons.org/en/RobotDesigns.html">primelessons.org Robot Designs</a> · <a href="https://pybricks.com/project/spike-prime/">Pybricks SPIKE Prime projects</a> · <a href="https://robotics.benedettelli.com/category/lego-spike-prime/">Prof Bricks (Benedettelli) SPIKE Prime</a>
+  </footer>
+</div>
+
+<script>
+  var starter=[
+    {n:"Coop Bot",t:"Chicken-style walker",img:"https://primelessons.org/RobotDesigns/images/Chicken.png",u:"https://primelessons.org/RobotDesigns/instructions/CoopBot.pdf"},
+    {n:"Droid Bot M (Modular)",t:"Classic driving base",img:"https://primelessons.org/RobotDesigns/images/DBMSP.png",u:"https://primelessons.org/RobotDesigns/instructions/DroidBotMSpikePrime.pdf"},
+    {n:"Droid Bot E (Expansion)",t:"Uses expansion set",img:"https://primelessons.org/RobotDesigns/images/DBE.png",u:"https://primelessons.org/RobotDesigns/instructions/DroidBotEBuildInstructions.pdf"},
+    {n:"Droid Bot IV",t:"Popular competition base",img:"https://primelessons.org/RobotDesigns/images/DBIV.png",u:"https://primelessons.org/RobotDesigns/instructions/DroidBotIVBuildInstructions.pdf"},
+    {n:"ADB (Modified)",t:"All-purpose driving base",img:"https://primelessons.org/RobotDesigns/images/ADB.png",u:"https://primelessons.org/RobotDesigns/instructions/ADBModifications.pdf"},
+    {n:"Tricky Grab and Lift",t:"Grabber arm build",img:"https://primelessons.org/RobotDesigns/images/TrickyGrabandLift.png",u:"https://primelessons.org/RobotDesigns/instructions/TrickyGrabandLift.pdf"},
+    {n:"Tic-Tac-Toe Bot",t:"Plays tic-tac-toe",img:"https://primelessons.org/RobotDesigns/images/tic-tac-toe.png",u:"https://primelessons.org/RobotDesigns/instructions/tic-tac-toe.pdf"},
+    {n:"Earthquake Simulator",t:"Shake-table machine",img:"https://primelessons.org/RobotDesigns/images/SPEarthquakeSimulator.png",u:"https://primelessons.org/RobotDesigns/instructions/SPEarthquakeSimulator.pdf"},
+    {n:"Print and Scan",t:"Printer/scanner build",img:"https://primelessons.org/RobotDesigns/images/PrintandScan.jpg",u:"https://primelessons.org/RobotDesigns/instructions/PrintandScan.lms"}
+  ];
+  var advanced=[
+    {n:"Groceries (machine learning)",t:"Sorts objects with AI camera",img:"https://pybricks.com/project/spike-prime/groceries/groceries.jpg",u:"https://pybricks.com/project/machine-learning-groceries/"},
+    {n:"Robotic arm with vision",t:"Camera-tracking arm",img:"https://pybricks.com/project/spike-prime/arm/camera-arm.jpg",u:"https://pybricks.com/project/robot-arm-camera-tracker/"},
+    {n:"Ball balancer",t:"Balances on top of a ball",img:"https://pybricks.com/project/spike-prime/balancer/spike-balancer.jpg",u:"https://pybricks.com/project/lego-spike-ball-balancer/"},
+    {n:"Hub menu launcher",t:"Run many programs from a menu",img:"https://pybricks.com/project/spike-prime/spike-hubmenu-small.jpg",u:"https://pybricks.com/project/spike-hub-menu/"}
+  ];
+  function render(list,elId){
+    var g=document.getElementById(elId);
+    list.forEach(function(p){
+      var c=document.createElement('div');c.className='card';
+      c.innerHTML=
+        '<div class="thumb"><img src="'+p.img+'" alt="'+p.n+'" loading="lazy" '+
+        'onerror="this.closest(\'.card\').classList.add(\'noimg\')">'+
+        '<div class="fallback">🧱 '+p.n+'<br><span style="font-size:11px">(image didn\'t load — use the link)</span></div></div>'+
+        '<div class="body"><div class="title">'+p.n+'</div><div class="tag">'+p.t+'</div>'+
+        '<a class="btn" href="'+p.u+'" target="_blank" rel="noopener">Build it →</a></div>';
+      g.appendChild(c);
+    });
+  }
+  var profbricks=[
+    {n:"Powered Exoskeleton",t:"Medical theme",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/04/spike_exo_cover_1x1.jpg",u:"https://robotics.benedettelli.com/spike-prime-powered-exoskeleton/"},
+    {n:"Balancing Wheelchair",t:"Medical theme",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/05/spike_wheelchair_web.jpg",u:"https://robotics.benedettelli.com/spike-prime-balancing-robot/"},
+    {n:"Scanner Hat",t:"Medical theme",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/04/scanner_hat_cover_1x1.jpg",u:"https://robotics.benedettelli.com/spike-prime-scanner-hat/"},
+    {n:"Robot Arm + Joystick",t:"Surgical / pick-and-place",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/03/spike_surgical_arm_web.jpg",u:"https://robotics.benedettelli.com/spike-prime-pick-and-place-robot-joystick/"},
+    {n:"Adaptive Claw",t:"Grabber with jaw",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/05/spike_power_claw_cover_web.jpg",u:"https://robotics.benedettelli.com/spike-prime-adaptive-claw/"},
+    {n:"T-Shirt Folding Robot",t:"Folds a shirt",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/05/spike_t-shirt_folding_robot_cover_web.jpg",u:"https://robotics.benedettelli.com/spike-prime-t-shirt-folding-robot/"},
+    {n:"SPIKE Prime Cat",t:"Animal build",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/04/spike-cat-cover-web.jpg",u:"https://robotics.benedettelli.com/spike-prime-cat/"},
+    {n:"Brick-Sorting Bird",t:"Animal + sorting",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/05/SPIKE-sorting-bird-web.jpg",u:"https://robotics.benedettelli.com/spike-learning-brick-sorter-bird-2/"},
+    {n:"Walking Bug (Hexapod)",t:"Six-legged walker",img:"https://robotics.benedettelli.com/wp-content/uploads/2023/08/SPIKE-bug-product-cover.jpg",u:"https://robotics.benedettelli.com/spike-prime-bug-hexapod/"},
+    {n:"Guide Robot",t:"Rolling helper bot",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/04/spike-guide-robot-product-cover.jpg",u:"https://robotics.benedettelli.com/spike-prime-guide-robot/"},
+    {n:"Self-Driving Car",t:"Autonomous car",img:"https://robotics.benedettelli.com/wp-content/uploads/2023/07/SPIKE-car-product-cover.jpg",u:"https://robotics.benedettelli.com/spike-prime-car/"},
+    {n:"Color-Sorting Robot",t:"Sorts by color",img:"https://robotics.benedettelli.com/wp-content/uploads/2024/03/SPIKE_sorter_cover_web.jpg",u:"https://robotics.benedettelli.com/spike-prime-color-sorter/"}
+  ];
+  function renderBig(list,elId){
+    var g=document.getElementById(elId);
+    list.forEach(function(p){
+      var c=document.createElement('div');c.className='card';
+      c.innerHTML=
+        '<div class="thumb"><a class="imglink" href="'+p.u+'" target="_blank" rel="noopener">'+
+        '<img src="'+p.img+'" alt="'+p.n+'" loading="lazy" '+
+        'onerror="this.closest(\'.card\').classList.add(\'noimg\')"></a>'+
+        '<div class="fallback">🧱 '+p.n+'<br><span style="font-size:11px">(image didn\'t load — use the link)</span></div></div>'+
+        '<div class="body"><div class="title">'+p.n+'</div><div class="tag">'+p.t+'</div>'+
+        '<a class="btn" href="'+p.u+'" target="_blank" rel="noopener">Open build →</a></div>';
+      g.appendChild(c);
+    });
+  }
+  render(starter,'grid1');
+  render(advanced,'grid2');
+  renderBig(profbricks,'grid3');
+</script>
+</body>
+</html>
