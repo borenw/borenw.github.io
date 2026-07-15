@@ -19,6 +19,8 @@
     --grey-bg: #F4F5F7;
     --orange: #FF8B00;
     --orange-bg: #FFF7E6;
+    --red: #DE350B;
+    --red-bg: #FFEBE6;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -97,6 +99,8 @@
   .live { background: var(--green-bg); color: var(--green); }
   .repo { background: var(--orange-bg); color: var(--orange); }
   .soon { background: var(--grey-bg); color: var(--grey); }
+  .public { background: var(--blue-light); color: var(--blue); }
+  .private { background: var(--red-bg); color: var(--red); }
   tr.placeholder td { color: var(--grey); }
   tr.placeholder td.ch { color: var(--grey); }
   footer { margin-top: 50px; text-align: center; color: var(--text-sub); font-size: 13px; }
@@ -255,7 +259,7 @@
           </div>
         </details>
         <a href="https://github.com/borenw/TIA_explorer">TIA Explorer</a> <span class="desc">— transimpedance amplifier notebook</span></td>
-        <td><span class="badge repo">GITHUB</span></td></tr>
+        <td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td class="ch">Bias</td><td><a href="https://github.com/borenw/current-mirror-sky130">Current Mirror — Sooch vs. 2-stack Cascode (SKY130)</a> <span class="desc">— NMOS bias current mirror on the open PDK: wide-swing Sooch vs standard cascode</span><br>
         <a href="https://github.com/borenw/wscm-sky130/blob/master/report.html">Wide-Swing Cascode Current Mirror — LVT-PMOS bias (SKY130)</a> <span class="desc">— annotated schematic + 1-click Cadence SKILL generator + report (private)</span>
         <details class="fig">
@@ -265,9 +269,9 @@
             <div class="figcap">Both mirrors are two NMOS tall (a cascode), so both get the ~g<sub>m</sub>r<sub>o</sub><sup>2</sup> output resistance. The <b>2-stack cascode</b> self-biases its cascode gate to 2·V<sub>gs</sub>, wasting ≈V<sub>t</sub> on the bottom device and starving the output cascode (V<sub>ds</sub> = 0.15 V → R<sub>out</sub> only 5.5 MΩ). The <b>Sooch wide-swing</b> mirror adds one ¼-size bias device that drops the cascode gate to V<sub>t</sub>+2V<sub>ov</sub>, seating the bottom pair at V<sub>dsat</sub> — recovering <b>~0.4 V of output swing</b> <i>and</i> giving <b>~5× the R<sub>out</sub></b> (26 MΩ) at mid-rail. Full ngspice write-up, annotated schematics and reproducible testbenches in the <a href="https://github.com/borenw/current-mirror-sky130">repo</a>.</div>
           </div>
         </details>
-        </td><td><span class="badge repo">GITHUB</span></td></tr>
+        </td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr><td class="ch">Ch. 3</td><td><a href="https://borenw.github.io/Bode_Plot_Sandbox/">Bode Plot Sandbox</a> <span class="desc">— GUI frequency-response explorer</span></td><td><span class="badge live">LIVE</span></td></tr>
-      <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/clamp-protection-loop">Feedback &amp; Stability — Delayed Hysteretic Shunt-Clamp Protection Loop (SKY130)</a> <span class="desc">— an LDO overvoltage clamp as a relay-feedback loop: hysteresis + loop delay → a bounded limit cycle. Time-domain SKY130/ngspice study showing overshoot = slew·τ<sub>loop</sub> and a max-safe-delay damage bound. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span></td></tr>
+      <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/clamp-protection-loop">Feedback &amp; Stability — Delayed Hysteretic Shunt-Clamp Protection Loop (SKY130)</a> <span class="desc">— an LDO overvoltage clamp as a relay-feedback loop: hysteresis + loop delay → a bounded limit cycle. Time-domain SKY130/ngspice study showing overshoot = slew·τ<sub>loop</sub> and a max-safe-delay damage bound. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 5</td><td>Noise Analysis</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr><td class="ch">Ch. 6</td><td><a href="https://borenw.github.io/Biquad-Sandbox/">Biquad Sandbox</a> <span class="desc">— play with biquad coefficients to create filters</span></td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td class="ch">Ch. 7</td><td><a href="https://borenw.github.io/Crystal-Oscillator/">Crystal Oscillator</a> <span class="desc">— oscillator visualizer</span></td><td><span class="badge live">LIVE</span></td></tr>
@@ -276,7 +280,7 @@
         <a href="https://github.com/borenw/Delta-Sigma-Modulation---Simple-Example">ΔΣ Modulation — Simple Example</a> <span class="desc">(MATLAB)</span><br>
         <a href="https://borenw.github.io/grumpy-worm/">grumPy WorM</a> <span class="desc">— PWM/ΔΣ teaching toy as a flappy game</span> · <a href="https://borenw.github.io/grumpy_worm/">pygbag version</a></td>
         <td><span class="badge live">LIVE</span></td></tr>
-      <tr><td class="ch">Ch. 9</td><td><a href="https://github.com/borenw/Analog-Leetcode">Analog Leetcode</a> <span class="desc">— problem sets &amp; drills</span></td><td><span class="badge repo">GITHUB</span></td></tr>
+      <tr><td class="ch">Ch. 9</td><td><a href="https://github.com/borenw/Analog-Leetcode">Analog Leetcode</a> <span class="desc">— problem sets &amp; drills</span></td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
     </table>
   </div>
 
@@ -287,8 +291,8 @@
       <tr><th>Chapter</th><th>Project</th><th>Status</th></tr>
       <tr class="placeholder"><td class="ch">Ch. 1</td><td>Semiconductor Fundamentals</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 2</td><td>PN Junctions &amp; Diodes</td><td><span class="badge soon">PLANNED</span></td></tr>
-      <tr><td class="ch">Ch. 3</td><td><a href="https://github.com/borenw/gmid-device-char">gm/ID Device Characterization</a> <span class="desc">— MOSFET operation notebook</span></td><td><span class="badge repo">GITHUB</span></td></tr>
-      <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/voltage-buffer-sky130#why-lowering-the-bias-current-cant-reclaim-headroom--the-vdsat-floor">Why lowering the bias current can't reclaim headroom — the V<sub>dsat</sub> floor</a> <span class="desc">— from the Voltage Buffer (SKY130) write-up</span></td><td><span class="badge repo">GITHUB</span></td></tr>
+      <tr><td class="ch">Ch. 3</td><td><a href="https://github.com/borenw/gmid-device-char">gm/ID Device Characterization</a> <span class="desc">— MOSFET operation notebook</span></td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/voltage-buffer-sky130#why-lowering-the-bias-current-cant-reclaim-headroom--the-vdsat-floor">Why lowering the bias current can't reclaim headroom — the V<sub>dsat</sub> floor</a> <span class="desc">— from the Voltage Buffer (SKY130) write-up</span></td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 5</td><td>Short-Channel Effects &amp; Scaling</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr><td class="ch">Ch. 6</td><td><a href="https://borenw.github.io/ESD/">ESD — Protection &amp; Debug Hub</a> <span class="desc">— 4 pages: debug master reference · damage first principles · current vs voltage · Rpo ballasting case study</span></td><td><span class="badge live">LIVE</span></td></tr>
     </table>
@@ -326,10 +330,10 @@
     <div class="course-banner">📒 Power Electronics <span class="code">EE 153</span></div>
     <table>
       <tr><th>Chapter</th><th>Project</th><th>Status</th></tr>
-      <tr><td class="ch">Ch. 1</td><td><a href="https://github.com/borenw/Flywheel-converter">Flywheel Converter</a></td><td><span class="badge repo">GITHUB</span></td></tr>
+      <tr><td class="ch">Ch. 1</td><td><a href="https://github.com/borenw/Flywheel-converter">Flywheel Converter</a></td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td class="ch">Ch. 2</td><td>
         <a href="http://localhost:8888/lab/tree/Buck_explorer_v1.ipynb">Buck Converter — Interactive Explorer</a> <span class="desc">— CCM/DCM &amp; voltage/peak-current-mode notebook (local Jupyter)</span> · <a href="https://github.com/borenw/borenw.github.io/blob/main/Buck_explorer_v1.ipynb">view on GitHub</a></td>
-        <td><span class="badge repo">GITHUB</span></td></tr>
+        <td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 3</td><td>Magnetics Design</td><td><span class="badge soon">PLANNED</span></td></tr>
     </table>
   </div>
@@ -341,7 +345,7 @@
       <tr><th>Chapter</th><th>Project</th><th>Status</th></tr>
       <tr class="placeholder"><td class="ch">Ch. 1</td><td>Feedback &amp; Block Diagrams</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 2</td><td>Stability &amp; Root Locus</td><td><span class="badge soon">PLANNED</span></td></tr>
-      <tr><td class="ch">Ch. 3</td><td><a href="https://github.com/borenw/clamp-protection-loop">Relay Feedback &amp; Limit Cycles — Delayed Hysteretic Clamp Loop (SKY130)</a> <span class="desc">— a hysteretic (relay) shunt-clamp with transport delay: the classic relay-plus-delay limit-cycle oscillator, worked in the time domain on real SKY130 devices. Derives the overshoot law V<sub>peak</sub>=V<sub>on</sub>+slew·τ and a maximum-loop-delay stability bound, all verified in ngspice. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span></td></tr>
+      <tr><td class="ch">Ch. 3</td><td><a href="https://github.com/borenw/clamp-protection-loop">Relay Feedback &amp; Limit Cycles — Delayed Hysteretic Clamp Loop (SKY130)</a> <span class="desc">— a hysteretic (relay) shunt-clamp with transport delay: the classic relay-plus-delay limit-cycle oscillator, worked in the time domain on real SKY130 devices. Derives the overshoot law V<sub>peak</sub>=V<sub>on</sub>+slew·τ and a maximum-loop-delay stability bound, all verified in ngspice. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 4</td><td>PID &amp; Loop Shaping</td><td><span class="badge soon">PLANNED</span></td></tr>
     </table>
   </div>
@@ -353,11 +357,11 @@
       <tr><th>Tool</th><th>Description</th><th>Status</th></tr>
       <tr><td><a href="https://borenw.github.io/Schematic/">Schematic</a></td><td class="desc">Schematic drawing tool</td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td><a href="https://borenw.github.io/Brighten-EDA-Dark-Theme/">Brighten EDA Dark Theme</a></td><td class="desc">Make EDA screenshots readable</td><td><span class="badge live">LIVE</span></td></tr>
-      <tr><td><a href="https://github.com/borenw/calibre-drc-lvs-gui">Calibre DRC / LVS GUI</a></td><td class="desc">Browser GUI to launch Calibre DRC/LVS in your shell env — prefill from logs, auto module-load, newest-deck discovery, live ETA, result compare</td><td><span class="badge repo">GITHUB</span></td></tr>
-      <tr><td><a href="https://github.com/borenw/run-csh-ihdl-gui">Run .csh + ihdl lock-check GUI</a></td><td class="desc">Run a .csh in your shell env with a Cliosoft-SOS lock-check guard for Cadence ihdl (verify schematic/symbol aren't checked out first) — live log + ETA</td><td><span class="badge repo">GITHUB</span></td></tr>
-      <tr><td><a href="https://github.com/borenw/Voice-to-SVG">Voice to SVG</a></td><td class="desc">Voice → vector graphics</td><td><span class="badge repo">GITHUB</span></td></tr>
+      <tr><td><a href="https://github.com/borenw/calibre-drc-lvs-gui">Calibre DRC / LVS GUI</a></td><td class="desc">Browser GUI to launch Calibre DRC/LVS in your shell env — prefill from logs, auto module-load, newest-deck discovery, live ETA, result compare</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td><a href="https://github.com/borenw/run-csh-ihdl-gui">Run .csh + ihdl lock-check GUI</a></td><td class="desc">Run a .csh in your shell env with a Cliosoft-SOS lock-check guard for Cadence ihdl (verify schematic/symbol aren't checked out first) — live log + ETA</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td><a href="https://github.com/borenw/Voice-to-SVG">Voice to SVG</a></td><td class="desc">Voice → vector graphics</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://borenw.github.io/Repo-Summary/">Repo Summary</a></td><td class="desc">Auto-updating list of all published repos</td><td><span class="badge live">LIVE</span></td></tr>
-      <tr><td><a href="https://github.com/borenw/ls-home-notebook">ls-home-notebook</a></td><td class="desc">Home notebook (Jupyter)</td><td><span class="badge repo">GITHUB</span></td></tr>
+      <tr><td><a href="https://github.com/borenw/ls-home-notebook">ls-home-notebook</a></td><td class="desc">Home notebook (Jupyter)</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
     </table>
   </div>
 
@@ -390,7 +394,7 @@
       <tr><td><a href="https://borenw.github.io/Lake-Fulmore/">Lake Fulmore</a></td><td class="desc">Trip page</td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td><a href="https://borenw.github.io/Campsite-Movies/">Campsite Movies</a></td><td class="desc">Movie picker for camping</td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td><a href="https://borenw.github.io/piano-theory/">Piano Theory</a></td><td class="desc">Music theory toy</td><td><span class="badge live">LIVE</span></td></tr>
-      <tr><td><a href="spike_prime_projects/">LEGO SPIKE Prime — Project Ideas</a></td><td class="desc">Pick-your-build gallery of 25 SPIKE Prime robot designs &amp; advanced builds, each linking to instructions</td><td><span class="badge live">LIVE</span></td></tr>
+      <tr><td><a href="spike_prime_projects/"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="vertical-align:-4px;margin-right:6px"><circle cx="8" cy="6.5" r="2.4" fill="#FFDE4D" stroke="#C9A200" stroke-width="1"/><circle cx="16" cy="6.5" r="2.4" fill="#FFDE4D" stroke="#C9A200" stroke-width="1"/><rect x="6" y="6.5" width="4" height="4" fill="#FFDE4D"/><rect x="14" y="6.5" width="4" height="4" fill="#FFDE4D"/><rect x="3" y="9.5" width="18" height="11" rx="2" fill="#F5CD2F" stroke="#C9A200" stroke-width="1"/><rect x="6" y="6.5" width="4" height="3.5" fill="none" stroke="#C9A200" stroke-width="1"/><rect x="14" y="6.5" width="4" height="3.5" fill="none" stroke="#C9A200" stroke-width="1"/></svg>LEGO SPIKE Prime — Project Ideas</a></td><td class="desc">Pick-your-build gallery of 25 SPIKE Prime robot designs &amp; advanced builds, each linking to instructions</td><td><span class="badge live">LIVE</span></td></tr>
     </table>
   </div>
 
