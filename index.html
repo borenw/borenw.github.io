@@ -146,7 +146,7 @@
         <ul><li><a href="#emrf">4.1 Inductance · 4.2 RLC Transients · 4.3 S-Parameters</a></li></ul>
       </li>
       <li><a href="#power">5. Power Electronics</a>
-        <ul><li><a href="#power">5.2 Buck Converter — Interactive Explorer (CCM/DCM)</a></li></ul>
+        <ul><li><a href="#power">5.2 Buck Converter — Interactive Explorer (CCM/DCM) · 5.4 Board-Level RLC / Coupling Spec</a></li></ul>
       </li>
       <li><a href="#controls">6. Control Systems</a>
         <ul><li><a href="#controls">6.3 Relay Feedback &amp; Limit Cycles — delayed hysteretic clamp loop</a></li></ul>
@@ -335,6 +335,7 @@
         <a href="http://localhost:8888/lab/tree/Buck_explorer_v1.ipynb">Buck Converter — Interactive Explorer</a> <span class="desc">— CCM/DCM &amp; voltage/peak-current-mode notebook (local Jupyter)</span> · <a href="https://github.com/borenw/borenw.github.io/blob/main/Buck_explorer_v1.ipynb">view on GitHub</a></td>
         <td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 3</td><td>Magnetics Design</td><td><span class="badge soon">PLANNED</span></td></tr>
+      <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/board-level-rlc-spec">Board-Level RLC Spec for IC Pins — Multiphase Buck</a> <span class="desc">— parasitic RLC budget &amp; victim/aggressor coupling spec for a multiphase buck controller. Interactive spec explorer: aggressor/victim pin-group dropdowns (power, PWM, clock, data, V/I/temp/ref sense) and a ranked list of coupling mechanisms (mutual-L, ground-return, capacitive, PDN, reflection…) that derives the board mutual-inductance / C<sub>ac</sub> / ground-return limits from each victim's error budget (M ≤ 8.3 pH per aggressor). Bench-sketch coupling schematic + worked V<sub>emf</sub>=M·dI/dt. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
     </table>
   </div>
 
