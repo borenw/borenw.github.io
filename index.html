@@ -38,6 +38,12 @@
   .banner h1 { font-size: 28px; font-weight: 600; margin-bottom: 6px; }
   .banner p { opacity: .85; font-size: 15px; }
   .container { max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }
+  .mosaic { display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:4px; max-width:1000px; margin:14px auto 0; padding:0 12px; }
+  .mosaic a { position:relative; aspect-ratio:1; overflow:hidden; border-radius:6px; border:1px solid var(--border); background:#f4f5f7; }
+  .mosaic img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .22s ease; }
+  .mosaic a:hover img { transform:scale(1.09); }
+  .mosaic a:hover { border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-light); z-index:2; }
+  @media (max-width:520px){ .mosaic { grid-template-columns:repeat(auto-fill,minmax(60px,1fr)); } }
 
   /* Table of contents */
   .toc {
@@ -120,6 +126,39 @@
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
 </div>
+
+<div class="mosaic" aria-label="Visual index of all pages">
+    <a href="https://borenw.github.io/gbw-power-area-tradeoff/" title="GBW · Power · Area"><img src="img/mosaic/gbw.jpg" alt="GBW · Power · Area" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/ibis-model-builder/" title="IBIS Model Builder"><img src="img/mosaic/ibis.jpg" alt="IBIS Model Builder" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Bode_Plot_Sandbox/" title="Bode Plot Sandbox"><img src="img/mosaic/bode.jpg" alt="Bode Plot Sandbox" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/ota-inverting-amp-explorer/" title="OTA Inverting Amp"><img src="img/mosaic/ota.jpg" alt="OTA Inverting Amp" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Biquad-Sandbox/" title="Biquad Sandbox"><img src="img/mosaic/biquad.jpg" alt="Biquad Sandbox" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Crystal-Oscillator/" title="Crystal Oscillator"><img src="img/mosaic/crystal.jpg" alt="Crystal Oscillator" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/ring-oscillator-model/" title="Ring Oscillator — Phase Model"><img src="img/mosaic/ringosc.jpg" alt="Ring Oscillator — Phase Model" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/grumpy-worm/" title="grumPy WorM"><img src="img/mosaic/grumpy.jpg" alt="grumPy WorM" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/gm-id-estimator/" title="gm/Id First-Order Estimator"><img src="img/mosaic/gmid.jpg" alt="gm/Id First-Order Estimator" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/ESD/" title="ESD — Protection & Debug Hub"><img src="img/mosaic/esd.jpg" alt="ESD — Protection & Debug Hub" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/3D-Fourier-Cos-Sin/" title="3D Fourier Cos/Sin"><img src="img/mosaic/fourier3d.jpg" alt="3D Fourier Cos/Sin" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/finger-multiplication/" title="Finger Multiplication"><img src="img/mosaic/finger.jpg" alt="Finger Multiplication" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Inductance-Calculator-Visual/" title="Inductance Calculator"><img src="img/mosaic/inductance.jpg" alt="Inductance Calculator" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Transient-Switch-L-C/" title="Transient L-C-SW"><img src="img/mosaic/transient.jpg" alt="Transient L-C-SW" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/What-is-S11-when-shorted-to-GND/" title="S11 when Shorted to GND"><img src="img/mosaic/s11.jpg" alt="S11 when Shorted to GND" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Schematic/" title="Schematic Tool"><img src="img/mosaic/schematic.jpg" alt="Schematic Tool" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Brighten-EDA-Dark-Theme/" title="Brighten EDA Dark Theme"><img src="img/mosaic/brighten.jpg" alt="Brighten EDA Dark Theme" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/esd-io-pin-tracer/" title="ESD / IO Pin Tracer"><img src="img/mosaic/esdio.jpg" alt="ESD / IO Pin Tracer" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/verilog-pin-mismatch-debugger/" title="Verilog Pin Mismatch Debugger"><img src="img/mosaic/verilog.jpg" alt="Verilog Pin Mismatch Debugger" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Repo-Summary/" title="Repo Summary"><img src="img/mosaic/reposum.jpg" alt="Repo Summary" loading="lazy" width="320" height="320"></a>
+    <a href="biohacking.html" title="40 Biohacks, Ranked"><img src="img/mosaic/biohack.jpg" alt="40 Biohacks, Ranked" loading="lazy" width="320" height="320"></a>
+    <a href="rsa/" title="RSA by Hand"><img src="img/mosaic/rsa.jpg" alt="RSA by Hand" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Catch-Bigfoot/" title="Catch Bigfoot"><img src="img/mosaic/bigfoot.jpg" alt="Catch Bigfoot" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Roadblocks/" title="Roadblocks"><img src="img/mosaic/roadblocks.jpg" alt="Roadblocks" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Lake-Fulmore/" title="Lake Fulmore"><img src="img/mosaic/lake.jpg" alt="Lake Fulmore" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/Campsite-Movies/" title="Campsite Movies"><img src="img/mosaic/campsite.jpg" alt="Campsite Movies" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/piano-theory/" title="Piano Theory"><img src="img/mosaic/piano.jpg" alt="Piano Theory" loading="lazy" width="320" height="320"></a>
+    <a href="spike_prime_projects/" title="LEGO SPIKE Prime"><img src="img/mosaic/spike.jpg" alt="LEGO SPIKE Prime" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/chip-packaging-explorer/" title="Advanced Packaging Explorer"><img src="img/mosaic/packaging.jpg" alt="Advanced Packaging Explorer" loading="lazy" width="320" height="320"></a>
+</div>
+
 
 <div class="container">
 
