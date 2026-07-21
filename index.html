@@ -164,8 +164,8 @@
 
   <div class="stats">
     <div class="stat"><div class="num">7</div><div class="lbl">Courses</div></div>
-    <div class="stat"><div class="num">27</div><div class="lbl">Live Pages</div></div>
-    <div class="stat"><div class="num">35</div><div class="lbl">Repositories</div></div>
+    <div class="stat"><div class="num">28</div><div class="lbl">Live Pages</div></div>
+    <div class="stat"><div class="num">36</div><div class="lbl">Repositories</div></div>
   </div>
 
   <!-- ============ INDEX ============ -->
@@ -384,6 +384,7 @@
       <tr class="placeholder"><td class="ch">Ch. 3</td><td>Magnetics Design</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/board-level-rlc-spec">Board-Level RLC Spec for IC Pins — Multiphase Buck</a> <span class="desc">— parasitic RLC budget &amp; victim/aggressor coupling spec for a multiphase buck controller. Interactive spec explorer: aggressor/victim pin-group dropdowns (power, PWM, clock, data, V/I/temp/ref sense) and a ranked list of coupling mechanisms (mutual-L, ground-return, capacitive, PDN, reflection…) that derives the board mutual-inductance / C<sub>ac</sub> / ground-return limits from each victim's error budget (M ≤ 8.3 pH per aggressor). Bench-sketch coupling schematic + worked V<sub>emf</sub>=M·dI/dt. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://borenw.github.io/inductive-crosstalk/">Inductive Crosstalk (Aggressor → Victim)</a> <span class="desc">— coupled 4-state RLC crosstalk explorer: a primary series-RLC loop (aggressor I<sub>1</sub>) mutually coupled by M to a secondary L<sub>2</sub>–R<sub>2</sub>–C<sub>2</sub> victim loop (measured across C<sub>2</sub>). Shows the transient of I<sub>1</sub>, the induced EMF M·dI<sub>1</sub>/dt and the filtered victim, and solves the separation d for a target victim peak (Case A far / 1 mV, Case B near / 100 mV, live Case C runs the actual RK4 ODE). Ships a one-click SciPy reproduction of the Case A table row (matches to &lt;0.5%).</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td class="ch">Ch. 4</td><td><a href="https://borenw.github.io/capacitive-crosstalk/">Capacitive Crosstalk (Aggressor → Victim)</a> <span class="desc">— coupling-cap crosstalk explorer: aggressor V<sub>agg</sub> couples through R<sub>1</sub>–C<sub>1</sub> into a victim R<sub>2</sub>∥C<sub>2</sub> node (a band-pass / high-pass). Interactive log-time transient shows the R<sub>1</sub>-limited response vs the R<sub>1</sub>=0 ideal-divider dashed reference, with τ<sub>1</sub>=R<sub>1</sub>C<sub>1</sub>C<sub>2</sub>/(C<sub>1</sub>+C<sub>2</sub>) &amp; τ<sub>2</sub>=R<sub>2</sub>(C<sub>1</sub>+C<sub>2</sub>) marked. Closed-form victim peak V<sub>A</sub>·C<sub>1</sub>/(C<sub>1</sub>+C<sub>2</sub>)·(τ<sub>1</sub>/τ<sub>2</sub>)^(τ<sub>1</sub>/(τ<sub>2</sub>−τ<sub>1</sub>)), verified vs a 2-state RK4 sim.</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
     </table>
   </div>
 
@@ -499,6 +500,7 @@
       <tr><td class="ch">29</td><td><a href="https://borenw.github.io/chip-packaging-explorer/">Advanced Packaging Explorer</a></td></tr>
       <tr><td class="ch">29</td><td><a href="https://borenw.github.io/mcm-browser/">MCM / Package Browser</a></td></tr>
       <tr><td class="ch">30</td><td><a href="https://borenw.github.io/inductive-crosstalk/">Inductive Crosstalk (Aggressor → Victim)</a></td></tr>
+      <tr><td class="ch">31</td><td><a href="https://borenw.github.io/capacitive-crosstalk/">Capacitive Crosstalk (Aggressor → Victim)</a></td></tr>
     </table>
     <p style="font-size:12.5px;color:var(--text-sub);margin-top:8px">Page numbers are permanent and append-only — a new page always takes the next number (29, 30, …), existing pages are never renumbered. Each page also shows its number in its own footer.</p>
   </div>
