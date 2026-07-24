@@ -34,9 +34,18 @@
     color: #fff;
     padding: 36px 24px 28px;
     text-align: center;
+    position: relative;
   }
   .banner h1 { font-size: 28px; font-weight: 600; margin-bottom: 6px; }
   .banner p { opacity: .85; font-size: 15px; }
+  /* Site revision badge — bump on every change (see CLAUDE.md "Revision rule"). */
+  .banner .rev {
+    position: absolute; top: 12px; right: 14px;
+    font-size: 12px; font-weight: 700; letter-spacing: .02em;
+    background: rgba(255,255,255,.20); color: #fff;
+    padding: 4px 11px; border-radius: 13px; white-space: nowrap;
+  }
+  @media (max-width:520px){ .banner .rev { top: 8px; right: 8px; font-size: 11px; } }
   .container { max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }
   .mosaic { display:grid; grid-template-columns:repeat(auto-fill,minmax(117px,1fr)); gap:5px; max-width:1200px; margin:14px auto 0; padding:0 12px; }
   .mosaic a { position:relative; aspect-ratio:1; overflow:hidden; border-radius:6px; border:1px solid var(--border); background:#f4f5f7; }
@@ -123,6 +132,7 @@
 
 
 <div class="banner">
+  <span class="rev" id="siterev">rev 59</span>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
 </div>

@@ -13,6 +13,15 @@ Guidance for Claude Code when working in this repository (Bo's Engineering Curri
   2. **The Page Registry** in this repo's `index.html` (the `#pages` section) — one row per page: number, title, link.
 - When you **create or add a new page**, allocate the next number, add its footer, and add its Registry row in the same change.
 
+## Revision rule (REQUIRED)
+
+**The site carries a visible revision number: the `rev N` badge in `index.html`'s banner (`<span class="rev" id="siterev">`).**
+
+- **On EVERY change you push to this repo** (editing `index.html`, adding/updating a Registry row, editing `biohacking.html` or any page/asset that lives directly in this repo), **increment that number by exactly 1** in the same commit — e.g. `rev 59` → `rev 60`. Never skip, reuse, or decrement it.
+- The number is a plain monotonic counter (not a date, not a git hash). One push that touches several files = one bump.
+- If you somehow can't find the badge, it is the `rev N` pill in the top-right of the `<div class="banner">`; restore it before pushing.
+- This is how the reader (and the next Claude) can tell at a glance which build is live. Treat it like the page-number rule: a hard requirement, done as part of the change, not an afterthought.
+
 ## Chart / figure rule (REQUIRED)
 
 **Every chart, plot, or figure on any page must carry a title or a figure number** (e.g. `Figure 3 · First-order constants vs process node`). Number figures per page (Figure 1, 2, 3 …) in reading order, and give each a short descriptive title. This applies to canvas plots, SVG diagrams, embedded images used as figures — anything a reader would call "a figure." Dual-axis charts must label each y-axis with its quantity **and color-match the axis label to its curve**.
