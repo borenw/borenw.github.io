@@ -39,13 +39,26 @@
   .banner h1 { font-size: 28px; font-weight: 600; margin-bottom: 6px; }
   .banner p { opacity: .85; font-size: 15px; }
   /* Site revision badge — bump on every change (see CLAUDE.md "Revision rule"). */
-  .banner .rev {
+  .banner .revbadges {
     position: absolute; top: 12px; right: 14px;
+    display: flex; gap: 6px; align-items: center;
+  }
+  .banner .rev, .banner .age {
     font-size: 12px; font-weight: 700; letter-spacing: .02em;
     background: rgba(255,255,255,.20); color: #fff;
     padding: 4px 11px; border-radius: 13px; white-space: nowrap;
   }
-  @media (max-width:520px){ .banner .rev { top: 8px; right: 8px; font-size: 11px; } }
+  .banner .age { font-weight: 600; opacity: .9; }
+  .banner .chk {
+    font-size: 12px; font-weight: 700; padding: 4px 11px; border-radius: 13px;
+    white-space: nowrap; background: rgba(255,255,255,.20); color: #fff; cursor: default;
+  }
+  .banner .chk.ok    { background: var(--green-bg); color: var(--green); }
+  .banner .chk.stale { background: #fff; color: var(--red); box-shadow: 0 0 0 2px var(--red); }
+  @media (max-width:520px){
+    .banner .revbadges { top: 8px; right: 8px; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+    .banner .rev, .banner .age, .banner .chk { font-size: 11px; padding: 3px 9px; }
+  }
   .container { max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }
   .mosaic { display:grid; grid-template-columns:repeat(auto-fill,minmax(117px,1fr)); gap:5px; max-width:1200px; margin:14px auto 0; padding:0 12px; }
   .mosaic a { position:relative; aspect-ratio:1; overflow:hidden; border-radius:6px; border:1px solid var(--border); background:#f4f5f7; }
@@ -132,7 +145,11 @@
 
 
 <div class="banner">
-  <span class="rev" id="siterev">rev 59</span>
+  <div class="revbadges">
+    <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
+    <span class="age" id="siteage" data-built="2026-07-24T23:10:46Z">built …</span>
+    <span class="rev" id="siterev">rev 60</span>
+  </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
 </div>
@@ -533,6 +550,66 @@
 </div>
 
 <script>
+  /* Age badge: how long since THIS build was authored (data-built, set at edit
+     time — see CLAUDE.md "Revision rule"). If the age looks older than your last
+     edit, you're viewing a cached copy; the tooltip says how to force-refresh. */
+  (function(){
+    var el = document.getElementById('siteage');
+    if (!el) return;
+    var built = new Date(el.getAttribute('data-built'));
+    var revEl = document.getElementById('siterev');
+    function rel(){
+      if (isNaN(built.getTime())) { el.textContent = 'built ?'; return; }
+      var s = Math.max(0, (Date.now() - built.getTime()) / 1000), t;
+      if (s < 60)        t = Math.floor(s) + 's';
+      else if (s < 3600) t = Math.floor(s / 60) + 'm';
+      else if (s < 86400) t = Math.floor(s / 3600) + 'h';
+      else               t = Math.floor(s / 86400) + 'd';
+      el.textContent = 'built ' + t + ' ago';
+      var rev = revEl ? revEl.textContent.replace(/\D/g, '') : '?';
+      el.title = 'This build: ' + built.toUTCString() + '  (rev ' + rev + ').\n' +
+        'If that is older than your last edit, you are viewing a cached copy — ' +
+        'hard-refresh with Ctrl-Shift-R (Cmd-Shift-R on Mac).';
+    }
+    rel();
+    setInterval(rel, 30000);
+  })();
+  /* Live freshness self-check: ask the GitHub API for the latest commit on main
+     and compare it to THIS build's data-built. Tells the reader whether they're
+     looking at the newest pushed build, a cached copy, or can't tell. */
+  (function(){
+    var pill = document.getElementById('sitecheck');
+    if (!pill || !window.fetch) return;
+    var ageEl = document.getElementById('siteage');
+    var built = ageEl ? new Date(ageEl.getAttribute('data-built')) : new Date(NaN);
+    var SLACK = 360000; // 6 min: this build's own commit lands shortly after data-built
+    fetch('https://api.github.com/repos/borenw/borenw.github.io/commits?per_page=1&sha=main',
+          { headers: { 'Accept': 'application/vnd.github+json' } })
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(a){
+        if (!a || !a.length) throw new Error('no commits');
+        var c = a[0], when = new Date(c.commit.committer.date), sha = c.sha.slice(0, 7);
+        if (isNaN(built.getTime()) || when.getTime() > built.getTime() + SLACK) {
+          var s = (Date.now() - when.getTime()) / 1000;
+          var t = s < 3600 ? Math.round(s/60)+'m' : (s < 86400 ? Math.round(s/3600)+'h' : Math.round(s/86400)+'d');
+          pill.textContent = '⚠ newer build — hard-refresh';
+          pill.className = 'chk stale';
+          pill.title = 'A newer commit (' + sha + ', pushed ' + t + ' ago) exists than the build you are viewing.\n'
+            + 'You are on a cached copy — hard-refresh: Ctrl-Shift-R (Cmd-Shift-R on Mac).\n'
+            + 'If it still lags right after a push, GitHub Pages can take ~1 min to deploy.';
+        } else {
+          pill.textContent = '✓ latest';
+          pill.className = 'chk ok';
+          pill.title = 'You are viewing the newest pushed build (' + sha + ', ' + when.toUTCString() + ').';
+        }
+      })
+      .catch(function(e){
+        pill.textContent = 'freshness: offline';
+        pill.className = 'chk';
+        pill.title = 'Could not reach the GitHub API to verify freshness (' + e.message + ').\n'
+          + 'The rev/built badges still reflect the exact build you loaded.';
+      });
+  })();
   (function(){
     var el = document.getElementById('lastmod');
     if (!el) return;
