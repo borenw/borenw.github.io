@@ -147,8 +147,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-07-26T14:27:08Z">built …</span>
-    <span class="rev" id="siterev">rev 65</span>
+    <span class="age" id="siteage" data-built="2026-07-27T16:07:14Z">built …</span>
+    <span class="rev" id="siterev">rev 66</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -170,7 +170,7 @@
     <a href="https://borenw.github.io/Inductance-Calculator-Visual/" title="Inductance Calculator"><img src="img/mosaic/inductance.jpg" alt="Inductance Calculator" loading="lazy" width="320" height="320"></a>
     <a href="https://borenw.github.io/Transient-Switch-L-C/" title="Transient L-C-SW"><img src="img/mosaic/transient.jpg" alt="Transient L-C-SW" loading="lazy" width="320" height="320"></a>
     <a href="https://borenw.github.io/What-is-S11-when-shorted-to-GND/" title="S11 when Shorted to GND"><img src="img/mosaic/s11.jpg" alt="S11 when Shorted to GND" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Schematic/" title="Schematic Tool"><img src="img/mosaic/schematic.jpg" alt="Schematic Tool" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/SVG-Editor-Lite/" title="SVG Editor Lite"><img src="img/mosaic/schematic.jpg" alt="SVG Editor Lite" loading="lazy" width="320" height="320"></a>
     <a href="https://borenw.github.io/Brighten-EDA-Dark-Theme/" title="Brighten EDA Dark Theme"><img src="img/mosaic/brighten.jpg" alt="Brighten EDA Dark Theme" loading="lazy" width="320" height="320"></a>
     <a href="https://borenw.github.io/esd-io-pin-tracer/" title="ESD / IO Pin Tracer"><img src="img/mosaic/esdio.jpg" alt="ESD / IO Pin Tracer" loading="lazy" width="320" height="320"></a>
     <a href="https://borenw.github.io/verilog-pin-mismatch-debugger/" title="Verilog Pin Mismatch Debugger"><img src="img/mosaic/verilog.jpg" alt="Verilog Pin Mismatch Debugger" loading="lazy" width="320" height="320"></a>
@@ -416,6 +416,7 @@
       <tr><td class="ch">Ch. 4</td><td><a href="https://borenw.github.io/capacitive-crosstalk/">Capacitive Crosstalk (Aggressor → Victim)</a> <span class="desc">— coupling-cap crosstalk explorer: aggressor V<sub>agg</sub> couples through R<sub>1</sub>–C<sub>1</sub> into a victim R<sub>2</sub>∥C<sub>2</sub> node (a band-pass / high-pass). Interactive log-time transient shows the R<sub>1</sub>-limited response vs the R<sub>1</sub>=0 ideal-divider dashed reference, with τ<sub>1</sub>=R<sub>1</sub>C<sub>1</sub>C<sub>2</sub>/(C<sub>1</sub>+C<sub>2</sub>) &amp; τ<sub>2</sub>=R<sub>2</sub>(C<sub>1</sub>+C<sub>2</sub>) marked. Closed-form victim peak V<sub>A</sub>·C<sub>1</sub>/(C<sub>1</sub>+C<sub>2</sub>)·(τ<sub>1</sub>/τ<sub>2</sub>)^(τ<sub>1</sub>/(τ<sub>2</sub>−τ<sub>1</sub>)), verified vs a 2-state RK4 sim.</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://borenw.github.io/aggressor-victim-info/">Aggressor / Victim Info Builder</a> <span class="desc">— type &amp; save aggressor (driver) + victim (receiver) pad info for SI crosstalk, with one-click macros for popular ICs (multiphase buck/boost, audio codec, DDR5 memory, BLDC motor gate driver) and optional R<sub>in</sub>/R<sub>out</sub>/C<sub>in</sub>/dV min–max (blank ⇒ single value). Exports the sectioned <code>#&nbsp;AGGRESSORS</code>/<code>#&nbsp;VICTIMS</code> CSV that the Inductive-Crosstalk Spec Checker imports (paste or browse .csv).</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://borenw.github.io/parasitic-extraction-viewer/">Parasitic Extraction (.cir) Table Viewer</a> <span class="desc">— drop or paste a SPICE parasitic-extraction netlist and get sortable/filterable tables + copy-paste Confluence/Markdown markup for mutual&nbsp;L (K couplings → M=k·√(L<sub>a</sub>·L<sub>b</sub>)), self&nbsp;L, mutual&nbsp;C and self&nbsp;C-to-GND, each with a pie summary, value-range filter and heat-bar ranking. Net filters take glob wildcards (<code>*PWM*</code>) and also match the element name; the Mutual-Inductance table opens pre-filtered Net1=<code>*PWM*</code> / Net2=<code>*CS*</code> to surface PWM-aggressor → current-sense-victim couplings.</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/crosstalk-spectrum">Crosstalk Buffer Approximation &amp; Spectrum</a> <span class="desc">— aggressor→victim AC cap-coupling, worked as an imaginary unity-gain buffer that decouples the network into two independent transfer functions. Interactive spectrum, a 1 MHz square-wave aggressor drive &amp; its harmonic spectrum, transient waveforms, and Python reference simulations. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
     </table>
   </div>
 
@@ -446,7 +447,7 @@
     <div class="course-banner">🛠 Lab Tools <span class="code">SHOP 101</span></div>
     <table>
       <tr><th>Tool</th><th>Description</th><th>Status</th></tr>
-      <tr><td><a href="https://borenw.github.io/Schematic/">Schematic</a></td><td class="desc">Schematic drawing tool</td><td><span class="badge live">LIVE</span></td></tr>
+      <tr><td><a href="https://borenw.github.io/SVG-Editor-Lite/">SVG Editor Lite</a></td><td class="desc">Lightweight SVG editor</td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td><a href="https://borenw.github.io/Brighten-EDA-Dark-Theme/">Brighten EDA Dark Theme</a></td><td class="desc">Make EDA screenshots readable</td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td><a href="https://github.com/borenw/calibre-drc-lvs-gui">Calibre DRC / LVS GUI</a></td><td class="desc">Browser GUI to launch Calibre DRC/LVS in your shell env — prefill from logs, auto module-load, newest-deck discovery, live ETA, result compare</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://github.com/borenw/maestro-to-adexl-gui">Maestro → ADE XL Converter GUI</a></td><td class="desc">Browser GUI that converts a Cadence ADE Assembler/Explorer (maestro) setup into a legacy ADE XL (adexl) cellview from the full path of a maestro view — pure file transform in your shell env (no Virtuoso needed), live log, and a per-file fidelity report diffing against any existing adexl view for the cell</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
@@ -521,7 +522,7 @@
       <tr><td class="ch">13</td><td><a href="https://borenw.github.io/Inductance-Calculator-Visual/">Inductance Calculator (Visual)</a></td></tr>
       <tr><td class="ch">14</td><td><a href="https://borenw.github.io/Transient-Switch-L-C/">Transient Switch L-C</a></td></tr>
       <tr><td class="ch">15</td><td><a href="https://borenw.github.io/What-is-S11-when-shorted-to-GND/">What is S11 when shorted to GND?</a></td></tr>
-      <tr><td class="ch">16</td><td><a href="https://borenw.github.io/Schematic/">Schematic</a></td></tr>
+      <tr><td class="ch">16</td><td><a href="https://borenw.github.io/SVG-Editor-Lite/">SVG Editor Lite</a></td></tr>
       <tr><td class="ch">17</td><td><a href="https://borenw.github.io/Brighten-EDA-Dark-Theme/">Brighten EDA Dark Theme</a></td></tr>
       <tr><td class="ch">18</td><td><a href="https://borenw.github.io/esd-io-pin-tracer/">ESD / IO Pin Tracer</a></td></tr>
       <tr><td class="ch">19</td><td><a href="https://borenw.github.io/verilog-pin-mismatch-debugger/">Verilog Pin Mismatch Debugger</a></td></tr>
