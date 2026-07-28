@@ -147,8 +147,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-07-27T16:07:14Z">built …</span>
-    <span class="rev" id="siterev">rev 66</span>
+    <span class="age" id="siteage" data-built="2026-07-28T13:42:31Z">built …</span>
+    <span class="rev" id="siterev">rev 67</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -185,6 +185,7 @@
     <a href="spike_prime_projects/" title="LEGO SPIKE Prime"><img src="img/mosaic/spike.jpg" alt="LEGO SPIKE Prime" loading="lazy" width="320" height="320"></a>
     <a href="https://borenw.github.io/chip-packaging-explorer/" title="Advanced Packaging Explorer"><img src="img/mosaic/packaging.jpg" alt="Advanced Packaging Explorer" loading="lazy" width="320" height="320"></a>
     <a href="https://borenw.github.io/3d-print-tools/" title="3D Print Tools — Easy Support &amp; 3D Browser"><img src="img/mosaic/print3d.jpg" alt="3D Print Tools — Easy Support &amp; 3D Browser" loading="lazy" width="320" height="320"></a>
+    <a href="https://borenw.github.io/3d-markup-overlay-viewer/" title="3D Markup + Overlay Viewer"><img src="img/mosaic/markup3d.jpg" alt="3D Markup + Overlay Viewer" loading="lazy" width="320" height="320"></a>
 </div>
 
 
@@ -192,8 +193,8 @@
 
   <div class="stats">
     <div class="stat"><div class="num">7</div><div class="lbl">Courses</div></div>
-    <div class="stat"><div class="num">32</div><div class="lbl">Live Pages</div></div>
-    <div class="stat"><div class="num">41</div><div class="lbl">Repositories</div></div>
+    <div class="stat"><div class="num">33</div><div class="lbl">Live Pages</div></div>
+    <div class="stat"><div class="num">42</div><div class="lbl">Repositories</div></div>
   </div>
 
   <!-- ============ INDEX ============ -->
@@ -464,6 +465,7 @@
       <tr><td><a href="https://github.com/borenw/ls-home-notebook">ls-home-notebook</a></td><td class="desc">Home notebook (Jupyter)</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://borenw.github.io/3d-print-tools/">🖨️ 3D Print Tools — Easy Support &amp; 3D Browser</a> <span class="desc">(<a href="https://github.com/borenw/3d-print-tools">repo</a>)</span></td><td class="desc">Two client-side tools. <b>Easy Support</b>: detects overhangs by grid-sampled downward raycasting and builds tapered supports with slim contact tips (default <b>4× smaller</b> contact area) for clean removal — reads .3mf/.stl, exports a valid .3mf (+ .stl), measured reduction shown live. <b>3D Browser + editor</b>: drag-and-drop viewer for STL / 3MF / OBJ / PLY / glTF with slicer-style mouse (left orbit, middle pan, wheel zoom) and mm dimensions — plus push/pull a flat face (M), detach a weakly-attached part chopped at its narrowest neck (O), and a surface-relative snapping ruler (K)</td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://github.com/borenw/circuit-ruler-3d-print">📏 Circuit Stencil Ruler (3D print)</a></td><td class="desc">Printable circuit-drafting stencil ruler (190 × 118 × 3 mm): engraved <b>cm + inch scales</b> plus <b>19 through-cut schematic symbols traced faithfully from the source SVG</b> (inverter/Schmitt, logic gates, latch &amp; flip-flop, MOSFETs, resistor, inductor, capacitor, ground, diode, op-amp, V/I sources, meter, transformer, switch) that you trace with a pen. A Python generator (shapely + trimesh) parses <code>template_ruler.svg</code>, arranges/sizes the real shapes, and auto-adds tiny <b>stencil bridges</b> to every enclosed island (31 islands / 34 ties) so nothing drops out — the STL is one watertight solid. Ships the <code>.stl</code>, draft render and generator</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td><a href="https://borenw.github.io/3d-markup-overlay-viewer/">🧩 3D Markup + Overlay Viewer</a> <span class="desc">(<a href="https://github.com/borenw/3d-markup-overlay-viewer">repo</a>)</span></td><td class="desc">Single-file, fully offline viewer for a 3D model that you can <b>mark up in 2D</b> and <b>overlay for comparison</b>. Reads <code>.stl</code> / <code>.3mf</code> / <code>.obj</code> (drag-drop or picker), all parsed locally. <b>Overlays</b> load on the <i>same coordinates</i> so a lid and its tile line up — rendered semi-transparent with an <b>X-ray</b> toggle to reveal overlap. Six orthographic views (top/bottom/front/back/left/right) plus a free <b>isometric</b> orbit, live mm scale bar and model dimensions. Draw <b>pen / line / arrow / box</b> markup (color palette + adjustable thickness) locked to the current view, then <b>export the render + markup as a PNG</b>. Three.js + JSZip inlined — no build, no network calls</td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
     </table>
   </div>
 
@@ -546,6 +548,7 @@
       <tr><td class="ch">36</td><td><a href="https://borenw.github.io/austin-baby-chicks/">🐣 Austin Baby Chicks — Store Finder</a></td></tr>
       <tr><td class="ch">37</td><td><a href="https://borenw.github.io/3d-print-tools/">3D Print Tools — Easy Support &amp; 3D Browser</a></td></tr>
       <tr><td class="ch">38</td><td><a href="https://borenw.github.io/magtile-circuits/">🧩 MagTile Circuits — 1-Second LED Blinker</a></td></tr>
+      <tr><td class="ch">39</td><td><a href="https://borenw.github.io/3d-markup-overlay-viewer/">3D Markup + Overlay Viewer</a></td></tr>
     </table>
     <p style="font-size:12.5px;color:var(--text-sub);margin-top:8px">Page numbers are permanent and append-only — a new page always takes the next number (29, 30, …), existing pages are never renumbered. Each page also shows its number in its own footer.</p>
   </div>
