@@ -147,8 +147,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-07-30T18:03:44Z">built …</span>
-    <span class="rev" id="siterev">rev 68</span>
+    <span class="age" id="siteage" data-built="2026-07-30T19:07:23Z">built …</span>
+    <span class="rev" id="siterev">rev 69</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -193,8 +193,8 @@
 
   <div class="stats">
     <div class="stat"><div class="num">7</div><div class="lbl">Courses</div></div>
-    <div class="stat"><div class="num">33</div><div class="lbl">Live Pages</div></div>
-    <div class="stat"><div class="num">43</div><div class="lbl">Repositories</div></div>
+    <div class="stat"><div class="num">34</div><div class="lbl">Live Pages</div></div>
+    <div class="stat"><div class="num">46</div><div class="lbl">Repositories</div></div>
   </div>
 
   <!-- ============ INDEX ============ -->
@@ -345,8 +345,11 @@
         </td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr><td class="ch">Bias</td><td><a href="https://github.com/borenw/cascode-bias-vo-swing">Cascode Bias Stack — Maximizing V<sub>o</sub> Swing via R<sub>i</sub></a> <span class="desc">— ngspice study of a 2-NMOS cascode bias string: R<sub>i</sub> sets V<sub>bias</sub>=V<sub>gs</sub>+I<sub>B</sub>·R<sub>i</sub> and positions the internal cascode node V<sub>o</sub> (branch current fixed at I<sub>B</sub>=10&nbsp;µA). Includes a 2-D R<sub>i</sub>-vs-V<sub>o</sub> sweep with the both-in-saturation window shaded and the dV<sub>o</sub>/dR<sub>i</sub>=I<sub>B</sub> slope labeled at 30&nbsp;kΩ; R<sub>i</sub>≈30&nbsp;kΩ centers V<sub>o</sub> for max symmetric swing (±0.18&nbsp;V). Also covers hand-sketch annotated operating points, a Verilog-A resistor model (OpenVAF→OSDI), resistor-programmed AND/OR/NAND/NOR logic, and a differential version (~13.6&nbsp;V/V).</span></td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td class="ch">Ch. 3</td><td><a href="https://borenw.github.io/Bode_Plot_Sandbox/">Bode Plot Sandbox</a> <span class="desc">— GUI frequency-response explorer</span></td><td><span class="badge live">LIVE</span></td></tr>
+      <tr><td class="ch">Ch. 3</td><td><a href="https://borenw.github.io/feedback-divider-freq-response/">Feedback Divider — Frequency-Response Analyzer</a> <span class="desc">— interactive Bode analysis of a 3-resistor DC-DC feedback divider with feed-forward cap C<sub>z</sub> and filter cap C<sub>p</sub>: exact transfer function solved live, magnitude &amp; phase plots, pole/zero table, resistance-split pie, and a one-click shareable preload link. The HF pole sits at R<sub>1</sub>‖R<sub>3</sub> (matches TI SLVA289B feed-forward pole), not the sketch's R<sub>1</sub>+R<sub>3</sub>.</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td class="ch">Ch. 3</td><td><a href="https://github.com/borenw/amplifier-1xsf-rc-splitting">Miller Two-Stage Amp (1× SF + RC Pole-Splitting) — Frequency Response</a> <span class="desc">— error-amp → 1× source-follower buffer → g<sub>2</sub> pass device with Miller cap C<sub>m</sub>; the buffer steers C<sub>m</sub> to cancel the RHP zero (indirect / Ahuja). Live magnitude/phase, gain-budget pie, ranked pole/zero table, and a g<sub>m</sub>/I<sub>D</sub> bias table; defaults recover Allen Ex 23-1 (70 dB, GBW 5 MHz, PM 60°). <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://borenw.github.io/ota-inverting-amp-explorer/">OTA Inverting Amp — V<sub>o</sub>/V<sub>i</sub> Explorer</a> <span class="desc">— interactive single-file explorer for an OTA inverting stage: plots |V<sub>o</sub>/V<sub>i</sub>| vs 1/R<sub>sw</sub>, 1/R<sub>i</sub> or g<sub>m</sub>, and shows the Miller-compensation feedback zero migrate LHP → ∞ → RHP (transmission null) as g·R<sub>f</sub> crosses 1</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/clamp-protection-loop">Feedback &amp; Stability — Delayed Hysteretic Shunt-Clamp Protection Loop (SKY130)</a> <span class="desc">— an LDO overvoltage clamp as a relay-feedback loop: hysteresis + loop delay → a bounded limit cycle. Time-domain SKY130/ngspice study showing overshoot = slew·τ<sub>loop</sub> and a max-safe-delay damage bound. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
+      <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/amplifier-current-loop">PadCs Error-Amp Current Loop — Stability Analysis</a> <span class="desc">— multi-stage Miller-compensated transconductance loop (I<sub>in</sub>→1→2→3→4→I<sub>in</sub>): pole/zero map sorted from 0 Hz, phase-budget pie, magnitude/phase Bode. The nulling resistor R<sub>z</sub> parks a LHP zero at ≈4.2 MHz for phase lead → PM ≈ 64° at f<sub>c</sub> = 13.8 MHz (Allen Ex 23-1 device values). <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 5</td><td>Noise Analysis</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr><td class="ch">Ch. 6</td><td><a href="https://borenw.github.io/Biquad-Sandbox/">Biquad Sandbox</a> <span class="desc">— play with biquad coefficients to create filters</span></td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td class="ch">Ch. 7</td><td><a href="https://borenw.github.io/Crystal-Oscillator/">Crystal Oscillator</a> <span class="desc">— oscillator visualizer</span></td><td><span class="badge live">LIVE</span></td></tr>
@@ -550,6 +553,7 @@
       <tr><td class="ch">37</td><td><a href="https://borenw.github.io/3d-print-tools/">3D Print Tools — Easy Support &amp; 3D Browser</a></td></tr>
       <tr><td class="ch">38</td><td><a href="https://borenw.github.io/magtile-circuits/">🧩 MagTile Circuits — 1-Second LED Blinker</a></td></tr>
       <tr><td class="ch">39</td><td><a href="https://borenw.github.io/3d-markup-overlay-viewer/">3D Markup + Overlay Viewer</a></td></tr>
+      <tr><td class="ch">40</td><td><a href="https://borenw.github.io/feedback-divider-freq-response/">Feedback Divider — Frequency-Response Analyzer</a></td></tr>
     </table>
     <p style="font-size:12.5px;color:var(--text-sub);margin-top:8px">Page numbers are permanent and append-only — a new page always takes the next number (29, 30, …), existing pages are never renumbered. Each page also shows its number in its own footer.</p>
   </div>
