@@ -147,8 +147,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-07-28T13:42:31Z">built …</span>
-    <span class="rev" id="siterev">rev 67</span>
+    <span class="age" id="siteage" data-built="2026-07-30T18:03:44Z">built …</span>
+    <span class="rev" id="siterev">rev 68</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -194,7 +194,7 @@
   <div class="stats">
     <div class="stat"><div class="num">7</div><div class="lbl">Courses</div></div>
     <div class="stat"><div class="num">33</div><div class="lbl">Live Pages</div></div>
-    <div class="stat"><div class="num">42</div><div class="lbl">Repositories</div></div>
+    <div class="stat"><div class="num">43</div><div class="lbl">Repositories</div></div>
   </div>
 
   <!-- ============ INDEX ============ -->
@@ -466,6 +466,7 @@
       <tr><td><a href="https://borenw.github.io/3d-print-tools/">🖨️ 3D Print Tools — Easy Support &amp; 3D Browser</a> <span class="desc">(<a href="https://github.com/borenw/3d-print-tools">repo</a>)</span></td><td class="desc">Two client-side tools. <b>Easy Support</b>: detects overhangs by grid-sampled downward raycasting and builds tapered supports with slim contact tips (default <b>4× smaller</b> contact area) for clean removal — reads .3mf/.stl, exports a valid .3mf (+ .stl), measured reduction shown live. <b>3D Browser + editor</b>: drag-and-drop viewer for STL / 3MF / OBJ / PLY / glTF with slicer-style mouse (left orbit, middle pan, wheel zoom) and mm dimensions — plus push/pull a flat face (M), detach a weakly-attached part chopped at its narrowest neck (O), and a surface-relative snapping ruler (K)</td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://github.com/borenw/circuit-ruler-3d-print">📏 Circuit Stencil Ruler (3D print)</a></td><td class="desc">Printable circuit-drafting stencil ruler (190 × 118 × 3 mm): engraved <b>cm + inch scales</b> plus <b>19 through-cut schematic symbols traced faithfully from the source SVG</b> (inverter/Schmitt, logic gates, latch &amp; flip-flop, MOSFETs, resistor, inductor, capacitor, ground, diode, op-amp, V/I sources, meter, transformer, switch) that you trace with a pen. A Python generator (shapely + trimesh) parses <code>template_ruler.svg</code>, arranges/sizes the real shapes, and auto-adds tiny <b>stencil bridges</b> to every enclosed island (31 islands / 34 ties) so nothing drops out — the STL is one watertight solid. Ships the <code>.stl</code>, draft render and generator</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://borenw.github.io/3d-markup-overlay-viewer/">🧩 3D Markup + Overlay Viewer</a> <span class="desc">(<a href="https://github.com/borenw/3d-markup-overlay-viewer">repo</a>)</span></td><td class="desc">Single-file, fully offline viewer for a 3D model that you can <b>mark up in 2D</b> and <b>overlay for comparison</b>. Reads <code>.stl</code> / <code>.3mf</code> / <code>.obj</code> (drag-drop or picker), all parsed locally. <b>Overlays</b> load on the <i>same coordinates</i> so a lid and its tile line up — rendered semi-transparent with an <b>X-ray</b> toggle to reveal overlap. Six orthographic views (top/bottom/front/back/left/right) plus a free <b>isometric</b> orbit, live mm scale bar and model dimensions. Draw <b>pen / line / arrow / box</b> markup (color palette + adjustable thickness) locked to the current view, then <b>export the render + markup as a PNG</b>. Three.js + JSZip inlined — no build, no network calls</td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td>✂️ 3MF Point Editor <span class="desc">(<a href="https://github.com/borenw/3mf-point-editor">repo</a>)</span></td><td class="desc">Single-file browser editor for <b>reshaping a printable mesh by dragging its vertices</b>, then exporting back to <code>.3mf</code>. Box-select points (Bambu-style navigation), drag free / locked to X-Y-Z / with a smooth <b>soft-falloff</b> radius, live Δ readout in mm. Import resolves <code>&lt;component&gt;</code> references recursively so assemblies and Bambu/Prusa build wrappers place every part, and vertices are welded on load so dragging a shared corner doesn't tear neighbouring triangles. <b>✂ Simplify</b> rebuilds a dense mesh as a rough constructive shape you can actually edit — <i>Blocks</i> voxelises the solid and re-emits its boundary (72,784 → 2,296 triangles on a 37 mm magnetic tile, watertight and manifold by construction), <i>Low-poly</i> does Rossignac–Borrel vertex clustering, <i>Boxes per part</i> gives one bounding box per connected island. Three.js + JSZip. <em>Private repo.</em></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
     </table>
   </div>
 
