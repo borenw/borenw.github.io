@@ -147,8 +147,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-08-02T11:38:46Z">built …</span>
-    <span class="rev" id="siterev">rev 73</span>
+    <span class="age" id="siteage" data-built="2026-08-02T11:48:39Z">built …</span>
+    <span class="rev" id="siterev">rev 74</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -610,7 +610,7 @@
         if (isNaN(built.getTime()) || when.getTime() > built.getTime() + SLACK) {
           var s = (Date.now() - when.getTime()) / 1000;
           var t = s < 3600 ? Math.round(s/60)+'m' : (s < 86400 ? Math.round(s/3600)+'h' : Math.round(s/86400)+'d');
-          pill.textContent = '⚠ newer build — hard-refresh';
+          pill.textContent = '⚠ newer build — hard-refresh: Ctrl+Shift+R (Win/Linux) · ⌘+Shift+R (Mac)';
           pill.className = 'chk stale';
           pill.title = 'A newer commit (' + sha + ', pushed ' + t + ' ago) exists than the build you are viewing.\n'
             + 'You are on a cached copy — hard-refresh: Ctrl-Shift-R (Cmd-Shift-R on Mac).\n'
