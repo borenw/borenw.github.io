@@ -148,7 +148,7 @@
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
     <span class="age" id="siteage" data-built="2026-08-05T00:50:00Z">built …</span>
-    <span class="rev" id="siterev">rev 78</span>
+    <span class="rev" id="siterev">rev 79</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -191,8 +191,8 @@
 
   <div class="stats">
     <div class="stat"><div class="num">7</div><div class="lbl">Courses</div></div>
-    <div class="stat"><div class="num">34</div><div class="lbl">Live Pages</div></div>
-    <div class="stat"><div class="num">49</div><div class="lbl">Repositories</div></div>
+    <div class="stat"><div class="num">35</div><div class="lbl">Live Pages</div></div>
+    <div class="stat"><div class="num">50</div><div class="lbl">Repositories</div></div>
   </div>
 
   <!-- ============ INDEX ============ -->
@@ -463,6 +463,7 @@
       <tr><td><a href="https://github.com/borenw/esd-io-pin-tracer">ESD / IO Pin Tracer</a> <span class="desc">(private — offline; usable locally)</span></td><td class="desc">Offline HTML tool: generate copy-ready SKILL for the CIW that traces schematic pad nets through the hierarchy (resistors as shorts) down to transistors and dumps a CSV; the page renders a grouped, per-column filter/sort table (pin rowspan merge) with per-pin summaries — output driver ΣW and estimated input Cin</td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr><td><a href="https://github.com/borenw/tsmc-transistor-flavors">TSMC Transistor Flavors</a></td><td class="desc">Editable CSV of TSMC node × flavor → approximate (public) gate-cap Cox, used by the ESD/IO Pin Tracer to estimate input capacitance. Values are placeholders to replace with your PDK's numbers</td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr><td><a href="https://github.com/borenw/verilog-pin-mismatch-debugger">Verilog Pin Mismatch Debugger</a> <span class="desc">(private — offline; usable locally)</span></td><td class="desc">Offline HTML tool: generate copy-ready SKILL for the CIW that dumps a schematic view's terminals, paste it back, and diff against a SystemVerilog module — highlights pin name / direction / width mismatches (bus &lt;7:0&gt; ↔ [7:0], inputOutput ↔ inout)</td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
+      <tr><td><a href="https://borenw.github.io/trn-schematic-explorer/">🔌 SimVision .trn → Interactive Schematic</a> <span class="desc">(<a href="https://github.com/borenw/trn-schematic-explorer">repo</a>)</span></td><td class="desc">Point <code>trn2schematic.py</code> at a Cadence SimVision SHM database (<code>waves.shm/waves.trn</code>) and get one self-contained HTML schematic — no Virtuoso, no server, <b>no netlist</b>. An SHM file carries no connectivity, so the netlist is recovered from the waveforms themselves: signals whose transition traces are bit-exact identical are the same net, fingerprinted <i>per bit</i>, so <code>fa_chain[2].fa.cin</code> resolves to <code>dut.carry[2]</code> and <code>.a</code> to <code>dut.a[2]</code>. Hierarchy comes from the <code>$scope</code> tree (empty <code>generate</code> wrappers fold into the block label) and pin direction from <code>simvisdbutil -reginput</code>. In the browser: opens at the top level, double-click a block to <b>expand it in place</b> while its unselected peers are ignored, shift-click to drop a net or pin, drag blocks to rearrange (wires re-route live), and click any wire/pin to <b>probe its waveform</b> in the pane below — the transition data travels inside the page. Reads a <code>.vcd</code> too, so it works with no Cadence tools at all</td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://borenw.github.io/mcm-browser/">MCM / Package Browser</a> <span class="desc">(<a href="https://github.com/borenw/mcm-browser">repo</a>)</span></td><td class="desc">Single-file viewer for a flip-chip BGA-on-substrate package: 2-D layer-by-layer top view (per-layer visibility / solo / net-highlight / hover-for-net, pan &amp; zoom) and a 3-D exploded stack (soldermask → metals / planes → core → metals, with die + C4 bumps + BGA balls + via pillars; orbit / zoom / explode / auto-spin). Ships a sample FCBGA; Load JSON accepts a neutral package-JSON exported from a Cadence <code>.mcm</code> (extracta / IPC-2581 / ODB++)</td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://borenw.github.io/SVG-Editor-Lite/">SVG Editor Lite</a> <span class="desc">(<a href="https://github.com/borenw/SVG-Editor-Lite">repo</a>)</span></td><td class="desc">Single-file, offline in-browser SVG editor: draw / select / snap / freehand doodle, live element tree, theming, and session auto-save to localStorage</td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td><a href="https://github.com/borenw/Voice-to-SVG">Voice to SVG</a></td><td class="desc">Voice → vector graphics</td><td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
@@ -568,6 +569,7 @@
       <tr><td class="ch">41</td><td><a href="https://borenw.github.io/3mf-point-editor/">✂️ 3MF Point Editor</a></td></tr>
       <tr><td class="ch">42</td><td><a href="https://borenw.github.io/amplifier-1xsf-rc-splitting/">Miller Two-Stage Amp (1× SF + RC Pole-Splitting) — Frequency Response</a></td></tr>
       <tr><td class="ch">43</td><td><a href="https://borenw.github.io/budget-timeline-dashboard/">📊 Budget Timeline — Recurring vs One-time</a></td></tr>
+      <tr><td class="ch">44</td><td><a href="https://borenw.github.io/trn-schematic-explorer/">🔌 SimVision .trn → Interactive Schematic</a></td></tr>
     </table>
     <p style="font-size:12.5px;color:var(--text-sub);margin-top:8px">Page numbers are permanent and append-only — a new page always takes the next number (29, 30, …), existing pages are never renumbered. Each page also shows its number in its own footer.</p>
   </div>
