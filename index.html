@@ -120,6 +120,17 @@
   td a { color: var(--blue); text-decoration: none; font-weight: 600; }
   td a:hover { text-decoration: underline; }
   .desc { color: var(--text-sub); font-size: 13px; }
+  /* Local-path chip. A file:// link cannot be navigated to from an https page,
+     so the path is offered as copy-to-clipboard rather than as a dead link. */
+  .lpath { display:inline-flex; align-items:center; gap:6px; margin-top:4px;
+           font-size:11px; }
+  .lpath code { background: var(--grey-bg); border:1px solid var(--border);
+                border-radius:3px; padding:2px 6px; font-size:11px;
+                color: var(--text-sub); }
+  .lpath button { font: inherit; font-weight:600; cursor:pointer;
+                  border:1px solid var(--border); border-radius:3px;
+                  background:#fff; color:var(--blue); padding:2px 8px; }
+  .lpath button:hover { background: var(--blue-lighter); }
   .badge {
     display: inline-block; font-size: 11px; font-weight: 700;
     padding: 2px 8px; border-radius: 10px; white-space: nowrap;
@@ -147,8 +158,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-08-25T02:46:32Z">built …</span>
-    <span class="rev" id="siterev">rev 94</span>
+    <span class="age" id="siteage" data-built="2026-08-25T03:11:22Z">built …</span>
+    <span class="rev" id="siterev">rev 95</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -500,7 +511,7 @@
     <div class="course-banner">💰 Personal Finance <span class="code">FIN 101</span></div>
     <table>
       <tr><th>Topic</th><th>Description</th><th>Status</th></tr>
-      <tr><td>🔒 <a href="https://github.com/borenw/budget-timeline-dashboard">📊 Budget Timeline — Recurring vs One-time</a> <span class="desc">(private — offline)</span></td><td class="desc">Single-file, fully offline budget dashboard built on one idea: <b>four buckets on one axis</b> — recurring/one-time × income/expense. Income stacks upward from $0 (recurring solid, one-time dashed on top); expense hangs <i>downward from the top edge of recurring income</i>, so the dot at the bottom of the expense column tells you whether the paycheck alone covered the month. <b>Import a Monarch CSV</b> for actuals and the next 3 months get forecast. Includes a <b>2× month-detail zoom</b> beside a filterable transaction table (category / account / regex), a <b>running-balance</b> line, a recurring-vs-one-time 2×2, a spending-mix pie and a category table that flags any month &gt;1σ above that category's own average, and an <b>annual-impact ranking</b> (recurring annualized ×12) that shows where a change actually moves the year. CSV parsed in-browser, items in <code>localStorage</code> — no network calls, no upload. Adds a <b>weighted monthly baseline</b> per category — 50% the average of the last 12 full months, 25% the last full month, 25% the same calendar month a year ago — with the current month prorated on <i>data coverage</i> rather than elapsed days, so a stale export reads as stale instead of as a month of near-zero spending, and a <b>bill tracker</b> that separates a real recurring bill from a repeat purchase and a closed account from an overdue one</td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
+      <tr><td>🔒 <a href="https://github.com/borenw/budget-timeline-dashboard">📊 Budget Timeline — Recurring vs One-time</a> <span class="desc">(private — offline)</span><br><span class="lpath"><code id="btdpath">file:///Users/boren_wang/repos/budget-timeline-dashboard/index.html</code><button type="button" onclick="copyLocalPath(this)">copy</button><span class="desc">open on this Mac</span></span></td><td class="desc">Single-file, fully offline budget dashboard built on one idea: <b>four buckets on one axis</b> — recurring/one-time × income/expense. Income stacks upward from $0 (recurring solid, one-time dashed on top); expense hangs <i>downward from the top edge of recurring income</i>, so the dot at the bottom of the expense column tells you whether the paycheck alone covered the month. <b>Import a Monarch CSV</b> for actuals and the next 3 months get forecast. Includes a <b>2× month-detail zoom</b> beside a filterable transaction table (category / account / regex), a <b>running-balance</b> line, a recurring-vs-one-time 2×2, a spending-mix pie and a category table that flags any month &gt;1σ above that category's own average, and an <b>annual-impact ranking</b> (recurring annualized ×12) that shows where a change actually moves the year. CSV parsed in-browser, items in <code>localStorage</code> — no network calls, no upload. Adds a <b>weighted monthly baseline</b> per category — 50% the average of the last 12 full months, 25% the last full month, 25% the same calendar month a year ago — with the current month prorated on <i>data coverage</i> rather than elapsed days, so a stale export reads as stale instead of as a month of near-zero spending, and a <b>bill tracker</b> that separates a real recurring bill from a repeat purchase and a closed account from an overdue one</td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
     </table>
   </div>
 
@@ -675,6 +686,28 @@
         + ' ' + d.toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit'});
     el.textContent = 'Last updated: ' + txt;
   })();
+</script>
+<script>
+/* Copy the local path for the private dashboard. navigator.clipboard needs a
+   secure context, which https is — but keep the textarea fallback for Safari
+   quirks and for anyone opening this file locally. */
+function copyLocalPath(btn){
+  var txt = document.getElementById("btdpath").textContent, was = btn.textContent;
+  function done(ok){ btn.textContent = ok ? "copied ✓" : "select it";
+                     setTimeout(function(){ btn.textContent = was; }, 1400); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ done(true); },
+                                           function(){ fallback(); });
+  } else fallback();
+  function fallback(){
+    var ta = document.createElement("textarea");
+    ta.value = txt; ta.setAttribute("readonly","");
+    ta.style.cssText = "position:fixed;top:-1000px;opacity:0";
+    document.body.appendChild(ta); ta.select();
+    var ok = false; try{ ok = document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta); done(ok);
+  }
+}
 </script>
 </body>
 </html>
