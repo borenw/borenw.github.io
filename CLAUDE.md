@@ -23,6 +23,47 @@ Guidance for Claude Code when working in this repository (Bo's Engineering Curri
 - If you can't find the badges, they are the pills in the top-right of `<div class="banner">` (`.revbadges`); restore them before pushing.
 - Treat this like the page-number rule: a hard requirement, done as part of the change, not an afterthought — it's how the reader (and the next Claude) can tell at a glance which build is live.
 
+## Tool-repo install rule (REQUIRED)
+
+**Every single-file tool repo in this account installs the same way: save one ZIP, paste one
+command, paste one more to run it.** The user should never have to correct this again — apply it
+without being asked, in the tool's own repo, whenever you create or change one.
+
+The README must open with this three-step block, adapted only in the repo name and script name:
+
+- **0 · Download** — the user clicks `Code ▾ → Download ZIP` (or the `<repo>-main.zip` link in the
+  README) and it lands in `~/Downloads`. No renaming, no unpacking by hand.
+- **1 · Paste this** — unpacks into `~/bin` and prints the version, so the paste proves itself:
+
+  ```bash
+  mkdir -p ~/bin && unzip -jo "`ls -t ~/Downloads/<repo>-main*.zip | head -1`" "*/<script>.py" -d ~/bin && chmod +x ~/bin/<script>.py && python3 ~/bin/<script>.py -V
+  ```
+
+- **2 · Paste this** — the run command with the user's own path:
+
+  ```bash
+  python3 ~/bin/<script>.py <their file> --open
+  ```
+
+Why each piece, so it does not get "simplified" away:
+
+- `ls -t … | head -1` picks the newest download, so `…main (1).zip` still works and **re-pasting
+  step 1 is how you update**.
+- `unzip -jo` flattens and overwrites — no nested folder, no stale copy.
+- The backtick-in-double-quotes form runs unchanged in **bash, zsh and tcsh/csh**. The EDA servers
+  here default to tcsh; a `$(...)` form would break there.
+- Ending on `-V` makes the install its own test, so **every tool script must accept `-V` /
+  `--version`**.
+- Nothing outside `~/bin` is touched, so `rm ~/bin/<script>.py` uninstalls it.
+
+Do **not** offer a different install as the main route — no `git clone`, no `pip install`, no
+`setup.py`, no installer script. The `curl` one-liner (public repos) and the `scp`-to-server note
+belong underneath as `<sub>` sub-points. **Verify the paste end-to-end against the live archive URL
+before claiming it works** (download the real ZIP, run the real command).
+
+The reader-facing copy of this convention lives in `index.html` under `#install`
+("📦 Tool Install Convention"); keep the two in sync when either changes.
+
 ## Chart / figure rule (REQUIRED)
 
 **Every chart, plot, or figure on any page must carry a title or a figure number** (e.g. `Figure 3 · First-order constants vs process node`). Number figures per page (Figure 1, 2, 3 …) in reading order, and give each a short descriptive title. This applies to canvas plots, SVG diagrams, embedded images used as figures — anything a reader would call "a figure." Dual-axis charts must label each y-axis with its quantity **and color-match the axis label to its curve**.

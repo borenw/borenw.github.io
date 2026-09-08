@@ -158,8 +158,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-09-08T13:42:34Z">built …</span>
-    <span class="rev" id="siterev">rev 98</span>
+    <span class="age" id="siteage" data-built="2026-09-08T14:02:24Z">built …</span>
+    <span class="rev" id="siterev">rev 99</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -232,6 +232,7 @@
       </li>
       <li><a href="#digital">💻 Digital Circuit Design — PRBS / LFSR: why the feedback gate must be XOR</a></li>
       <li><a href="#packaging">📦 Advanced Packaging — MCM · 2.5D interposer · EMIB · LGA</a></li>
+      <li><a href="#install">📦 Tool Install Convention — save the ZIP, paste two commands</a></li>
       <li><a href="#tools">7. Lab Tools</a></li>
       <li><a href="biohacking.html">8. Health &amp; Longevity — 40 Biohacks Ranked</a></li>
       <li><a href="#finance">💰 Personal Finance — Budget Timeline (recurring vs one-time)</a></li>
@@ -454,6 +455,66 @@
       <tr><th>Chapter</th><th>Project</th><th>Status</th></tr>
       <tr><td class="ch">Ch. 1</td><td><a href="https://borenw.github.io/chip-packaging-explorer/">Advanced Packaging Explorer</a> <span class="desc">— how a package re-connects two chiplets: pick an example (MCM on organic substrate · 2.5D silicon interposer / CoWoS · EMIB embedded bridge · LGA socket) and see a labeled cross-section + the die-to-die path, interconnect pitch, cost and a real-world part; side-by-side comparison table</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 2</td><td>3D stacking — TSV &amp; hybrid bonding (Foveros)</td><td><span class="badge soon">PLANNED</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ============ TOOL INSTALL CONVENTION ============ -->
+  <div class="course" id="install">
+    <div class="course-banner">📦 Tool Install Convention <span class="code">HOUSE RULE</span></div>
+    <p class="desc" style="margin:10px 2px 6px">
+      Every single-file tool repo in this account installs the <b>same way</b>: save one ZIP, paste one
+      command, paste one more to run it. Two clicks and two pastes, nothing to learn per tool, and it
+      works on a locked-down EDA server where <code>pip install</code> is not available. The steps are
+      always these, with only the repo name and the script name changing:
+    </p>
+    <table>
+      <tr><th style="width:1%">Step</th><th>What the user does</th></tr>
+      <tr>
+        <td><b>0</b></td>
+        <td class="desc">On the repo page click <b>Code ▾ → Download ZIP</b> (or the
+          <code>&lt;repo&gt;-main.zip</code> link in the README). It lands in <code>~/Downloads</code>.
+          Nothing is renamed or unpacked by hand.</td>
+      </tr>
+      <tr>
+        <td><b>1</b></td>
+        <td class="desc">Paste <b>one</b> command that unpacks the script into <code>~/bin</code> and
+          prints the version it just installed — so the paste itself proves it worked:
+          <pre style="white-space:pre-wrap;overflow-wrap:break-word;background:rgba(127,127,127,.10);padding:9px 11px;border-radius:6px;margin:7px 0 0"><code>mkdir -p ~/bin &amp;&amp; unzip -jo "`ls -t ~/Downloads/&lt;repo&gt;-main*.zip | head -1`" "*/&lt;script&gt;.py" -d ~/bin &amp;&amp; chmod +x ~/bin/&lt;script&gt;.py &amp;&amp; python3 ~/bin/&lt;script&gt;.py -V</code></pre>
+        </td>
+      </tr>
+      <tr>
+        <td><b>2</b></td>
+        <td class="desc">Paste the run command, with the user's own path substituted:
+          <pre style="white-space:pre-wrap;overflow-wrap:break-word;background:rgba(127,127,127,.10);padding:9px 11px;border-radius:6px;margin:7px 0 0"><code>python3 ~/bin/&lt;script&gt;.py &lt;their file&gt; --open</code></pre>
+        </td>
+      </tr>
+    </table>
+    <p class="desc" style="margin:12px 2px 4px">
+      <b>Why it is written this way.</b> <code>ls -t … | head -1</code> picks the newest download, so a
+      browser that saved <code>…main (1).zip</code> still works and re-pasting step 1 is how you update.
+      <code>unzip -jo</code> flattens and overwrites, so there is no nested folder and no stale copy.
+      The backtick-in-double-quotes form runs unchanged in <b>bash, zsh and tcsh/csh</b>, which matters
+      because the EDA servers here default to tcsh. Ending on <code>-V</code> turns the install into its
+      own test. Nothing outside <code>~/bin</code> is touched, so <code>rm ~/bin/&lt;script&gt;.py</code>
+      uninstalls it.
+    </p>
+    <p class="desc" style="margin:8px 2px 4px">
+      <b>Rule for Claude — do this without being asked.</b> When you create or update a tool repo in
+      this account, its README must open with this exact three-step block (adapted only in repo and
+      script name), the script must accept <code>-V</code>/<code>--version</code>, and you must verify
+      the paste end-to-end against the live archive URL before saying it works. Do not invent a
+      different install (no <code>git clone</code>, no <code>pip install</code>, no
+      <code>setup.py</code>, no installer script as the primary path). Add the <code>curl</code>
+      one-liner and the <code>scp</code>-to-server note as sub-points, never as the main route.
+    </p>
+    <table>
+      <tr><th>Already following it</th><th>Script installed to <code>~/bin</code></th></tr>
+      <tr><td><a href="https://github.com/borenw/gds-dashboard">GDS Dashboard</a></td><td class="desc"><code>gds_dashboard.py</code></td></tr>
+      <tr><td><a href="https://github.com/borenw/chip-review-report">Chip Top Layout Review</a></td><td class="desc"><code>chip_review.py</code>, <code>hier_browser.py</code></td></tr>
+      <tr><td><a href="https://github.com/borenw/spectre-spec-rerun">Spectre Spec Re-run</a></td><td class="desc"><code>spec_rerun/spec_rerun.py</code></td></tr>
+      <tr><td><a href="https://github.com/borenw/adexl-spec-rerun">ADE XL Spec Re-run</a></td><td class="desc"><code>adexl_rerun/adexl_rerun.py</code></td></tr>
+      <tr><td><a href="https://github.com/borenw/device-op-point">Device Operating Point</a></td><td class="desc"><code>device-op-point/oppoint.py</code></td></tr>
+      <tr><td><a href="https://github.com/borenw/xrun-shm-trn-finder">xrun SHM Run Finder</a></td><td class="desc"><code>xrun_shm_trn_finder.py</code></td></tr>
     </table>
   </div>
 
