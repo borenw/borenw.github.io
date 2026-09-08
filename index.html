@@ -1,5 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--
+================================================================================
+  STOP. READ THIS BEFORE YOU EDIT ANYTHING.  (Claude: this means you.)
+================================================================================
+
+  If the user said "borenw.github.io" - in any form, including "the site", "my
+  page", "the curriculum", "add it to my github page", or just pasting a
+  borenw.github.io URL - then you are working on THIS repo, and these rules are
+  not optional and not a style preference. The user has had to repeat them, so
+  they are written here, in the first thing anyone opens.
+
+  DO THIS FIRST, EVERY TIME, WITHOUT BEING ASKED:
+
+    1. Read CLAUDE.md in this repo, all of it, before your first edit. It is
+       the authority; this banner is only the part people kept missing.
+
+    2. Any push that touches this repo: bump the rev badge by exactly 1
+       (<span class="rev" id="siterev">) AND refresh data-built on
+       <span class="age" id="siteage"> to `date -u +%Y-%m-%dT%H:%M:%SZ`.
+       One push touching several files is one bump. Never skip or reuse.
+
+    3. A new HOSTED page gets the next unused page number, its own footer
+       ("Page N - Bo's Engineering Curriculum") and a Page Registry row in
+       #pages. A GitHub-only repo with no hosted page gets NO number - link it
+       from the right course table instead, and update the Repositories count.
+
+    4. Every chart or figure carries a title or a figure number.
+
+  AND THESE TWO, WHICH ARE ABOUT THE TOOL REPOS THIS SITE LINKS TO. They live
+  in the tool's own repo, but they get forgotten because the user asks for them
+  here. Apply them to any CLI tool you write or touch for this account:
+
+    A. INSTALL - see the "Tool Install Convention" section (#install) on this
+       page and in CLAUDE.md. Save the ZIP to ~/Downloads, paste ONE command
+       that unpacks the script into ~/bin and prints its version, paste ONE
+       more to run it. Two clicks, two pastes. No git clone, no pip install,
+       no setup.py as the main route. Every tool script accepts -V/--version.
+       Verify the paste end-to-end against the live archive URL before you
+       claim it works.
+
+    B. STATUS EVERY 5 SECONDS - a long-running CLI must never look hung. The
+       user has sat through a 500-second parse with nothing on screen; do not
+       let that happen again. Any phase that can run longer than a few seconds
+       prints ONE line to STDERR every 5 SECONDS carrying all four of:
+
+         - which phase it is in, and how far through that phase (a real
+           percentage against a real total - stream bytes, records, cells,
+           shapes, output bytes - never an invented one; if the total is
+           genuinely unknowable, print what has been done and the elapsed
+           time and NO percentage),
+         - the rate, and the ETA for that phase,
+         - the OVERALL percentage and ETA for the whole run, weighted across
+           phases and anchored to what previous runs actually took on this
+           machine (keep a small timing cache under ~/.cache/<tool>/, honour
+           XDG_CACHE_HOME, correct the estimate as the run goes, and say so
+           when there is no baseline yet),
+         - for any phase writing a file, that file's SIZE and TIMESTAMP on
+           disk as it grows, so "is it still writing?" is answered by looking.
+
+       Measure the 5 seconds from the start of the RUN, not the start of the
+       phase, or a long run made of short phases goes quiet at every boundary.
+       Print nothing until the first 5 s are up, so short runs stay silent.
+       stderr only - stdout stays the pasteable summary. Rewrite the line in
+       place on a tty, append whole lines when redirected to a log. Offer
+       --no-progress (keep the summary, drop the heartbeat) and -q (drop both).
+
+       Reference implementations, in this account, already doing exactly this:
+       borenw/gds-dashboard (gds_dashboard.py - Progress/Run/RunHistory) and
+       borenw/chip-review-report (chip_review.py - Progress). Copy the shape
+       from one of them rather than inventing a new one.
+
+    C. And if it is slow, profile it before you explain it away. On
+       gds-dashboard that was worth 2.4x: read the stream in blocks rather
+       than per record, no throwaway string formatting per record, a fast path
+       for the common shape, and -j to put one file on each core.
+
+  None of this is visible to a reader of the page - it is a comment on purpose.
+  Keep it that way, keep it in sync with CLAUDE.md, and do not delete it.
+================================================================================
+-->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -158,8 +238,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-09-08T14:02:24Z">built …</span>
-    <span class="rev" id="siterev">rev 99</span>
+    <span class="age" id="siteage" data-built="2026-09-08T15:18:06Z">built …</span>
+    <span class="rev" id="siterev">rev 100</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>

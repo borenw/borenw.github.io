@@ -1,5 +1,10 @@
 # CLAUDE.md — borenw.github.io
 
+> **If the user mentioned `borenw.github.io` — in any form ("the site", "my page", "the
+> curriculum", or a pasted URL) — read this whole file before your first edit.** The same
+> reminder is repeated as a comment at the top of `index.html`, because it kept being missed.
+> Every rule below marked REQUIRED is a rule the user has already had to repeat.
+
 Guidance for Claude Code when working in this repository (Bo's Engineering Curriculum, the GitHub Pages site at https://borenw.github.io/).
 
 ## Page-number rule (REQUIRED)
@@ -63,6 +68,49 @@ before claiming it works** (download the real ZIP, run the real command).
 
 The reader-facing copy of this convention lives in `index.html` under `#install`
 ("📦 Tool Install Convention"); keep the two in sync when either changes.
+
+## Long-running CLI rule — status every 5 seconds (REQUIRED)
+
+**A tool in this account must never look hung.** The user has sat through a 500-second parse
+with nothing on screen, unable to tell a slow run from a stuck one. Any CLI you write or touch
+here reports progress, without being asked.
+
+Any phase that can run longer than a few seconds prints **one line to stderr every 5 seconds**,
+carrying all four of:
+
+1. **Which phase, and how far through it** — a real percentage against a real total (stream
+   bytes, records, cells, shapes, output bytes). Never invent one: if the total is genuinely
+   unknowable, print what has been done so far and the elapsed time and *no* percentage.
+2. **The rate and the ETA for that phase.**
+3. **The overall percentage and ETA for the whole run**, weighted across phases and anchored to
+   **what previous runs actually took on this machine** — keep a small timing cache under
+   `~/.cache/<tool>/` (honour `XDG_CACHE_HOME`), predict an exact repeat from its own last run
+   and anything else from the median seconds-per-input-byte, correct it as the run goes, and say
+   plainly when there is no baseline yet.
+4. **For a phase writing a file: that file's size and timestamp on disk** as it grows, so "is it
+   still writing?" is answered by looking at the line.
+
+Mechanics that are part of the rule, because getting them wrong is how it fails quietly:
+
+- Measure the 5 s **from the start of the run, not the start of the phase** — otherwise a long
+  run made of short phases goes silent at every phase boundary.
+- Print nothing until the first 5 s are up, so short runs stay silent.
+- **stderr only.** stdout stays the pasteable summary, so `> report.txt` and `| mail` are
+  unaffected. Rewrite in place on a tty; append whole lines when redirected to a log.
+- Offer `--no-progress` (keep the summary, drop the heartbeat) and `-q` (drop both).
+
+Copy the shape from a tool that already does it rather than inventing another:
+`borenw/gds-dashboard` (`gds_dashboard.py` — `Progress` / `Run` / `RunHistory`) or
+`borenw/chip-review-report` (`chip_review.py` — `Progress`).
+
+**And if it is slow, profile it before explaining it away.** On gds-dashboard that was worth
+2.4x on a 4.2-million-record parse: read the stream in blocks rather than per record, no
+throwaway string formatting per record (`RT.get(t, "UNKNOWN_%02X" % t)` formats one for every
+record, found or not), a fast path for the shape that dominates real layouts (axis-aligned
+rectangles), and `-j` to put one file on each core. Report the before and after honestly.
+
+The reader-facing summary of this and the install rule lives in `index.html` — the install one
+under `#install`, this one only in the comment at the top of the file. Keep all three in sync.
 
 ## Chart / figure rule (REQUIRED)
 
