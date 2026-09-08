@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Integration Format — one launcher, one page</title>
+<meta name="description" content="The format every Claude Code tool on this site follows so a new .py and its .html drop straight into the master dashboard: DASH_ marker lines on stdout, a self-contained sub-page, and one tile entry.">
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --sub:#555; --line:#e3e3e3;
+    --blue:#2563eb; --card:#f7f8fa; --code-bg:#f4f4f6; --code-fg:#1a1a1a;
+    --warn-bg:#fff7ed; --warn-line:#fdba74; --ok-bg:#f0fdf4; --ok-line:#86efac;
+    --pass:#15803d; --fail:#b91c1c; --warnc:#b45309; --skip:#64748b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1115; --fg:#e6e6e6; --sub:#9aa0aa; --line:#2a2f3a;
+      --blue:#6ea8ff; --card:#161a22; --code-bg:#0b0d12; --code-fg:#e6e6e6;
+      --warn-bg:#2a1e12; --warn-line:#7c4a1e; --ok-bg:#10241a; --ok-line:#1f5c3a;
+      --pass:#2ecc8f; --fail:#ff6b62; --warnc:#ffb02e; --skip:#8794a8;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px;}
+  h1{font-size:28px;line-height:1.25;margin:8px 0 4px}
+  .lede{color:var(--sub);font-size:16px;margin:0 0 24px}
+  h2{font-size:20px;margin:34px 0 10px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:20px 0 6px}
+  a{color:var(--blue)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    background:var(--code-bg);padding:.1em .35em;border-radius:4px;font-size:.92em}
+  pre{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--line);
+    border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:13.5px;line-height:1.55}
+  pre code{background:none;padding:0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px;display:block;overflow-x:auto}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--card)}
+  .note{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:14px 0;background:var(--card)}
+  .warn{background:var(--warn-bg);border-color:var(--warn-line)}
+  .ok{background:var(--ok-bg);border-color:var(--ok-line)}
+  .kicker{color:var(--blue);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+  footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);
+    color:var(--sub);font-size:13px}
+  footer a{color:var(--sub)}
+  figure{margin:18px 0 22px;padding:0}
+  figcaption{font-size:13px;color:var(--sub);margin-top:8px}
+  figcaption b{color:var(--fg)}
+  .fig{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:10px}
+  .fig svg{display:block;width:100%;height:auto}
+  .s{font-weight:700}
+  .s.PASS{color:var(--pass)} .s.FAIL{color:var(--fail)}
+  .s.WARN{color:var(--warnc)} .s.SKIP{color:var(--skip)}
+  ol.chk{padding-left:20px} ol.chk li{margin:5px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="kicker">Claude Code · Dashboard Format</div>
+  <h1>One launcher, one page — the dashboard integration format</h1>
+  <p class="lede">Every tool here ends up as a script plus a page, and until now each one
+  invented its own way of saying “this passed.” This is the house format: follow it and a
+  new <code>.py</code> plus its <code>.html</code> drop into the master dashboard as a live
+  tile — green at a glance, one click to run, one click to open — with no glue code on
+  either side. It is deliberately small: <b>five marker lines on stdout</b>, one
+  self-contained page, one JSON entry.</p>
+
+  <div class="note ok">
+    <b>Read this first if you are Claude Code.</b> When you are asked for a dashboard, a
+    checker, a report generator, or any tool that ends in “…and show me whether it passed,”
+    build it to this format rather than inventing a new one. Sections 2, 5, 6 and 7 are the
+    requirements; section 9 is a template you can copy.
+  </div>
+
+  <div class="note warn">
+    <b>This sits on top of two site-wide rules, it does not replace them.</b> Everything
+    written here assumes the tool already obeys the
+    <a href="https://borenw.github.io/#install">Tool Install Convention</a> (one ZIP, two
+    pasted commands, and therefore a working <code>-V</code>) and the
+    <b>status-every-5-seconds rule</b> for any phase that can outlast a few seconds. Both
+    live in <a href="https://github.com/borenw/borenw.github.io/blob/main/CLAUDE.md">CLAUDE.md</a>.
+    A tile is a nicer front end for a tool that is already well behaved on its own — it is
+    not a substitute for one.
+  </div>
+
+  <h2>1 · The shape</h2>
+  <p>One master launcher owns the browser tab. Everything else is a normal standalone
+  program that happens to describe its own result in a way the master can read.</p>
+  <ul>
+    <li><b>One master <code>.py</code></b> serves <b>one master <code>.html</code></b> —
+      the only page you keep open. It runs the sub-tools, tracks their status, and links
+      their pages.</li>
+    <li><b>Each sub-tool is its own <code>.py</code></b>, still runnable by hand from a
+      terminal with no dashboard anywhere in sight.</li>
+    <li><b>Each sub-tool writes its own <code>.html</code></b> — a full sub-dashboard for
+      the detail that will not fit on a tile. The master opens it in its own tab.</li>
+  </ul>
+
+  <figure>
+    <div class="fig">
+      <svg viewBox="0 0 800 250" role="img" aria-label="Data flow from a task script to the master dashboard tile and to its own sub-page">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+          <style>
+            .bx{fill:none;stroke:currentColor;stroke-width:1.4;rx:8}
+            .lb{font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+                fill:currentColor}
+            .sm{font:11px ui-monospace,SFMono-Regular,Menlo,monospace;fill:currentColor;opacity:.72}
+            .ln{stroke:currentColor;stroke-width:1.4;fill:none;marker-end:url(#ar)}
+          </style>
+        </defs>
+        <g color="var(--fg)">
+          <rect class="bx" x="14" y="86" width="176" height="76" rx="8"/>
+          <text class="lb" x="102" y="116" text-anchor="middle">your task .py</text>
+          <text class="sm" x="102" y="136" text-anchor="middle">tasks/drc_check.py</text>
+
+          <path class="ln" d="M192 108 H 296"/>
+          <text class="sm" x="244" y="100" text-anchor="middle">stdout</text>
+          <text class="sm" x="244" y="126" text-anchor="middle">DASH_ lines</text>
+
+          <path class="ln" d="M192 150 C 240 150, 250 206, 300 206"/>
+          <text class="sm" x="250" y="230" text-anchor="middle">writes</text>
+
+          <rect class="bx" x="300" y="72" width="186" height="76" rx="8"/>
+          <text class="lb" x="393" y="102" text-anchor="middle">master launcher</text>
+          <text class="sm" x="393" y="122" text-anchor="middle">chipdash.py</text>
+
+          <rect class="bx" x="300" y="178" width="186" height="58" rx="8"/>
+          <text class="lb" x="393" y="203" text-anchor="middle">sub-dashboard</text>
+          <text class="sm" x="393" y="221" text-anchor="middle">reports/drc.html</text>
+
+          <path class="ln" d="M488 110 H 592"/>
+          <text class="sm" x="540" y="102" text-anchor="middle">status</text>
+
+          <path class="ln" d="M488 207 C 560 207, 610 168, 638 152"/>
+          <text class="sm" x="574" y="232" text-anchor="middle">opened in a tab</text>
+
+          <rect class="bx" x="596" y="60" width="190" height="102" rx="8"/>
+          <text class="lb" x="691" y="88" text-anchor="middle">master .html</text>
+          <circle cx="628" cy="116" r="6" fill="var(--pass)"/>
+          <text class="sm" x="644" y="120">PASS tile</text>
+          <circle cx="628" cy="142" r="6" fill="var(--fail)"/>
+          <text class="sm" x="644" y="146">FAIL tile</text>
+
+          <text class="sm" x="691" y="184" text-anchor="middle">one page, always open</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption><b>Figure 1 · How a tool reaches the master dashboard.</b> The task script
+    talks to the master only through marker lines on stdout, and to the reader through a
+    page it writes itself. Neither side imports the other, so every task stays runnable on
+    its own.</figcaption>
+  </figure>
+
+  <h2>2 · The contract — five marker lines</h2>
+  <p>A task reports its result by <b>printing</b>. That is the whole protocol: no imports,
+  no sockets, no exit-code guessing games. Any line matching
+  <code>DASH_&lt;KEY&gt;: &lt;value&gt;</code> is consumed by the master; every other line
+  stays in the live log.</p>
+  <table>
+    <tr><th>Marker</th><th>Meaning</th><th>Example</th></tr>
+    <tr><td><code>DASH_STATUS:</code></td>
+        <td>The tile's LED. One of <span class="s PASS">PASS</span>
+            <span class="s WARN">WARN</span> <span class="s FAIL">FAIL</span>
+            <span class="s SKIP">SKIP</span>. Print it <b>last</b>.</td>
+        <td><code>DASH_STATUS: FAIL</code></td></tr>
+    <tr><td><code>DASH_SUMMARY:</code></td>
+        <td>One line under the tile name. Numbers, not adjectives — this is what gets read
+            at a glance.</td>
+        <td><code>DASH_SUMMARY: 10 open · 28 waived · 23 checks</code></td></tr>
+    <tr><td><code>DASH_METRIC:</code></td>
+        <td>A <code>label=value</code> pair for the detail rail. Emit as many as you like;
+            the first two also appear on the tile.</td>
+        <td><code>DASH_METRIC: open violations=10</code></td></tr>
+    <tr><td><code>DASH_HTML:</code></td>
+        <td>Absolute path to the page this run wrote. It becomes the tile's
+            <b>open</b> button.</td>
+        <td><code>DASH_HTML: /…/reports/drc.html</code></td></tr>
+    <tr><td><code>DASH_LINK:</code></td>
+        <td><code>label|url</code> — an extra link in the rail (a log, a repo, a ticket).</td>
+        <td><code>DASH_LINK: raw report|file:///…/drc.rep</code></td></tr>
+  </table>
+  <p>Flush as you go (<code>print(…, flush=True)</code>) so the log streams live instead of
+  arriving all at once at the end.</p>
+
+  <h2>3 · The status vocabulary</h2>
+  <p>Four words, so that a wall of tiles means the same thing to everyone reading it.</p>
+  <table>
+    <tr><th>Status</th><th>Use it when</th><th>Exit code</th></tr>
+    <tr><td><span class="s PASS">PASS</span></td>
+        <td>Everything checked, nothing to act on. This is the only green.</td><td>0</td></tr>
+    <tr><td><span class="s WARN">WARN</span></td>
+        <td>Passed, but with something a human should know: waived violations, a margin
+            under 10%, a stale input.</td><td>0</td></tr>
+    <tr><td><span class="s FAIL">FAIL</span></td>
+        <td>A real violation. Someone has work to do before tapeout.</td><td>1</td></tr>
+    <tr><td><span class="s SKIP">SKIP</span></td>
+        <td>Could not run — input file missing, tool not installed. <b>Never</b> report a
+            missing input as PASS.</td><td>0</td></tr>
+  </table>
+  <div class="note warn">
+    <b>Set the exit code too.</b> The marker drives the tile; the exit code lets the same
+    script sit in a nightly cron or a CI job with nothing else wrapped around it. FAIL
+    exits 1, everything else exits 0.
+  </div>
+
+  <h2>4 · Scripts that predate this format still work</h2>
+  <p>With no <code>DASH_STATUS</code> line the master falls back, in order:</p>
+  <ol>
+    <li>a line matching <code>verdict: PASS|FAIL|WARN|SKIP</code> (also
+      <code>CORRECT</code> / <code>INCORRECT</code>, so Calibre-style output scores itself);</li>
+    <li>failing that, the exit code — <code>0</code> is PASS, anything else FAIL.</li>
+  </ol>
+  <p>So an existing checker usually needs <b>no changes at all</b> to become a tile. Add the
+  markers when you want the summary line and the metrics, not to make it work.</p>
+
+  <h2>5 · Rules for the task <code>.py</code></h2>
+  <ol class="chk">
+    <li><b>One file, standard library only.</b> It has to run on a laptop and on a
+      workstation over SSH with nothing installed. No numpy, no requests, no framework.</li>
+    <li><b>Runnable by hand.</b> <code>python3 tasks/thing.py --help</code> must work and be
+      useful with no dashboard running.</li>
+    <li><b>Every input is a flag with a working default</b> —
+      <code>--rep</code>, <code>--gds</code>, <code>--data</code>. Point the default at a
+      committed sample so the tile demonstrates itself on a fresh clone.</li>
+    <li><b>Missing input is SKIP, not a crash</b> and not a pass.</li>
+    <li><b>Accept <code>-V</code> / <code>--version</code>.</b> The install convention ends
+      on it, so the paste proves itself — and the dashboard has something to show when a
+      tile will not start.</li>
+    <li><b>Report progress on stderr every 5 seconds</b>, per the site-wide rule: phase and
+      real percentage, rate and ETA, overall ETA, and the output file's size as it grows.
+      <code>stdout</code> stays the pasteable summary and the <code>DASH_</code> markers, so
+      the two never collide. Offer <code>--no-progress</code> and <code>-q</code>. The log
+      pane is live; a silent 90-second run looks hung either way.</li>
+    <li><b>Never write outside the dashboard directory</b> unless a flag says so. Reports
+      go to <code>reports/</code>.</li>
+    <li><b>Be re-runnable.</b> The run button gets pressed repeatedly; a second run must
+      overwrite cleanly, not append or fail.</li>
+  </ol>
+
+  <h2>6 · Rules for the sub-dashboard <code>.html</code></h2>
+  <ol class="chk">
+    <li><b>Self-contained.</b> One file, inline CSS, no CDN and no network calls — it has to
+      open from <code>file://</code> on a machine with no internet.</li>
+    <li><b>Light and dark.</b> Define the light palette on <code>:root</code> and override it
+      under <code>@media (prefers-color-scheme: dark)</code>.</li>
+    <li><b>Lead with the numbers.</b> A KPI strip across the top, then the tables. The reader
+      arrived from a red tile and wants to know what is red.</li>
+    <li><b>Worst first.</b> Sort so failures are at the top of every table; nobody scrolls to
+      find the problem.</li>
+    <li><b>Say when it was generated</b>, and from which input file, in the subtitle. A
+      report with no timestamp gets trusted long after it went stale.</li>
+    <li><b>Every figure carries a number and a title</b> —
+      <i>Figure 1 · …</i> — per the site-wide
+      <a href="https://github.com/borenw/borenw.github.io/blob/main/CLAUDE.md">chart rule</a>.</li>
+    <li><b>If it is published here, it carries its page number</b> in the footer, and a row
+      in the Page Registry. Local-only reports do not get numbers.</li>
+  </ol>
+
+  <h2>7 · Registering the tile</h2>
+  <p>One object in the launcher's config. <code>id</code> is what other tiles and the state
+  file refer to, so keep it short and never reuse one.</p>
+<pre><code>{
+  "id":      "drc",
+  "name":    "DRC",
+  "group":   "Physical Verification",
+  "icon":    "▦",
+  "cmd":     "python3 tasks/drc_check.py",
+  "doc":     "Calibre DRC summary — open vs waived violations, grouped by design area.",
+  "timeout": 900
+}</code></pre>
+  <table>
+    <tr><th>Field</th><th>Required</th><th>Notes</th></tr>
+    <tr><td><code>id</code></td><td>yes</td><td>Short, stable, unique. Used in URLs and in the state file.</td></tr>
+    <tr><td><code>name</code></td><td>yes</td><td>Fits a 208-px tile — two words at most.</td></tr>
+    <tr><td><code>group</code></td><td>yes</td><td>Groups are the rows of the board. Reuse an existing one before inventing another.</td></tr>
+    <tr><td><code>cmd</code></td><td>—</td><td>String or argv list. Omit it for a link-only tile.</td></tr>
+    <tr><td><code>url</code></td><td>—</td><td>An external dashboard to open. Mutually exclusive with <code>cmd</code> in practice.</td></tr>
+    <tr><td><code>doc</code></td><td>yes</td><td>One sentence, shown in the detail rail. Say what it reads and what it decides.</td></tr>
+    <tr><td><code>timeout</code></td><td>—</td><td>Seconds before the run is terminated. Set it for anything that touches a simulator.</td></tr>
+    <tr><td><code>rollup</code></td><td>—</td><td><code>true</code> makes the tile run <em>after</em> all the others — see below.</td></tr>
+  </table>
+
+  <h2>8 · Rollup tiles read the other tiles</h2>
+  <p>The master writes every finished run to <code>state/results.json</code>, keyed by tile
+  <code>id</code>: status, summary, metrics, and the timestamp. A tile marked
+  <code>"rollup": true</code> is scheduled last, so it can read that file and turn the whole
+  board into one verdict — a tapeout gate, a nightly digest, a release checklist.</p>
+  <p>Two rules make a rollup honest, and both are easy to skip:</p>
+  <ul>
+    <li><b>Never-run is not a pass.</b> A dependency with no entry is a hole in the gate.</li>
+    <li><b>Age matters.</b> A PASS from three days ago against a layout edited this morning
+      is not a PASS. Compare the timestamp and downgrade to WARN.</li>
+  </ul>
+
+  <h2>9 · Copy-paste template</h2>
+  <p>A complete, valid task in 30 lines. Start here.</p>
+<pre><code>#!/usr/bin/env python3
+"""One line saying what this checks and what it decides."""
+import argparse, os, sys
+
+def emit(k, v): print("DASH_%s: %s" % (k, v), flush=True)
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-V", "--version", action="version", version="thing 1.0")
+    ap.add_argument("--no-progress", action="store_true")   # per the 5-second rule
+    ap.add_argument("-q", "--quiet", action="store_true")
+    ap.add_argument("--rep", default="samples/thing.rep")   # a committed sample
+    a = ap.parse_args()
+
+    if not os.path.exists(a.rep):          # missing input is SKIP, never PASS
+        emit("STATUS", "SKIP")
+        emit("SUMMARY", "no input at %s" % a.rep)
+        return 0
+
+    print("reading %s" % a.rep)            # plain prints become the live log
+    bad, waived = check(a.rep)             # ... your actual work ...
+
+    path = write_report(bad)               # a self-contained page, per section 6
+    emit("HTML", os.path.abspath(path))
+    emit("METRIC", "violations=%d" % len(bad))
+    emit("METRIC", "waived=%d" % waived)
+
+    st = "FAIL" if bad else ("WARN" if waived else "PASS")
+    emit("SUMMARY", "%d open · %d waived" % (len(bad), waived))
+    emit("STATUS", st)                     # status last
+    return 1 if st == "FAIL" else 0        # exit code for cron / CI
+
+if __name__ == "__main__":
+    sys.exit(main())</code></pre>
+
+  <h2>10 · Checklist before you call it done</h2>
+  <ol class="chk">
+    <li><code>python3 tasks/thing.py</code> runs standalone and prints a
+      <code>DASH_STATUS</code>.</li>
+    <li><code>python3 tasks/thing.py -V</code> prints a version, so the install paste is
+      self-testing.</li>
+    <li>A run longer than 5 s prints a heartbeat on <b>stderr</b>, and
+      <code>-q</code> silences it without touching stdout.</li>
+    <li>It exits <code>1</code> on FAIL and <code>0</code> otherwise.</li>
+    <li>Deleting its input yields <span class="s SKIP">SKIP</span>, not a traceback.</li>
+    <li>Running it twice in a row gives the same answer.</li>
+    <li>Its page opens from <code>file://</code> with no network.</li>
+    <li>Its page renders in both light and dark, and every figure has a number and title.</li>
+    <li>The tile entry is in the launcher config, with a <code>doc</code> line.</li>
+    <li>The sample input is committed, so a fresh clone demonstrates itself.</li>
+  </ol>
+
+  <div class="note">
+    <b>Why a format at all.</b> The alternative is what most of these tools grew up as: a
+    script whose result lives in whichever terminal happened to run it. Fixing the output
+    shape — not the tools — is what lets one page speak for all of them, and lets the next
+    tool be useful the moment it is written instead of after somebody wires it in.
+  </div>
+
+  <footer>
+    <a href="https://borenw.github.io/">Page 50 · Bo's Engineering Curriculum</a>
+    · the format used by the Chip Lead Dashboard and every task script behind it
+  </footer>
+
+</div>
+</body>
+</html>
