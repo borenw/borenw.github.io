@@ -163,15 +163,21 @@
   .toc a { color: var(--blue); text-decoration: none; }
   .toc a:hover { text-decoration: underline; }
 
-  /* Stats strip */
-  .stats { display: flex; gap: 12px; margin: 16px 0 8px; flex-wrap: wrap; }
-  .stat {
-    flex: 1; min-width: 130px;
-    background: var(--grey-bg); border: 1px solid var(--border);
-    border-radius: 6px; padding: 12px 16px; text-align: center;
-  }
-  .stat .num { font-size: 24px; font-weight: 700; color: var(--blue); }
-  .stat .lbl { font-size: 12px; color: var(--text-sub); text-transform: uppercase; letter-spacing: .4px; }
+  /* Notes tiles — a second row under the mosaic. Each is a small hand-drawn
+     figure that opens a Google Doc; the caption is real text so Ctrl-F finds it.
+     Hover/focus blows the figure up to its native size (script at the bottom
+     picks the zoom and the anchor point, so it never runs off-screen). */
+  .notes { max-width:1200px; margin:18px auto 0; padding:0 12px; }
+  .notes h2 { font-size:12px; font-weight:700; color:var(--text-sub); text-transform:uppercase; letter-spacing:.4px; margin:0 0 6px 2px; }
+  .notes .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,150px)); gap:8px; }
+  .notes a { display:block; text-decoration:none; color:var(--text); }
+  .notes .fig { display:block; position:relative; aspect-ratio:640/476; border-radius:6px; border:1px solid var(--border); background:#fff; }
+  .notes img { width:100%; height:100%; object-fit:contain; display:block; border-radius:6px; background:#fff;
+               transform-origin:var(--zo, top left); transition:transform .2s ease, box-shadow .2s ease; position:relative; }
+  .notes a:hover img, .notes a:focus-visible img { transform:scale(var(--zoom, 3.5)); z-index:20; box-shadow:0 0 0 .5px var(--blue), 0 6px 24px rgba(9,30,66,.35); border-radius:3px; }
+  .notes a:hover .fig, .notes a:focus-visible .fig { z-index:20; }
+  .notes .cap { display:block; font-size:12px; font-weight:600; line-height:1.35; margin-top:4px; color:var(--blue); }
+  .notes a:hover .cap { text-decoration:underline; }
 
   /* Course sections */
   .course { margin-top: 40px; scroll-margin-top: 12px; }
@@ -238,8 +244,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-09-15T11:36:00Z">built …</span>
-    <span class="rev" id="siterev">rev 103</span>
+    <span class="age" id="siteage" data-built="2026-09-15T12:18:04Z">built …</span>
+    <span class="rev" id="siterev">rev 104</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -277,14 +283,18 @@
     <a href="https://borenw.github.io/3d-markup-overlay-viewer/" title="3D Markup + Overlay Viewer"><img src="img/mosaic/markup3d.jpg" alt="3D Markup + Overlay Viewer" loading="lazy" width="320" height="320"></a>
 </div>
 
+<section class="notes" aria-labelledby="notes-h">
+  <h2 id="notes-h">✏️ Design Notes</h2>
+  <div class="grid">
+    <a href="https://docs.google.com/document/d/1kmIY1Jr-XIuNW19hzpCQoeyrEw4ZtrsbTrZGMob0wHU/edit?tab=t.0" target="_blank" rel="noopener" title="CMFB — NMOS diff pair with PMOS current-mirror common-mode feedback (Google Doc)">
+      <span class="fig"><img src="img/notes/cmfb-diff-amp.png" alt="Hand-drawn schematic: Differential Amplifier with CMFB — NMOS diff pair with PMOS current-mirror common-mode feedback" width="640" height="476" loading="lazy"></span>
+      <span class="cap">Differential Amplifier with CMFB</span>
+    </a>
+  </div>
+</section>
+
 
 <div class="container">
-
-  <div class="stats">
-    <div class="stat"><div class="num">8</div><div class="lbl">Courses</div></div>
-    <div class="stat"><div class="num">39</div><div class="lbl">Live Pages</div></div>
-    <div class="stat"><div class="num">65</div><div class="lbl">Repositories</div></div>
-  </div>
 
   <!-- ============ INDEX ============ -->
   <div class="toc">
@@ -860,6 +870,33 @@ function copyLocalPath(btn){
     document.body.removeChild(ta); done(ok);
   }
 }
+</script>
+<script>
+/* Notes tiles: grow the hovered figure to its native width (never past the
+   viewport), anchored so the enlarged figure stays fully on screen. */
+(function(){
+  function fit(a){
+    var img = a.querySelector('img'); if (!img) return;
+    var r = img.getBoundingClientRect(); if (!r.width) return;
+    var W = window.innerWidth, H = window.innerHeight, m = 12;
+    var z = Math.min((img.naturalWidth || 640) / r.width, (W - 2*m) / r.width, (H - 2*m) / r.height);
+    z = Math.max(1, z);
+    var sw = r.width * z, sh = r.height * z;
+    /* Where the zoomed box should land: at the tile's own corner if it fits,
+       else slid back inside the viewport. Then solve for the transform-origin
+       (px from the tile's top-left) that puts it there. */
+    var L = Math.max(m, Math.min(r.left, W - m - sw));
+    var T = Math.max(m, Math.min(r.top,  H - m - sh));
+    var ox = z > 1 ? (L - r.left) / (1 - z) : 0;
+    var oy = z > 1 ? (T - r.top)  / (1 - z) : 0;
+    img.style.setProperty('--zoom', z.toFixed(2));
+    img.style.setProperty('--zo', ox.toFixed(1) + 'px ' + oy.toFixed(1) + 'px');
+  }
+  document.querySelectorAll('.notes a').forEach(function(a){
+    a.addEventListener('mouseenter', function(){ fit(a); });
+    a.addEventListener('focus', function(){ fit(a); });
+  });
+})();
 </script>
 </body>
 </html>

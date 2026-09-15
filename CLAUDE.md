@@ -129,4 +129,4 @@ If several pages were pushed, list each link + page number.
 - `index.html` — the curriculum home (course → chapter tables) and the **Page Registry** (`#pages`).
 - `biohacking.html`, `rsa/`, `spike_prime_projects/`, `Buck_explorer_v1.ipynb` — pages/assets that live directly in this repo.
 - Most tool pages live in their **own repos** under github.com/borenw and are surfaced here by link. Editing their footer means editing that repo.
-- Stats strip (Courses / Live Pages / Repositories) is maintained by the site owner; update the counts when you add a page.
+- The Courses / Live Pages / Repositories stats strip was removed at rev 104 (owner request); do not bring it back. Its slot under the mosaic is now the **Design Notes** tile row (`.notes`) — small hand-drawn figures that link out to Google Docs, caption as real text so Ctrl-F finds it, hover/focus zooms to native size. Add a tile by copying the existing `<a>` and dropping the image in `img/notes/`. These are links, not pages: no page number.
