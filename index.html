@@ -140,12 +140,49 @@
     .banner .rev, .banner .age, .banner .chk { font-size: 11px; padding: 3px 9px; }
   }
   .container { max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }
-  .mosaic { display:grid; grid-template-columns:repeat(auto-fill,minmax(117px,1fr)); gap:5px; max-width:1200px; margin:14px auto 0; padding:0 12px; }
-  .mosaic a { position:relative; aspect-ratio:1; overflow:hidden; border-radius:6px; border:1px solid var(--border); background:#f4f5f7; }
+  /* ---- Visual index: grouped by course, searchable, zoom-responsive ------------
+     Tile size is set in px against the CSS viewport, so browser/trackpad zoom
+     (which shrinks the CSS viewport) walks DOWN this ladder: tiles get bigger and
+     fewer fit per row, giving the zoomed-in reader the area they asked for.
+     Keyword text lives in .mosaic .kw - in the DOM for find-in-page, the search
+     box and screen readers, clipped so it never touches the tile's look. */
+  .mosaic-wrap { max-width:1200px; margin:14px auto 0; padding:0 12px; }
+  .msearch { display:flex; align-items:center; gap:8px; margin:0 0 10px; }
+  .msearch input { flex:1; min-width:0; font:inherit; font-size:13px; padding:7px 10px 7px 30px; border:1px solid var(--border); border-radius:7px; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%235E6C84' stroke-width='1.6'%3E%3Ccircle cx='7' cy='7' r='4.5'/%3E%3Cpath d='M10.5 10.5 L14 14'/%3E%3C/svg%3E") no-repeat 9px 50% / 13px 13px; color:var(--text); -webkit-appearance:none; appearance:none; }
+  .msearch input:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-light); }
+  .msearch .mcount { font-size:12px; color:var(--text-sub); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  /* Course label sits in its own left column so a one-tile course does not cost a
+     whole empty row; it stacks above the tiles once the viewport (or the zoom) is
+     tight enough that 142px of label is worth more as tile area. */
+  .mgroup { display:grid; grid-template-columns:142px minmax(0,1fr); gap:0 11px; align-items:start; margin:0 0 12px; }
+  .mgroup h3 { font-size:12px; font-weight:700; color:var(--text-sub); text-transform:uppercase; letter-spacing:.4px; margin:3px 0 6px; text-align:right; line-height:1.3; }
+  .mgroup h3 a { color:inherit; text-decoration:none; }
+  .mgroup h3 a:hover { color:var(--blue); text-decoration:underline; }
+  .mgroup h3 .n { font-weight:600; color:var(--grey); letter-spacing:0; }
+  .mosaic { display:grid; grid-template-columns:repeat(auto-fill,minmax(117px,1fr)); gap:5px; }
+  .mosaic a { position:relative; display:block; aspect-ratio:1; overflow:hidden; border-radius:6px; border:1px solid var(--border); background:#f4f5f7; }
   .mosaic img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .22s ease; }
   .mosaic a:hover img { transform:scale(1.09); }
   .mosaic a:hover { border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-light); z-index:2; }
-  @media (max-width:520px){ .mosaic { grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); } }
+  .mosaic .kw { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0; }
+  .mosaic .cap { position:absolute; left:0; right:0; bottom:0; padding:12px 5px 4px; font-size:10.5px; line-height:1.2; font-weight:600; color:#fff; pointer-events:none;
+                 background:linear-gradient(to top,rgba(9,30,66,.93),rgba(9,30,66,.74) 55%,rgba(9,30,66,0)); opacity:0; transition:opacity .16s ease; }
+  .mosaic a:hover .cap, .mosaic a:focus-visible .cap { opacity:1; }
+  .mosaic a.mhit { border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-light); }
+  .mosaic .cap .mpv { font-weight:600; opacity:.72; }
+  .mnone { font-size:13px; color:var(--text-sub); padding:6px 2px 10px; }
+  /* .mgroup/.mosaic a set display, which beats the UA [hidden] rule - restore it */
+  .mgroup[hidden], .mosaic a[hidden] { display:none !important; }
+  /* zoom ladder - narrower CSS viewport (= zoomed in) means bigger tiles, fewer per row */
+  @media (max-width:1240px){ .mosaic { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); } }
+  @media (max-width:1000px){ .mosaic { grid-template-columns:repeat(auto-fill,minmax(168px,1fr)); gap:6px; }
+                             .mosaic .cap { font-size:11.5px; } }
+  @media (max-width:760px) { .mosaic { grid-template-columns:repeat(auto-fill,minmax(205px,1fr)); gap:7px; }
+                             .mosaic .cap { font-size:13px; padding:16px 8px 6px; }
+                             .mgroup { grid-template-columns:minmax(0,1fr); gap:0; }
+                             .mgroup h3 { text-align:left; margin-left:2px; } }
+  @media (max-width:520px) { .mosaic { grid-template-columns:repeat(auto-fill,minmax(31%,1fr)); gap:5px; }
+                             .mosaic .cap { font-size:10.5px; padding:12px 5px 4px; } }
 
   /* Table of contents */
   .toc {
@@ -244,44 +281,100 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-09-16T14:14:03Z">built …</span>
-    <span class="rev" id="siterev">rev 107</span>
+    <span class="age" id="siteage" data-built="2026-09-20T11:48:28Z">built …</span>
+    <span class="rev" id="siterev">rev 108</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
 </div>
 
-<div class="mosaic" aria-label="Visual index of all pages">
-    <a href="https://borenw.github.io/gbw-power-area-tradeoff/" title="GBW · Power · Area"><img src="img/mosaic/gbw.jpg" alt="GBW · Power · Area" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/ibis-model-builder/" title="IBIS Model Builder"><img src="img/mosaic/ibis.jpg" alt="IBIS Model Builder" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Bode_Plot_Sandbox/" title="Bode Plot Sandbox"><img src="img/mosaic/bode.jpg" alt="Bode Plot Sandbox" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/ota-inverting-amp-explorer/" title="OTA Inverting Amp"><img src="img/mosaic/ota.jpg" alt="OTA Inverting Amp" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Biquad-Sandbox/" title="Biquad Sandbox"><img src="img/mosaic/biquad.jpg" alt="Biquad Sandbox" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Crystal-Oscillator/" title="Crystal Oscillator"><img src="img/mosaic/crystal.jpg" alt="Crystal Oscillator" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/ring-oscillator-model/" title="Ring Oscillator — Phase Model"><img src="img/mosaic/ringosc.jpg" alt="Ring Oscillator — Phase Model" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/grumpy-worm/" title="grumPy WorM"><img src="img/mosaic/grumpy.jpg" alt="grumPy WorM" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/gm-id-estimator/" title="gm/Id First-Order Estimator"><img src="img/mosaic/gmid.jpg" alt="gm/Id First-Order Estimator" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/ESD/" title="ESD — Protection & Debug Hub"><img src="img/mosaic/esd.jpg" alt="ESD — Protection & Debug Hub" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/3D-Fourier-Cos-Sin/" title="3D Fourier Cos/Sin"><img src="img/mosaic/fourier3d.jpg" alt="3D Fourier Cos/Sin" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/finger-multiplication/" title="Finger Multiplication"><img src="img/mosaic/finger.jpg" alt="Finger Multiplication" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Inductance-Calculator-Visual/" title="Inductance Calculator"><img src="img/mosaic/inductance.jpg" alt="Inductance Calculator" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Transient-Switch-L-C/" title="Transient L-C-SW"><img src="img/mosaic/transient.jpg" alt="Transient L-C-SW" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/What-is-S11-when-shorted-to-GND/" title="S11 when Shorted to GND"><img src="img/mosaic/s11.jpg" alt="S11 when Shorted to GND" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/SVG-Editor-Lite/" title="SVG Editor Lite"><img src="img/mosaic/schematic.jpg" alt="SVG Editor Lite" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Brighten-EDA-Dark-Theme/" title="Brighten EDA Dark Theme"><img src="img/mosaic/brighten.jpg" alt="Brighten EDA Dark Theme" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Repo-Summary/" title="Repo Summary"><img src="img/mosaic/reposum.jpg" alt="Repo Summary" loading="lazy" width="320" height="320"></a>
-    <a href="biohacking.html" title="40 Biohacks, Ranked"><img src="img/mosaic/biohack.jpg" alt="40 Biohacks, Ranked" loading="lazy" width="320" height="320"></a>
-    <a href="rsa/" title="RSA by Hand"><img src="img/mosaic/rsa.jpg" alt="RSA by Hand" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Catch-Bigfoot/" title="Catch Bigfoot"><img src="img/mosaic/bigfoot.jpg" alt="Catch Bigfoot" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Roadblocks/" title="Roadblocks"><img src="img/mosaic/roadblocks.jpg" alt="Roadblocks" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Lake-Fulmore/" title="Lake Fulmore"><img src="img/mosaic/lake.jpg" alt="Lake Fulmore" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/Campsite-Movies/" title="Campsite Movies"><img src="img/mosaic/campsite.jpg" alt="Campsite Movies" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/piano-theory/" title="Piano Theory"><img src="img/mosaic/piano.jpg" alt="Piano Theory" loading="lazy" width="320" height="320"></a>
-    <a href="spike_prime_projects/" title="LEGO SPIKE Prime"><img src="img/mosaic/spike.jpg" alt="LEGO SPIKE Prime" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/chip-packaging-explorer/" title="Advanced Packaging Explorer"><img src="img/mosaic/packaging.jpg" alt="Advanced Packaging Explorer" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/3d-print-tools/" title="3D Print Tools — Easy Support &amp; 3D Browser"><img src="img/mosaic/print3d.jpg" alt="3D Print Tools — Easy Support &amp; 3D Browser" loading="lazy" width="320" height="320"></a>
-    <a href="https://borenw.github.io/3d-markup-overlay-viewer/" title="3D Markup + Overlay Viewer"><img src="img/mosaic/markup3d.jpg" alt="3D Markup + Overlay Viewer" loading="lazy" width="320" height="320"></a>
-    <a href="https://github.com/borenw/smith-sphere" title="🔒 Smith Sphere — 3D Smith chart on a stereographic sphere (private repo)"><img src="img/mosaic/smithsphere.jpg" alt="Smith Sphere — 3D Smith chart on a stereographic sphere" loading="lazy" width="320" height="320"></a>
+<div class="mosaic-wrap" role="region" aria-label="Visual index of all pages, grouped by course">
+  <div class="msearch">
+    <input id="mq" type="search" placeholder="Search the 31 pages — name, topic, keyword…" aria-label="Search pages" autocomplete="off" spellcheck="false">
+    <span class="mcount" id="mcount" role="status" aria-live="polite">31 pages</span>
+  </div>
+  <div id="mnone" class="mnone" hidden>No page matches that. Try a different word — or Ctrl-F, every tile carries its keywords.</div>
+  <section class="mgroup" data-cat="analog" aria-labelledby="mg-analog">
+    <h3 id="mg-analog"><a href="#analog">📘 Analog Circuit Design</a> <span class="n">8</span></h3>
+    <div class="mosaic">
+      <a href="https://borenw.github.io/gbw-power-area-tradeoff/" title="GBW · Power · Area"><img src="img/mosaic/gbw.jpg" alt="GBW · Power · Area" loading="lazy" width="320" height="320"><span class="cap">GBW · Power · Area</span><span class="kw">GBW · Power · Area — 📘 Analog Circuit Design — gain bandwidth product GBW power area tradeoff op-amp opamp amplifier design space current budget figure of merit</span></a>
+      <a href="https://borenw.github.io/ibis-model-builder/" title="IBIS Model Builder"><img src="img/mosaic/ibis.jpg" alt="IBIS Model Builder" loading="lazy" width="320" height="320"><span class="cap">IBIS Model Builder</span><span class="kw">IBIS Model Builder — 📘 Analog Circuit Design — IBIS buffer model signal integrity I/O driver receiver IV curve VT waveform package parasitics .ibs</span></a>
+      <a href="https://borenw.github.io/Bode_Plot_Sandbox/" title="Bode Plot Sandbox"><img src="img/mosaic/bode.jpg" alt="Bode Plot Sandbox" loading="lazy" width="320" height="320"><span class="cap">Bode Plot Sandbox</span><span class="kw">Bode Plot Sandbox — 📘 Analog Circuit Design — Bode plot poles zeros magnitude phase margin gain margin transfer function frequency response stability compensation</span></a>
+      <a href="https://borenw.github.io/ota-inverting-amp-explorer/" title="OTA Inverting Amp"><img src="img/mosaic/ota.jpg" alt="OTA Inverting Amp" loading="lazy" width="320" height="320"><span class="cap">OTA Inverting Amp</span><span class="kw">OTA Inverting Amp — 📘 Analog Circuit Design — OTA operational transconductance amplifier inverting closed loop gain feedback factor loading virtual ground</span></a>
+      <a href="https://borenw.github.io/Biquad-Sandbox/" title="Biquad Sandbox"><img src="img/mosaic/biquad.jpg" alt="Biquad Sandbox" loading="lazy" width="320" height="320"><span class="cap">Biquad Sandbox</span><span class="kw">Biquad Sandbox — 📘 Analog Circuit Design — biquad active filter low-pass high-pass band-pass notch Sallen-Key quality factor Q cutoff second order</span></a>
+      <a href="https://borenw.github.io/Crystal-Oscillator/" title="Crystal Oscillator"><img src="img/mosaic/crystal.jpg" alt="Crystal Oscillator" loading="lazy" width="320" height="320"><span class="cap">Crystal Oscillator</span><span class="kw">Crystal Oscillator — 📘 Analog Circuit Design — crystal oscillator quartz Pierce resonator negative resistance motional ESR load capacitance startup margin</span></a>
+      <a href="https://borenw.github.io/ring-oscillator-model/" title="Ring Oscillator — Phase Model"><img src="img/mosaic/ringosc.jpg" alt="Ring Oscillator — Phase Model" loading="lazy" width="320" height="320"><span class="cap">Ring Oscillator — Phase Model</span><span class="kw">Ring Oscillator — Phase Model — 📘 Analog Circuit Design — ring oscillator phase model VCO jitter phase noise delay stage inverter chain period</span></a>
+      <a href="https://borenw.github.io/grumpy-worm/" title="grumPy WorM"><img src="img/mosaic/grumpy.jpg" alt="grumPy WorM" loading="lazy" width="320" height="320"><span class="cap">grumPy WorM</span><span class="kw">grumPy WorM — 📘 Analog Circuit Design — PWM pulse width modulation delta-sigma data converter teaching toy flappy game duty cycle</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="device" aria-labelledby="mg-device">
+    <h3 id="mg-device"><a href="#device">📗 Device Physics</a> <span class="n">2</span></h3>
+    <div class="mosaic">
+      <a href="https://borenw.github.io/gm-id-estimator/" title="gm/Id First-Order Estimator"><img src="img/mosaic/gmid.jpg" alt="gm/Id First-Order Estimator" loading="lazy" width="320" height="320"><span class="cap">gm/Id First-Order Estimator</span><span class="kw">gm/Id First-Order Estimator — 📗 Device Physics — gm/Id transconductance efficiency MOSFET sizing inversion level weak strong Vdsat headroom process node first-order</span></a>
+      <a href="https://borenw.github.io/ESD/" title="ESD — Protection &amp; Debug Hub"><img src="img/mosaic/esd.jpg" alt="ESD — Protection &amp; Debug Hub" loading="lazy" width="320" height="320"><span class="cap">ESD — Protection &amp; Debug Hub</span><span class="kw">ESD — Protection &amp; Debug Hub — 📗 Device Physics — ESD electrostatic discharge HBM CDM MM clamp protection latch-up I/O pin failure debug hub</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="math" aria-labelledby="mg-math">
+    <h3 id="mg-math"><a href="#math">📙 Engineering Mathematics</a> <span class="n">2</span></h3>
+    <div class="mosaic">
+      <a href="https://borenw.github.io/3D-Fourier-Cos-Sin/" title="3D Fourier Cos/Sin"><img src="img/mosaic/fourier3d.jpg" alt="3D Fourier Cos/Sin" loading="lazy" width="320" height="320"><span class="cap">3D Fourier Cos/Sin</span><span class="kw">3D Fourier Cos/Sin — 📙 Engineering Mathematics — Fourier series transform cosine sine harmonics spectrum DFT FFT 3D visualization basis functions</span></a>
+      <a href="https://borenw.github.io/finger-multiplication/" title="Finger Multiplication"><img src="img/mosaic/finger.jpg" alt="Finger Multiplication" loading="lazy" width="320" height="320"><span class="cap">Finger Multiplication</span><span class="kw">Finger Multiplication — 📙 Engineering Mathematics — finger multiplication mental math arithmetic times table trick nines</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="emrf" aria-labelledby="mg-emrf">
+    <h3 id="mg-emrf"><a href="#emrf">📕 Electromagnetics &amp; RF</a> <span class="n">4</span></h3>
+    <div class="mosaic">
+      <a href="https://borenw.github.io/Inductance-Calculator-Visual/" title="Inductance Calculator"><img src="img/mosaic/inductance.jpg" alt="Inductance Calculator" loading="lazy" width="320" height="320"><span class="cap">Inductance Calculator</span><span class="kw">Inductance Calculator — 📕 Electromagnetics &amp; RF — inductance calculator loop wire bond trace solenoid nanohenry nH geometry mutual self</span></a>
+      <a href="https://borenw.github.io/Transient-Switch-L-C/" title="Transient L-C-SW"><img src="img/mosaic/transient.jpg" alt="Transient L-C-SW" loading="lazy" width="320" height="320"><span class="cap">Transient L-C-SW</span><span class="kw">Transient L-C-SW — 📕 Electromagnetics &amp; RF — transient LC switch RLC ringing step response damping energy transfer time domain</span></a>
+      <a href="https://borenw.github.io/What-is-S11-when-shorted-to-GND/" title="S11 when Shorted to GND"><img src="img/mosaic/s11.jpg" alt="S11 when Shorted to GND" loading="lazy" width="320" height="320"><span class="cap">S11 when Shorted to GND</span><span class="kw">S11 when Shorted to GND — 📕 Electromagnetics &amp; RF — S11 S-parameters reflection coefficient short to ground Smith chart return loss VSWR impedance match</span></a>
+      <a href="https://github.com/borenw/smith-sphere" title="Smith Sphere · private repo"><img src="img/mosaic/smithsphere.jpg" alt="Smith Sphere · private repo" loading="lazy" width="320" height="320"><span class="cap">Smith Sphere <span class="mpv">· private repo</span></span><span class="kw">Smith Sphere · private repo — 📕 Electromagnetics &amp; RF — Smith chart sphere Riemann stereographic projection impedance point at infinity three.js private GitHub repo</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="power" aria-labelledby="mg-power">
+    <h3 id="mg-power"><a href="#power">📒 Power Electronics</a> <span class="n">1</span></h3>
+    <div class="mosaic">
+      <a href="https://github.com/borenw/hysteretic-buck-converter" title="Hysteretic Buck Converter · private repo"><img src="img/mosaic/hysteretic.jpg" alt="Hysteretic Buck Converter · private repo" loading="lazy" width="320" height="320"><span class="cap">Hysteretic Buck Converter <span class="mpv">· private repo</span></span><span class="kw">Hysteretic Buck Converter · private repo — 📒 Power Electronics — hysteretic buck converter bang-bang relay comparator DC-DC switching frequency fsw ripple ESR ceramic cap output impedance inductor duty cycle synchronous NMOS dead time startup private GitHub repo</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="packaging" aria-labelledby="mg-packaging">
+    <h3 id="mg-packaging"><a href="#packaging">📦 Advanced Packaging</a> <span class="n">1</span></h3>
+    <div class="mosaic">
+      <a href="https://borenw.github.io/chip-packaging-explorer/" title="Advanced Packaging Explorer"><img src="img/mosaic/packaging.jpg" alt="Advanced Packaging Explorer" loading="lazy" width="320" height="320"><span class="cap">Advanced Packaging Explorer</span><span class="kw">Advanced Packaging Explorer — 📦 Advanced Packaging — packaging MCM 2.5D interposer CoWoS EMIB LGA socket chiplet die-to-die cross-section pitch cost</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="tools" aria-labelledby="mg-tools">
+    <h3 id="mg-tools"><a href="#tools">🛠 Lab Tools</a> <span class="n">5</span></h3>
+    <div class="mosaic">
+      <a href="https://borenw.github.io/SVG-Editor-Lite/" title="SVG Editor Lite"><img src="img/mosaic/schematic.jpg" alt="SVG Editor Lite" loading="lazy" width="320" height="320"><span class="cap">SVG Editor Lite</span><span class="kw">SVG Editor Lite — 🛠 Lab Tools — SVG editor vector drawing schematic figure markup lightweight browser</span></a>
+      <a href="https://borenw.github.io/Brighten-EDA-Dark-Theme/" title="Brighten EDA Dark Theme"><img src="img/mosaic/brighten.jpg" alt="Brighten EDA Dark Theme" loading="lazy" width="320" height="320"><span class="cap">Brighten EDA Dark Theme</span><span class="kw">Brighten EDA Dark Theme — 🛠 Lab Tools — brighten EDA dark theme screenshot contrast invert Cadence Virtuoso waveform image readable</span></a>
+      <a href="https://borenw.github.io/Repo-Summary/" title="Repo Summary"><img src="img/mosaic/reposum.jpg" alt="Repo Summary" loading="lazy" width="320" height="320"><span class="cap">Repo Summary</span><span class="kw">Repo Summary — 🛠 Lab Tools — repository summary GitHub repo index catalog overview tool</span></a>
+      <a href="https://borenw.github.io/3d-print-tools/" title="3D Print Tools — Easy Support &amp; 3D Browser"><img src="img/mosaic/print3d.jpg" alt="3D Print Tools — Easy Support &amp; 3D Browser" loading="lazy" width="320" height="320"><span class="cap">3D Print Tools — Easy Support &amp; 3D Browser</span><span class="kw">3D Print Tools — Easy Support &amp; 3D Browser — 🛠 Lab Tools — 3D print tools STL support generator mesh browser overhang slicer printing</span></a>
+      <a href="https://borenw.github.io/3d-markup-overlay-viewer/" title="3D Markup + Overlay Viewer"><img src="img/mosaic/markup3d.jpg" alt="3D Markup + Overlay Viewer" loading="lazy" width="320" height="320"><span class="cap">3D Markup + Overlay Viewer</span><span class="kw">3D Markup + Overlay Viewer — 🛠 Lab Tools — 3D markup overlay viewer annotate model review compare STL mesh</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="biohacking" aria-labelledby="mg-biohacking">
+    <h3 id="mg-biohacking"><a href="#biohacking">🧬 Health &amp; Longevity</a> <span class="n">1</span></h3>
+    <div class="mosaic">
+      <a href="biohacking.html" title="40 Biohacks, Ranked"><img src="img/mosaic/biohack.jpg" alt="40 Biohacks, Ranked" loading="lazy" width="320" height="320"><span class="cap">40 Biohacks, Ranked</span><span class="kw">40 Biohacks, Ranked — 🧬 Health &amp; Longevity — biohacking longevity health sleep exercise fasting supplements ranked evidence lifespan</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="crypto" aria-labelledby="mg-crypto">
+    <h3 id="mg-crypto"><a href="#crypto">🔐 Cryptography &amp; Security</a> <span class="n">1</span></h3>
+    <div class="mosaic">
+      <a href="rsa/" title="RSA by Hand"><img src="img/mosaic/rsa.jpg" alt="RSA by Hand" loading="lazy" width="320" height="320"><span class="cap">RSA by Hand</span><span class="kw">RSA by Hand — 🔐 Cryptography &amp; Security — RSA public key cryptography encryption modular arithmetic primes totient by hand worked example</span></a>
+    </div>
+  </section>
+  <section class="mgroup" data-cat="recess" aria-labelledby="mg-recess">
+    <h3 id="mg-recess"><a href="#recess">🎮 Recess — Games &amp; Fun</a> <span class="n">6</span></h3>
+    <div class="mosaic">
+      <a href="https://borenw.github.io/Catch-Bigfoot/" title="Catch Bigfoot"><img src="img/mosaic/bigfoot.jpg" alt="Catch Bigfoot" loading="lazy" width="320" height="320"><span class="cap">Catch Bigfoot</span><span class="kw">Catch Bigfoot — 🎮 Recess — Games &amp; Fun — game Catch Bigfoot arcade fun play</span></a>
+      <a href="https://borenw.github.io/Roadblocks/" title="Roadblocks"><img src="img/mosaic/roadblocks.jpg" alt="Roadblocks" loading="lazy" width="320" height="320"><span class="cap">Roadblocks</span><span class="kw">Roadblocks — 🎮 Recess — Games &amp; Fun — game Roadblocks puzzle driving obstacle fun play</span></a>
+      <a href="https://borenw.github.io/Lake-Fulmore/" title="Lake Fulmore"><img src="img/mosaic/lake.jpg" alt="Lake Fulmore" loading="lazy" width="320" height="320"><span class="cap">Lake Fulmore</span><span class="kw">Lake Fulmore — 🎮 Recess — Games &amp; Fun — game Lake Fulmore adventure exploration fun play</span></a>
+      <a href="https://borenw.github.io/Campsite-Movies/" title="Campsite Movies"><img src="img/mosaic/campsite.jpg" alt="Campsite Movies" loading="lazy" width="320" height="320"><span class="cap">Campsite Movies</span><span class="kw">Campsite Movies — 🎮 Recess — Games &amp; Fun — campsite movies camping film list outdoor screen night</span></a>
+      <a href="https://borenw.github.io/piano-theory/" title="Piano Theory"><img src="img/mosaic/piano.jpg" alt="Piano Theory" loading="lazy" width="320" height="320"><span class="cap">Piano Theory</span><span class="kw">Piano Theory — 🎮 Recess — Games &amp; Fun — piano music theory chords scales intervals keyboard circle of fifths</span></a>
+      <a href="spike_prime_projects/" title="LEGO SPIKE Prime"><img src="img/mosaic/spike.jpg" alt="LEGO SPIKE Prime" loading="lazy" width="320" height="320"><span class="cap">LEGO SPIKE Prime</span><span class="kw">LEGO SPIKE Prime — 🎮 Recess — Games &amp; Fun — LEGO SPIKE Prime robotics projects kids motors sensors build</span></a>
+    </div>
+  </section>
 </div>
 
 <section class="notes" aria-labelledby="notes-h">
@@ -320,7 +413,7 @@
         <ul><li><a href="#emrf">4.1 Inductance · 4.2 RLC Transients · 4.3 S-Parameters</a></li></ul>
       </li>
       <li><a href="#power">5. Power Electronics</a>
-        <ul><li><a href="#power">5.2 Buck Converter — Interactive Explorer (CCM/DCM) · 5.4 Board-Level RLC / Coupling Spec</a></li></ul>
+        <ul><li><a href="#power">5.2 Buck Converter — Interactive Explorer (CCM/DCM) · 5.2 Hysteretic Buck Converter — Interactive Simulator · 5.4 Board-Level RLC / Coupling Spec</a></li></ul>
       </li>
       <li><a href="#controls">6. Control Systems</a>
         <ul><li><a href="#controls">6.3 Relay Feedback &amp; Limit Cycles — delayed hysteretic clamp loop</a></li></ul>
@@ -522,6 +615,7 @@
       <tr><td class="ch">Ch. 2</td><td>
         <a href="http://localhost:8888/lab/tree/Buck_explorer_v1.ipynb">Buck Converter — Interactive Explorer</a> <span class="desc">— CCM/DCM &amp; voltage/peak-current-mode notebook (local Jupyter)</span> · <a href="https://github.com/borenw/borenw.github.io/blob/main/Buck_explorer_v1.ipynb">view on GitHub</a></td>
         <td><span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
+      <tr><td class="ch">Ch. 2</td><td>🔒 <a href="https://github.com/borenw/hysteretic-buck-converter">Hysteretic Buck Converter — Interactive Simulator</a> <span class="desc">(private — offline)</span><br><span class="lpath"><code>file:///Users/boren_wang/repos/hysteretic-buck-converter/index.html</code><button type="button" onclick="copyLocalPath(this)">copy</button><span class="desc">open on this Mac</span></span><span class="desc"> — bang-bang (relay) control instead of a compensated error amplifier: a comparator with hysteresis V<sub>IH</sub>/V<sub>IL</sub> drives the switch, so there is no loop to compensate and no fixed clock. One self-contained HTML file, no dependencies, no network. It integrates L·dI<sub>L</sub>/dt = V<sub>sw</sub> − V<sub>out</sub> and C·dV<sub>C</sub>/dt = I<sub>L</sub> − V<sub>out</sub>/R<sub>L</sub> with V<sub>out</sub> = V<sub>C</sub> + R<sub>esr</sub>·I<sub>C</sub>, and flips the switch a comparator+driver delay t<sub>d</sub> after V<sub>out</sub> crosses a threshold — so <b>f<sub>sw</sub> is measured off the simulated gate edges and checked against the closed form</b> rather than assumed. <b>Figure 1</b> live schematic + I<sub>L</sub>/V<sub>out</sub> waveform (moving a slider boxes that parameter in red in both; ghost traces keep the last three states); <b>Figure 2</b> V<sub>OUT</sub>/I<sub>L</sub>(f) output impedance, live, with f<sub>p</sub>=1/(2πR<sub>L</sub>C) and f<sub>z</sub>=1/(2πR<sub>esr</sub>C) marked and the f<sub>sw</sub> &gt; f<sub>z</sub> ⇒ Z ≈ R<sub>esr</sub>, ∠0° condition flagged; <b>Figure 3</b> frequency ladder &amp; ripple budget, ranking which term actually sets f<sub>sw</sub>. The <b>Ceramic-cap</b> button jumps to the low-ESR case where the ripple stops tracking I<sub>L</sub> and the loop misbehaves. Synchronous-NMOS vs diode low side, startup from V<sub>out</sub>=0, shareable-link state encoding, a <b>▶ interview demo</b> that plays fundamentals Q1–Q5 with timed slider moves and word-synced captions, a vertical (Shorts) reflow, and a command line (<code>demo 3</code>, <code>esr=12</code>, <code>l += 1</code>, <code>sweep esr 40 1 20</code>, <code>play l</code>).</span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 3</td><td>Magnetics Design</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/board-level-rlc-spec">Board-Level RLC Spec for IC Pins — Multiphase Buck</a> <span class="desc">— parasitic RLC budget &amp; victim/aggressor coupling spec for a multiphase buck controller. Interactive spec explorer: aggressor/victim pin-group dropdowns (power, PWM, clock, data, V/I/temp/ref sense) and a ranked list of coupling mechanisms (mutual-L, ground-return, capacitive, PDN, reflection…) that derives the board mutual-inductance / C<sub>ac</sub> / ground-return limits from each victim's error budget (M ≤ 8.3 pH per aggressor). Bench-sketch coupling schematic + worked V<sub>emf</sub>=M·dI/dt. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://borenw.github.io/inductive-crosstalk/">Inductive Crosstalk (Aggressor → Victim)</a> <span class="desc">— coupled 4-state RLC crosstalk explorer: a primary series-RLC loop (aggressor I<sub>1</sub>) mutually coupled by M to a secondary L<sub>2</sub>–R<sub>2</sub>–C<sub>2</sub> victim loop (measured across C<sub>2</sub>). Shows the transient of I<sub>1</sub>, the induced EMF M·dI<sub>1</sub>/dt and the filtered victim, and solves the separation d for a target victim peak (Case A far / 1 mV, Case B near / 100 mV, live Case C runs the actual RK4 ODE). Ships a one-click SciPy reproduction of the Case A table row (matches to &lt;0.5%).</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
@@ -852,6 +946,68 @@
         + ' ' + d.toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit'});
     el.textContent = 'Last updated: ' + txt;
   })();
+</script>
+<script>
+/* Visual-index search. Every tile carries its keywords in a clipped .kw span —
+   there for find-in-page and screen readers without touching the tile's look —
+   and this filters on the same text. Space-separated terms are ANDed; a course
+   name ("power", "recess") works as a term, so does a page title. ?q= deep-links
+   a filtered view; Esc clears; "/" from anywhere focuses the box. */
+(function(){
+  var box = document.getElementById('mq');
+  if (!box) return;
+  var count = document.getElementById('mcount');
+  var none  = document.getElementById('mnone');
+  var groups = [].slice.call(document.querySelectorAll('.mgroup'));
+  var nEls = groups.map(function(g){ return g.querySelector('h3 .n'); });
+  var tiles = groups.map(function(g){
+    return [].slice.call(g.querySelectorAll('.mosaic > a')).map(function(a){
+      var kw = a.querySelector('.kw');
+      return { a: a, t: ((kw ? kw.textContent : '') + ' ' + a.getAttribute('href')).toLowerCase() };
+    });
+  });
+  var total = tiles.reduce(function(n, g){ return n + g.length; }, 0);
+
+  function apply(q){
+    var terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+    var shown = 0;
+    groups.forEach(function(g, i){
+      var n = 0;
+      tiles[i].forEach(function(o){
+        var hit = terms.every(function(t){ return o.t.indexOf(t) !== -1; });
+        o.a.hidden = !hit;
+        o.a.classList.toggle('mhit', hit && terms.length > 0);
+        if (hit) n++;
+      });
+      if (nEls[i]) nEls[i].textContent = (terms.length && n < tiles[i].length) ? (n + '/' + tiles[i].length) : String(tiles[i].length);
+      g.hidden = (n === 0);
+      shown += n;
+    });
+    count.textContent = terms.length ? (shown + ' of ' + total + ' pages') : (total + ' pages');
+    none.hidden = (shown > 0 || terms.length === 0);
+    return shown;
+  }
+
+  var t0;
+  box.addEventListener('input', function(){
+    clearTimeout(t0);
+    t0 = setTimeout(function(){ apply(box.value); }, 70);
+  });
+  box.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ box.value = ''; apply(''); }
+    if (e.key === 'Enter'){
+      var first = document.querySelector('.mgroup:not([hidden]) .mosaic > a:not([hidden])');
+      if (first) first.click();
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || '')) && !e.metaKey && !e.ctrlKey){
+      e.preventDefault(); box.focus(); box.select();
+    }
+  });
+  var q = new URLSearchParams(location.search).get('q');
+  if (q){ box.value = q; apply(q); }
+})();
 </script>
 <script>
 /* Copy the local path for the private dashboard. navigator.clipboard needs a
