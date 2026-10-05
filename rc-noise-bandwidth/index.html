@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RC Noise Bandwidth: kT/C and the π/2</title>
+<meta name="description" content="Why a single-pole RC integrates 4kTR to exactly kT/C, and why its noise bandwidth is π/2 times the 3 dB corner, shown four ways: linear equal area, arctan flattening, quarter circle vs triangle, and a rolling-arc animation.">
+<style>
+  :root{
+    --bg:#ffffff; --fg:#172b4d; --sub:#5e6c84; --line:#dfe1e6; --card:#f4f5f7;
+    --blue:#0052cc; --blue-l:#deebff; --blue-m:#4c9aff;
+    --coral:#de5b30; --coral-l:#f0997b; --teal:#1d9e75; --teal-l:#5dcaa5;
+    --green:#00875a; --green-l:#e3fcef; --amber:#b76e00; --amber-l:#fffae6; --red:#de350b; --red-l:#ffebe6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:15.5px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:900px;margin:0 auto;padding:0 18px 64px;}
+  .top{background:var(--blue);color:#fff;padding:22px 18px 18px;margin:0 -18px 22px;}
+  .top .kick{font-size:12.5px;letter-spacing:.6px;text-transform:uppercase;opacity:.85}
+  .top h1{margin:4px 0 6px;font-size:26px;line-height:1.25}
+  .top p{margin:0;opacity:.92;font-size:15px}
+  .top a{color:#fff}
+  .banner{background:var(--blue);color:#fff;font-weight:600;font-size:17px;padding:9px 14px;border-radius:4px;margin:34px 0 12px}
+  .banner .n{opacity:.8;margin-right:6px}
+  h3{font-size:15.5px;margin:20px 0 6px;color:var(--fg)}
+  a{color:var(--blue)}
+  .toc{border:1px solid var(--line);border-left:4px solid var(--blue);background:var(--card);border-radius:0;padding:12px 18px}
+  .toc b{display:block;margin-bottom:4px}
+  .toc ul{margin:4px 0;padding-left:20px}
+  .toc li{margin:2px 0}
+  table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--blue-l);color:var(--fg)}
+  td.rk{font-weight:700;color:var(--blue);white-space:nowrap}
+  .ok{color:var(--green);font-weight:600} .bad{color:var(--red);font-weight:600} .mid{color:var(--amber);font-weight:600}
+  .num{font-variant-numeric:tabular-nums;font-weight:600}
+  .bar{height:12px;background:var(--blue-m);border-radius:3px;min-width:2px}
+  .barcell{width:34%}
+  .note{border:1px solid var(--line);border-left:4px solid var(--blue);background:var(--card);padding:10px 14px;margin:12px 0}
+  .note.warn{border-left-color:var(--amber);background:var(--amber-l)}
+  .note.good{border-left-color:var(--green);background:var(--green-l)}
+  .eq{font-family:"Cambria Math","STIX Two Math",Georgia,serif;font-size:17px;background:var(--card);border:1px solid var(--line);padding:10px 14px;margin:10px 0;overflow-x:auto;white-space:nowrap}
+  figure{margin:16px 0;border:1px solid var(--line);border-radius:6px;padding:12px}
+  figcaption{font-size:13.5px;color:var(--sub);margin-top:8px}
+  figcaption b{color:var(--fg)}
+  svg{display:block;width:100%;height:auto}
+  .ctl{display:flex;gap:10px;align-items:center;margin:8px 0 4px;flex-wrap:wrap}
+  .ctl label{font-size:13.5px;color:var(--sub)}
+  .ctl input[type=range]{flex:1;min-width:140px}
+  .ctl .val{font-weight:600;min-width:70px;text-align:right;font-variant-numeric:tabular-nums}
+  button{font:inherit;font-size:13.5px;padding:5px 12px;border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:4px;cursor:pointer}
+  button:hover{background:var(--blue-l)}
+  .meters{display:grid;grid-template-columns:110px minmax(0,1fr) 54px;gap:5px 8px;align-items:center;font-size:13px;margin-top:8px}
+  .meters .trk{background:var(--card);height:14px;border-radius:3px;border:1px solid var(--line)}
+  .meters .fill{height:12px;border-radius:2px}
+  .status{margin-top:10px;font-size:13.5px;padding:7px 11px;border-radius:4px;background:var(--card);color:var(--sub)}
+  .status.hit{background:var(--green-l);color:var(--green)}
+  .photo img{width:100%;height:auto;border-radius:4px}
+  .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:16px;align-items:center}
+  @media (max-width:640px){.two{grid-template-columns:1fr}}
+  .lg{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);color:var(--sub);font-size:13px}
+  footer a{color:var(--sub)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <div class="kick">📘 Analog Circuit Design · Ch. 5 Noise</div>
+  <h1>RC Noise Bandwidth: where 4kTR becomes kT/C</h1>
+  <p>Why the 4, the R and the π all vanish, and why a single pole's noise bandwidth is π/2 times its 3 dB corner, shown four ways until it looks obvious.</p>
+</div>
+
+<div class="toc">
+  <b>📑 Index</b>
+  <ul>
+    <li><a href="#s1">1 · The notebook questions</a>
+      <ul><li><a href="#s1">Figure 0 · notebook p.26 · verdict table</a></li></ul></li>
+    <li><a href="#s2">2 · Spot noise vs integrated noise</a></li>
+    <li><a href="#s3">3 · Where the 4, the R and the π go</a></li>
+    <li><a href="#s4">4 · Four pictures of the same π/2</a>
+      <ul>
+        <li><a href="#f1">Figure 1 · Linear f: equal-area brick wall</a></li>
+        <li><a href="#f2">Figure 2 · θ = arctan(f/f<sub>c</sub>): the RC goes flat</a></li>
+        <li><a href="#f3">Figure 3 · Quarter circle vs triangle</a></li>
+        <li><a href="#f4">Figure 4 · Rolling the arc (animation)</a></li>
+      </ul></li>
+    <li><a href="#s5">5 · Half the noise lives above the corner</a>
+      <ul><li><a href="#f5">Figure 5 · noise split pie · ENBW by filter order</a></li></ul></li>
+    <li><a href="#s6">6 · Interview one-liners</a></li>
+  </ul>
+</div>
+
+<!-- ================= 1 ================= -->
+<div class="banner" id="s1"><span class="n">1</span>📓 The notebook questions</div>
+<div class="two">
+  <figure class="photo" style="margin:0">
+    <a href="notebook-p26.jpg"><img src="notebook-p26.jpg" alt="Hand-written notebook page 26: 4kTR is a PSD, TIA SNR versus R, RC low-pass rms noise versus R, and adding a load resistor at Vout." loading="lazy"></a>
+    <figcaption><b>Figure 0 · Notebook p.26</b>, the three noise questions this page grew out of.</figcaption>
+  </figure>
+  <div>
+    <table>
+      <tr><th>#</th><th>📍 Question</th><th>✔️</th><th>💡 Note</th></tr>
+      <tr><td class="rk">#1</td><td>📐 4kTR is V²/Hz, not V<sub>n</sub></td><td class="ok">✅</td><td>PSD, not rms</td></tr>
+      <tr><td class="rk">#2</td><td>📈 TIA: R↑ raises SNR</td><td class="ok">✅</td><td>Pay R in noise, earn R² in signal: power SNR ∝ R</td></tr>
+      <tr><td class="rk">#3</td><td>🔁 RC LPF: V<sub>rms</sub> if R↓</td><td class="ok">✅</td><td>Unchanged, area is kT/C</td></tr>
+      <tr><td class="rk">#4</td><td>🔌 Add R<sub>load</sub> at V<sub>out</sub></td><td class="mid">⚠️</td><td>Reduces <i>spot</i> noise only; see §2</td></tr>
+      <tr><td class="rk">#5</td><td>🧮 "uncorrelated noise cancels at √N"</td><td class="bad">❌</td><td>Never cancels; adds in power. Node sees 4kT(R₁∥R₂), the Thevenin R</td></tr>
+    </table>
+  </div>
+</div>
+<div class="eq">V̅<sub>o</sub>² / Δf = 4kT [ R₁·(R₂/(R₁+R₂))² + R₂·(R₁/(R₁+R₂))² ] = 4kT·(R₁∥R₂)</div>
+<p>Each resistor's noise reaches V<sub>o</sub> through the other's divider, and the two add in power. Nothing cancels; the divider just attenuates faster than the noise accumulates. The √N rule is only the special case of N equal resistors in parallel.</p>
+
+<!-- ================= 2 ================= -->
+<div class="banner" id="s2"><span class="n">2</span>🎯 Spot noise vs integrated noise</div>
+<p>Every real node has capacitance, so "does adding R<sub>load</sub> reduce the noise?" has two honest answers. Name which one you mean.</p>
+<table>
+  <tr><th>#</th><th>📏 Quantity</th><th>🧾 Units</th><th>🔌 Add R<sub>load</sub></th><th>🔑 Set by</th></tr>
+  <tr><td class="rk">#1</td><td>Spot noise, below the RC corner</td><td>V/√Hz</td><td class="ok">↓ drops</td><td>√(4kT·R∥)</td></tr>
+  <tr><td class="rk">#2</td><td>Noise over a fixed band below f<sub>c</sub></td><td>V rms</td><td class="ok">↓ drops</td><td>√(4kT·R∥·B)</td></tr>
+  <tr><td class="rk">#3</td><td>Total integrated noise, 0 to ∞</td><td>V rms</td><td class="mid">→ unchanged</td><td>√(kT/C)</td></tr>
+</table>
+<div class="note">Below the corner the node is <b>resistor-limited</b> (flat 4kTR). Integrated through the corner it is <b>capacitor-limited</b> (kT/C, R drops out). Lower R lowers the density but widens the band by the same factor.</div>
+
+<!-- ================= 3 ================= -->
+<div class="banner" id="s3"><span class="n">3</span>🧮 Where the 4, the R and the π go</div>
+<p>No approximation is thrown away. Every constant cancels exactly.</p>
+<table>
+  <tr><th>#</th><th>🪜 Step</th><th>📐 Expression</th><th>✂️ What cancels</th></tr>
+  <tr><td class="rk">#1</td><td>Resistor PSD</td><td>4kTR &nbsp;[V²/Hz]</td><td></td></tr>
+  <tr><td class="rk">#2</td><td>3 dB corner</td><td>f<sub>c</sub> = 1/(2πRC)</td><td></td></tr>
+  <tr><td class="rk">#3</td><td>Noise bandwidth = ∫|H|² df</td><td>f<sub>c</sub>·∫<sub>0</sub><sup>∞</sup> dx/(1+x²) = f<sub>c</sub>·π/2</td><td>arctan(∞) = π/2</td></tr>
+  <tr><td class="rk">#4</td><td>Plug in f<sub>c</sub></td><td>(π/2)·1/(2πRC) = 1/(4RC)</td><td class="ok">π meets π</td></tr>
+  <tr><td class="rk">#5</td><td>Total noise</td><td>4kTR · 1/(4RC) = <b>kT/C</b></td><td class="ok">4 meets 4, R meets R</td></tr>
+</table>
+<div class="note warn">Two bandwidths, don't mix them: the <b>3 dB corner</b> 1/(2πRC) is the real, gentle roll-off. The <b>noise bandwidth</b> 1/(4RC) is a fictitious brick wall that passes the same noise power. It is π/2 ≈ 1.57× wider than the corner, because the 1/f² tail keeps leaking noise past f<sub>c</sub>.</div>
+
+<!-- ================= 4 ================= -->
+<div class="banner" id="s4"><span class="n">4</span>🔭 Four pictures of the same π/2</div>
+
+<h3 id="f1">Figure 1 · Linear f: slide the brick wall until the areas balance</h3>
+<figure>
+  <svg id="fig1" viewBox="0 0 560 270" role="img" aria-label="Figure 1: single-pole RC |H|² on a linear frequency axis with a draggable brick wall; coral overcount and teal undercount areas."></svg>
+  <div class="ctl"><label for="w1">Wall</label><input type="range" id="w1" min="0.5" max="4" step="0.005" value="1.571"><span class="val" id="w1v"></span><button id="w1s">Snap to π/2</button></div>
+  <div class="meters" id="m1"></div>
+  <div class="status" id="st1"></div>
+  <figcaption><b>Figure 1.</b> Coral: area the wall adds, w − arctan(w). Teal: tail the wall drops, π/2 − arctan(w). The arctan terms cancel, so they match only at w = π/2. The catch: the teal tail runs to infinity off the right edge, so the eye is not convinced. That is why Figures 2 to 4 exist.</figcaption>
+</figure>
+
+<h3 id="f2">Figure 2 · θ = arctan(f/f<sub>c</sub>): the RC curve goes flat</h3>
+<div class="eq">x = tan θ &nbsp;⇒&nbsp; dx/(1+x²) = cos²θ · sec²θ dθ = dθ</div>
+<figure>
+  <svg id="fig2" viewBox="0 0 560 270" role="img" aria-label="Figure 2: in theta space the RC integrand is a flat bar of height 1 from 0 to 90 degrees; the brick wall becomes a sec squared horn."></svg>
+  <div class="ctl"><label for="w2">Wall</label><input type="range" id="w2" min="0.6" max="1.85" step="0.005" value="1.571"><span class="val" id="w2v"></span><button id="w2s">Snap to π/2</button></div>
+  <div class="meters" id="m2"></div>
+  <div class="status" id="st2"></div>
+  <figcaption><b>Figure 2.</b> 0 to ∞ in frequency squeezes into 0 to 90°, and f<sub>c</sub> lands at 45°. The RC is now a flat bar of length π/2. The brick wall becomes a sec²θ horn. Both coral and teal are finite and fully on screen.</figcaption>
+</figure>
+
+<h3 id="f3">Figure 3 · Quarter circle vs triangle</h3>
+<figure>
+  <svg id="fig3" viewBox="0 0 560 360" role="img" aria-label="Figure 3: unit quarter disk (RC) and a right triangle on the tangent line up to the wall (brick wall); equal areas when the wall height is pi over 2."></svg>
+  <div class="ctl"><label for="w3">Wall</label><input type="range" id="w3" min="0.5" max="1.95" step="0.005" value="1.571"><span class="val" id="w3v"></span><button id="w3s">Snap to π/2</button></div>
+  <div class="meters" id="m3"></div>
+  <div class="status" id="st3"></div>
+  <figcaption><b>Figure 3.</b> Frequency lives on the vertical tangent line x = 1; each f is seen from O at θ = arctan(f/f<sub>c</sub>). A thin slice df makes a skinny triangle of area ½·df. Pulled back inside the unit circle it shrinks by the distance squared, 1 + (f/f<sub>c</sub>)², which is exactly the RC's |H|². So the brick wall counts the whole triangle (½·w) and the RC counts the quarter disk (π/4). Equal area: ½·w = π/4, so <b>w = π/2</b>. Every area here is half the noise-bandwidth units.</figcaption>
+</figure>
+
+<h3 id="f4">Figure 4 · Rolling the arc: arc length = wall height</h3>
+<figure>
+  <svg id="fig4" viewBox="0 0 560 380" role="img" aria-label="Figure 4 animation: the quarter circle rolls up the tangent line; its 90 degree end lands at pi over 2 times fc; then the teal tail slice and coral overshoot appear."></svg>
+  <div class="ctl"><button id="p4" aria-label="Play or pause">⏸ Pause</button><input type="range" id="t4" min="0" max="1000" step="1" value="0" aria-label="Scrub animation"><button id="r4">↺ Restart</button></div>
+  <div class="status" id="st4"></div>
+  <figcaption><b>Figure 4.</b> Sector area = ½·radius·arc and triangle area = ½·base·height, both with a 1 in front, so equal area means <b>height = arc length</b>. Roll the circle up the wall and the 90° end touches down at exactly π/2·f<sub>c</sub>. Two different maps live on this chart: <b>rolling</b> (arc length → height, 90° → π/2) proves the equality; <b>projection</b> from O (90° → ∞) is where the teal tail slice from 57.5° to 90° comes from.</figcaption>
+</figure>
+
+<!-- ================= 5 ================= -->
+<div class="banner" id="s5"><span class="n">5</span>🥧 Half the noise lives above the corner</div>
+<div class="two">
+  <figure id="f5" style="margin:0">
+    <svg viewBox="0 0 220 220" role="img" aria-label="Figure 5 pie: single pole RC noise power is split 50 percent below fc and 50 percent above fc.">
+      <circle cx="110" cy="110" r="90" fill="#4c9aff"/>
+      <path d="M110 110 L110 20 A90 90 0 0 1 110 200 Z" fill="#f0997b"/>
+      <text x="62" y="114" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">50%</text>
+      <text x="158" y="114" font-size="15" font-weight="600" fill="#5c1d08" text-anchor="middle">50%</text>
+    </svg>
+    <figcaption><b>Figure 5 · Single-pole noise split.</b> <span class="lg" style="background:#4c9aff"></span>0 to f<sub>c</sub>: arctan(1) = π/4. <span class="lg" style="background:#f0997b"></span>f<sub>c</sub> to ∞: π/2 − π/4 = π/4. Exactly half. In Figure 3 that is the 45° line splitting the quarter disk.</figcaption>
+  </figure>
+  <div>
+    <p style="margin-top:0">Steeper filters leak less past their corner, so the brick-wall equivalent hugs f<sub>3dB</sub>. Ranked by excess noise bandwidth (ENBW/f<sub>3dB</sub> − 1):</p>
+    <table id="enbw">
+      <tr><th>#</th><th>🎛 Filter</th><th>📏 ENBW/f<sub>3dB</sub></th><th class="barcell">📊 Excess</th></tr>
+    </table>
+    <p style="font-size:13px;color:var(--sub)">Butterworth n: ENBW/f<sub>3dB</sub> = (π/2n)/sin(π/2n). Two identical real poles: ENBW = 1/(8τ), f<sub>3dB</sub> = √(√2−1)/(2πτ).</p>
+  </div>
+</div>
+
+<!-- ================= 6 ================= -->
+<div class="banner" id="s6"><span class="n">6</span>🎤 Interview one-liners</div>
+<table>
+  <tr><th>#</th><th>❓ Prompt</th><th>🗣 Say this</th></tr>
+  <tr><td class="rk">#1</td><td>Why kT/C?</td><td>4kTR times the noise bandwidth 1/(4RC): the 4 and the R cancel exactly. It is energy over capacitance, no approximation.</td></tr>
+  <tr><td class="rk">#2</td><td>Why π/2?</td><td>The RC tail past the corner is worth 57% more width: ∫dx/(1+x²) = arctan → π/2. Geometrically, a right triangle on a unit base must be π/2 tall to match a quarter circle.</td></tr>
+  <tr><td class="rk">#3</td><td>Add R<sub>load</sub>: more or less noise?</td><td>Spot noise drops as 4kT·R∥. Total integrated noise on a capacitive node stays kT/C. Name the measurement bandwidth.</td></tr>
+  <tr><td class="rk">#4</td><td>Uncorrelated sources?</td><td>They add in quadrature, growing as √N. They never cancel; correlated signals grow as N, which is why averaging wins.</td></tr>
+  <tr><td class="rk">#5</td><td>TIA: bigger R always better?</td><td>Power SNR ∝ R while resistor noise dominates. But R also lowers bandwidth, and at high f the op-amp e<sub>n</sub>·C<sub>in</sub> noise takes over.</td></tr>
+</table>
+
+<footer>
+  <a href="https://borenw.github.io/">Page 55 · Bo's Engineering Curriculum</a> · 📘 Analog Circuit Design, Ch. 5 Noise · derivations on this page are first-principles; figures drawn from the exact integrals.
+</footer>
+</div>
+
+<script>
+(function(){
+var NS="http://www.w3.org/2000/svg", P2=Math.PI/2;
+function el(t,a,s){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);if(s!==undefined)e.textContent=s;return e;}
+function set(e,a){for(var k in a)e.setAttribute(k,a[k]);}
+function $(i){return document.getElementById(i);}
+var C={blue:"#0052cc",blueL:"#deebff",coral:"#de5b30",coralL:"#f0997b",teal:"#1d9e75",tealL:"#5dcaa5",grid:"#c1c7d0",sub:"#5e6c84",fg:"#172b4d"};
+function meters(id,rows,scale){
+  var m=$(id),out=[];m.innerHTML="";
+  rows.forEach(function(r){
+    m.appendChild(Object.assign(document.createElement("span"),{textContent:r[0],style:"color:"+C.sub}));
+    var trk=document.createElement("div");trk.className="trk";
+    var f=document.createElement("div");f.className="fill";f.style.background=r[1];trk.appendChild(f);m.appendChild(trk);
+    var v=document.createElement("span");v.className="num";v.style.textAlign="right";m.appendChild(v);
+    out.push([f,v]);
+  });
+  return function(vals){vals.forEach(function(x,i){out[i][0].style.width=Math.min(100,x/scale*100)+"%";out[i][1].textContent=x.toFixed(3);});};
+}
+function status(id,ok,okTxt,hiTxt,loTxt,hi){var s=$(id);s.className="status"+(ok?" hit":"");s.textContent=ok?okTxt:(hi?hiTxt:loTxt);}
+function slider(id,vid,snap,draw){var s=$(id);s.addEventListener("input",function(){draw(+s.value);});$(snap).addEventListener("click",function(){s.value=P2;draw(P2);});draw(P2);}
+
+/* ---------- Figure 1: linear f ---------- */
+(function(){
+  var svg=$("fig1"),X0=46,SX=96,Y0=228,SY=185,XM=5.3;
+  var px=function(x){return X0+x*SX},py=function(v){return Y0-v*SY},H=function(x){return 1/(1+x*x)};
+  svg.appendChild(el("line",{x1:px(0),y1:Y0,x2:px(XM),y2:Y0,stroke:C.grid}));
+  svg.appendChild(el("line",{x1:px(0),y1:Y0,x2:px(0),y2:py(1.12),stroke:C.grid}));
+  [0,1,2,3,4,5].forEach(function(t){svg.appendChild(el("text",{x:px(t),y:Y0+16,"text-anchor":"middle","font-size":12,fill:C.sub},t===0?"0":t===1?"fc":t+"fc"));});
+  [[1,"1"],[0.5,"0.5"]].forEach(function(p){svg.appendChild(el("text",{x:px(0)-6,y:py(p[0])+4,"text-anchor":"end","font-size":12,fill:C.sub},p[1]));svg.appendChild(el("line",{x1:px(0),y1:py(p[0]),x2:px(XM),y2:py(p[0]),stroke:"#ebecf0","stroke-dasharray":"3 3"}));});
+  svg.appendChild(el("text",{x:px(XM),y:Y0+32,"text-anchor":"end","font-size":12,fill:C.sub},"f (linear) · tail continues to ∞ →"));
+  var over=el("path",{fill:C.coralL,"fill-opacity":.7}),under=el("path",{fill:C.tealL,"fill-opacity":.75}),wall=el("path",{fill:"none",stroke:"#6b778c","stroke-width":1.6,"stroke-dasharray":"6 3"});
+  svg.appendChild(over);svg.appendChild(under);svg.appendChild(wall);
+  var d="";for(var i=0;i<=240;i++){var x=XM*i/240;d+=(i?"L":"M")+px(x)+" "+py(H(x));}
+  svg.appendChild(el("path",{d:d,fill:"none",stroke:C.blue,"stroke-width":2.4}));
+  svg.appendChild(el("text",{x:px(2.6),y:py(0.5),"font-size":13,fill:C.blue},"|H|² = 1/(1+(f/fc)²)"));
+  var lab=el("text",{"font-size":12,"text-anchor":"middle",fill:C.fg});svg.appendChild(lab);
+  var mt=meters("m1",[["Wall adds",C.coralL],["Tail lost",C.tealL]],1.2);
+  slider("w1","w1v","w1s",function(w){
+    var o="M"+px(0)+" "+py(1)+" L"+px(w)+" "+py(1);for(var i=60;i>=0;i--){var x=w*i/60;o+=" L"+px(x)+" "+py(H(x));}
+    set(over,{d:o+"Z"});
+    var u="M"+px(w)+" "+Y0;for(var j=0;j<=100;j++){var xx=w+(XM-w)*j/100;u+=" L"+px(xx)+" "+py(H(xx));}
+    set(under,{d:u+" L"+px(XM)+" "+Y0+"Z"});
+    set(wall,{d:"M"+px(0)+" "+py(1)+" L"+px(w)+" "+py(1)+" L"+px(w)+" "+Y0});
+    set(lab,{x:px(w),y:py(1)-8});lab.textContent="wall "+w.toFixed(2)+" fc";
+    var a=w-Math.atan(w),b=P2-Math.atan(w);$("w1v").textContent=w.toFixed(2)+" fc";mt([a,b]);
+    status("st1",Math.abs(a-b)<.006,"Balanced at π/2·fc ≈ 1.571 fc: both 0.567.","Wall too far right: it adds more than the tail it drops.","Wall too far left: the dropped tail outweighs the added sliver.",a>b);
+  });
+})();
+
+/* ---------- Figure 2: theta space ---------- */
+(function(){
+  var svg=$("fig2"),X0=46,SX=480/P2,Y0=232,SY=46;
+  var px=function(t){return X0+t*SX},py=function(v){return Y0-v*SY};
+  var cp=el("clipPath",{id:"cp2"});cp.appendChild(el("rect",{x:X0,y:10,width:500,height:Y0-10}));var df=el("defs");df.appendChild(cp);svg.appendChild(df);
+  svg.appendChild(el("line",{x1:X0,y1:Y0,x2:px(P2)+6,y2:Y0,stroke:C.grid}));
+  svg.appendChild(el("line",{x1:X0,y1:Y0,x2:X0,y2:12,stroke:C.grid}));
+  [1,2,3,4].forEach(function(v){svg.appendChild(el("text",{x:X0-6,y:py(v)+4,"text-anchor":"end","font-size":12,fill:C.sub},v));});
+  [[0,"0"],[Math.atan(.5),"0.5fc"],[Math.PI/4,"fc (45°)"],[Math.atan(2),"2fc"],[Math.atan(5),"5fc"],[P2,"∞ (90°)"]].forEach(function(p){
+    svg.appendChild(el("line",{x1:px(p[0]),y1:Y0,x2:px(p[0]),y2:Y0+4,stroke:C.grid}));
+    svg.appendChild(el("text",{x:px(p[0]),y:Y0+17,"text-anchor":p[0]===P2?"end":"middle","font-size":12,fill:C.sub},p[1]));});
+  var g=el("g",{"clip-path":"url(#cp2)"});svg.appendChild(g);
+  g.appendChild(el("rect",{x:X0,y:py(1),width:P2*SX,height:SY,fill:C.blueL}));
+  var over=el("path",{fill:C.coralL,"fill-opacity":.8}),under=el("rect",{fill:C.tealL,"fill-opacity":.85,y:py(1),height:SY}),horn=el("path",{fill:"none",stroke:C.coral,"stroke-width":2}),wall=el("line",{stroke:"#6b778c","stroke-dasharray":"6 3","stroke-width":1.5,y1:12,y2:Y0});
+  [over,under,horn,wall].forEach(function(e){g.appendChild(e);});
+  g.appendChild(el("line",{x1:X0,y1:py(1),x2:px(P2),y2:py(1),stroke:C.blue,"stroke-width":2.4}));
+  svg.appendChild(el("text",{x:px(.1),y:py(1)+30,"font-size":12,fill:C.blue},"RC: flat bar, height 1, length π/2"));
+  svg.appendChild(el("text",{x:px(.06),y:py(4.3),"font-size":12,fill:C.coral},"brick wall: sec²θ horn"));
+  var lab=el("text",{"font-size":12,fill:C.fg,y:24});svg.appendChild(lab);
+  var mt=meters("m2",[["Wall adds",C.coralL],["Tail lost",C.tealL]],1.2);
+  slider("w2","w2v","w2s",function(w){
+    var tw=Math.atan(w),h="",o="M"+X0+" "+py(1);
+    for(var i=0;i<=90;i++){var t=tw*i/90,v=1/Math.pow(Math.cos(t),2);h+=(i?"L":"M")+px(t)+" "+py(v);o+=" L"+px(t)+" "+py(v);}
+    set(horn,{d:h+" L"+px(tw)+" "+Y0});set(over,{d:o+" L"+px(tw)+" "+py(1)+"Z"});
+    set(under,{x:px(tw),width:(P2-tw)*SX});set(wall,{x1:px(tw),x2:px(tw)});
+    set(lab,{x:Math.min(px(tw)+5,470)});lab.textContent="wall "+w.toFixed(2)+" fc";
+    var a=w-tw,b=P2-tw;$("w2v").textContent=w.toFixed(2)+" fc";mt([a,b]);
+    status("st2",Math.abs(a-b)<.006,"Balanced at π/2·fc: coral horn tip = teal strip = 0.567.","Wall too far right: coral outgrows teal.","Wall too far left: teal outgrows coral.",a>b);
+  });
+})();
+
+/* ---------- shared circle geometry ---------- */
+function circleFig(svg,U,OX,OY,wMax){
+  var X=function(x){return OX+x*U},Y=function(y){return OY-y*U};
+  svg.appendChild(el("line",{x1:X(0),y1:Y(0),x2:X(1.45),y2:Y(0),stroke:C.grid}));
+  svg.appendChild(el("line",{x1:X(0),y1:Y(0),x2:X(0),y2:Y(Math.min(wMax,2.6)),stroke:"#ebecf0"}));
+  svg.appendChild(el("line",{x1:X(1),y1:Y(0),x2:X(1),y2:Y(wMax),stroke:C.sub,"stroke-width":1.2}));
+  [[.5,"0.5fc"],[1,"fc"],[P2,"π/2·fc"],[2,"2fc"]].forEach(function(p){if(p[0]>wMax)return;
+    svg.appendChild(el("line",{x1:X(1),y1:Y(p[0]),x2:X(1)+5,y2:Y(p[0]),stroke:C.sub}));
+    svg.appendChild(el("text",{x:X(1)+9,y:Y(p[0])+4,"font-size":12,fill:p[0]===P2?C.coral:C.sub},p[1]));});
+  svg.appendChild(el("text",{x:X(1)+9,y:Y(wMax)+12,"font-size":12,fill:C.sub},"f axis"));
+  svg.appendChild(el("text",{x:X(0)-5,y:Y(0)+15,"font-size":12,"text-anchor":"end",fill:C.sub},"O"));
+  svg.appendChild(el("text",{x:X(1),y:Y(0)+15,"font-size":12,"text-anchor":"middle",fill:C.sub},"1"));
+  return {X:X,Y:Y};
+}
+
+/* ---------- Figure 3: quarter circle vs triangle ---------- */
+(function(){
+  var svg=$("fig3"),U=160,g=circleFig(svg,U,170,335,1.98),X=g.X,Y=g.Y;
+  svg.appendChild(el("path",{d:"M"+X(0)+" "+Y(0)+" L"+X(1)+" "+Y(0)+" A"+U+" "+U+" 0 0 0 "+X(0)+" "+Y(1)+"Z",fill:C.blueL}));
+  svg.appendChild(el("line",{x1:X(0),y1:Y(0),x2:X(1),y2:Y(1),stroke:C.grid,"stroke-dasharray":"3 3"}));
+  svg.appendChild(el("text",{x:X(.33),y:Y(.12),"font-size":12,fill:C.sub},"45° = fc"));
+  var over=el("path",{fill:C.coralL,"fill-opacity":.85}),under=el("path",{fill:C.tealL,"fill-opacity":.9}),tri=el("path",{fill:"none",stroke:C.coral,"stroke-width":2});
+  [over,under].forEach(function(e){svg.appendChild(e);});
+  svg.appendChild(el("path",{d:"M"+X(1)+" "+Y(0)+" A"+U+" "+U+" 0 0 0 "+X(0)+" "+Y(1),fill:"none",stroke:C.blue,"stroke-width":2.6}));
+  svg.appendChild(tri);
+  var dot=el("circle",{r:4.5,fill:C.coral}),lab=el("text",{"font-size":12,"text-anchor":"end",fill:C.coral});svg.appendChild(dot);svg.appendChild(lab);
+  svg.appendChild(el("text",{x:X(-.06),y:Y(1.02),"font-size":12,"text-anchor":"end",fill:C.blue},"RC: quarter disk"));svg.appendChild(el("text",{x:X(-.06),y:Y(1.02)+15,"font-size":12,"text-anchor":"end",fill:C.blue},"area π/4"));
+  var mt=meters("m3",[["Triangle (wall)",C.coral],["Quarter disk",C.blue],["Coral (adds)",C.coralL],["Teal (tail)",C.tealL]],1.0);
+  slider("w3","w3v","w3s",function(w){
+    var t=Math.atan(w),cx=Math.cos(t),cy=Math.sin(t);
+    set(tri,{d:"M"+X(0)+" "+Y(0)+" L"+X(1)+" "+Y(0)+" L"+X(1)+" "+Y(w)+"Z"});
+    set(over,{d:"M"+X(1)+" "+Y(0)+" L"+X(1)+" "+Y(w)+" L"+X(cx)+" "+Y(cy)+" A"+U+" "+U+" 0 0 1 "+X(1)+" "+Y(0)+"Z"});
+    set(under,{d:"M"+X(0)+" "+Y(0)+" L"+X(cx)+" "+Y(cy)+" A"+U+" "+U+" 0 0 0 "+X(0)+" "+Y(1)+"Z"});
+    set(dot,{cx:X(1),cy:Y(w)});set(lab,{x:X(1)-9,y:Y(w)-7});lab.textContent="wall "+w.toFixed(2)+" fc";
+    var T=w/2,Q=Math.PI/4;$("w3v").textContent=w.toFixed(2)+" fc";mt([T,Q,(w-t)/2,(P2-t)/2]);
+    status("st3",Math.abs(T-Q)<.003,"Balanced: triangle ½·1·(π/2) = quarter disk π/4.","Triangle bigger than quarter disk: wall too far out.","Triangle smaller than quarter disk: wall too low.",T>Q);
+  });
+})();
+
+/* ---------- Figure 4: rolling animation ---------- */
+(function(){
+  var svg=$("fig4"),U=132,g=circleFig(svg,U,180,360,2.62),X=g.X,Y=g.Y,W=P2;
+  var cp=el("clipPath",{id:"cp4"});cp.appendChild(el("rect",{x:0,y:0,width:560,height:365}));var df=el("defs");df.appendChild(cp);svg.appendChild(df);
+  var gg=el("g",{"clip-path":"url(#cp4)"});svg.appendChild(gg);
+  gg.appendChild(el("path",{d:"M"+X(0)+" "+Y(0)+" L"+X(1)+" "+Y(0)+" A"+U+" "+U+" 0 0 0 "+X(0)+" "+Y(1)+"Z",fill:C.blueL,stroke:C.blue,"stroke-opacity":.35,"stroke-dasharray":"3 3"}));
+  gg.appendChild(el("path",{d:"M"+X(0)+" "+Y(0)+" L"+X(1)+" "+Y(0)+" L"+X(1)+" "+Y(W)+"Z",fill:"none",stroke:C.coral,"stroke-width":1.8}));
+  var wheel=el("circle",{fill:"none",stroke:C.grid,"stroke-dasharray":"2 4",r:U,cx:X(0)}),rsec=el("path",{fill:C.blue,"fill-opacity":.18}),rarc=el("path",{fill:"none",stroke:C.blue,"stroke-width":2.8}),spoke=el("line",{stroke:C.blue,"stroke-opacity":.6}),unr=el("line",{stroke:C.blue,"stroke-width":5,"stroke-linecap":"round",x1:X(1),x2:X(1),y1:Y(0)});
+  var over=el("path",{fill:C.coralL,"fill-opacity":.85}),under=el("path",{fill:C.tealL,"fill-opacity":.9}),ray=el("line",{stroke:"#993c1d","stroke-width":1.3,"stroke-dasharray":"4 3",x1:X(0),y1:Y(0),x2:X(1),y2:Y(W)}),dot=el("circle",{r:4.5,fill:C.blue});
+  [wheel,rsec,rarc,spoke,unr,over,under,ray,dot].forEach(function(e){gg.appendChild(e);});
+  var lab=el("g");svg.appendChild(lab);
+  var tw=Math.atan(W),cx=Math.cos(tw),cy=Math.sin(tw);
+  set(over,{d:"M"+X(1)+" "+Y(0)+" L"+X(1)+" "+Y(W)+" L"+X(cx)+" "+Y(cy)+" A"+U+" "+U+" 0 0 1 "+X(1)+" "+Y(0)+"Z"});
+  set(under,{d:"M"+X(0)+" "+Y(0)+" L"+X(cx)+" "+Y(cy)+" A"+U+" "+U+" 0 0 0 "+X(0)+" "+Y(1)+"Z"});
+  var ease=function(u){return u<=0?0:u>=1?1:u*u*(3-2*u)},T1=1.2,T2=5.4,T3=7,T4=8.5,TT=12.5;
+  function frame(t){
+    var s=P2*ease((t-T1)/(T2-T1)),a1=P2-s,sx=Math.cos(a1),sy=s+Math.sin(a1);
+    var roll=t<T3+.4?1:Math.max(0,1-(t-T3-.4)/.8),proj=ease((t-T3)/(T4-T3));
+    set(wheel,{cy:Y(s),"stroke-opacity":roll});
+    set(rsec,{d:a1>.001?"M"+X(0)+" "+Y(s)+" L"+X(1)+" "+Y(s)+" A"+U+" "+U+" 0 0 0 "+X(sx)+" "+Y(sy)+"Z":"",opacity:roll});
+    set(rarc,{d:a1>.001?"M"+X(1)+" "+Y(s)+" A"+U+" "+U+" 0 0 0 "+X(sx)+" "+Y(sy):"",opacity:roll});
+    set(spoke,{x1:X(0),y1:Y(s),x2:X(sx),y2:Y(sy),opacity:roll});
+    set(unr,{y2:Y(s),opacity:s>.002?1:0});set(dot,{cx:X(sx),cy:Y(sy)});
+    set(over,{opacity:proj});set(under,{opacity:proj});set(ray,{opacity:proj});
+    lab.innerHTML="";
+    if(proj>.5){
+      lab.appendChild(el("text",{x:X(.1),y:Y(.78),"font-size":12,fill:"#085041"},"tail lost 0.284"));
+      lab.appendChild(el("text",{x:X(.82),y:Y(1.15),"font-size":12,"text-anchor":"end",fill:"#712b13"},"wall adds 0.284"));
+      lab.appendChild(el("text",{x:X(.5),y:Y(.5),"font-size":12,"text-anchor":"middle",fill:"#712b13"},"57.5°"));
+    }
+    if(t>=T2-.05&&t<T3+.6)lab.appendChild(el("text",{x:X(1)-9,y:Y(W)-10,"font-size":12,"text-anchor":"end",fill:C.blue},"arc lands here"));
+    var st=$("st4");st.className="status"+(t>=T2&&t<T3?" hit":"");
+    st.textContent=t<T1?"Start: quarter disk (RC, π/4) and triangle up to the wall (brick wall, ½·w).":
+      t<T2?"Rolling the circle up the tangent line. Arc point at angle α touches down at height α. Unrolled: "+s.toFixed(2)+".":
+      t<T3?"The 90° end lands at π/2·fc, the wall top. Arc length = wall height, so triangle area = quarter disk area.":
+      t<T4?"Switch to projection from O: the ray to the wall top cuts the arc at 57.5°.":
+      "Teal: tail from π/2·fc to ∞, squeezed into 57.5° to 90°. Coral: what the wall adds. Both 0.284 (×2 = 0.567).";
+  }
+  var t=0,last=null,playing=true,pr=$("t4");
+  function tick(ts){if(last===null)last=ts;var dt=(ts-last)/1000;last=ts;
+    if(playing){t+=dt;if(t>TT)t=0;pr.value=Math.round(t/TT*1000);frame(t);}requestAnimationFrame(tick);}
+  $("p4").addEventListener("click",function(){playing=!playing;this.textContent=playing?"⏸ Pause":"▶ Play";});
+  $("r4").addEventListener("click",function(){t=0;pr.value=0;frame(0);});
+  pr.addEventListener("input",function(){t=pr.value/1000*TT;frame(t);});
+  frame(0);requestAnimationFrame(tick);
+})();
+
+/* ---------- ENBW table ---------- */
+(function(){
+  var bw=function(n){var a=Math.PI/(2*n);return a/Math.sin(a);};
+  var two=(1/8)/(Math.sqrt(Math.sqrt(2)-1)/(2*Math.PI));
+  var rows=[["🔵 1-pole RC",bw(1)],["🟣 2 identical real poles",two],["🟢 2-pole Butterworth",bw(2)],["🟡 3-pole Butterworth",bw(3)],["🟠 4-pole Butterworth",bw(4)],["⬜ Ideal brick wall",1]];
+  rows.sort(function(a,b){return b[1]-a[1];});
+  var tb=$("enbw"),mx=rows[0][1]-1;
+  rows.forEach(function(r,i){
+    var ex=r[1]-1,col=ex>.3?"#de350b":ex>.08?"#b76e00":"#00875a";
+    var tr=document.createElement("tr");
+    tr.innerHTML='<td class="rk">#'+(i+1)+'</td><td>'+r[0]+'</td><td class="num" style="color:'+col+'">'+r[1].toFixed(3)+'</td><td class="barcell"><div class="bar" style="width:'+(mx?ex/mx*100:0)+'%;background:'+col+'"></div><span style="font-size:12px;color:#5e6c84">+'+(ex*100).toFixed(1)+'%</span></td>';
+    tb.appendChild(tr);
+  });
+})();
+})();
+</script>
+</body>
+</html>

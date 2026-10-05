@@ -283,8 +283,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-10-02T20:36:14Z">built …</span>
-    <span class="rev" id="siterev">rev 116</span>
+    <span class="age" id="siteage" data-built="2026-10-05T17:50:39Z">built …</span>
+    <span class="rev" id="siterev">rev 117</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -293,16 +293,17 @@
 
 <div class="mosaic-wrap" role="region" aria-label="Visual index of all pages, grouped by course">
   <div class="msearch">
-    <input id="mq" type="search" placeholder="Search the 31 pages — name, topic, keyword…" aria-label="Search pages" autocomplete="off" spellcheck="false">
-    <span class="mcount" id="mcount" role="status" aria-live="polite">31 pages</span>
+    <input id="mq" type="search" placeholder="Search the 37 pages — name, topic, keyword…" aria-label="Search pages" autocomplete="off" spellcheck="false">
+    <span class="mcount" id="mcount" role="status" aria-live="polite">37 pages</span>
   </div>
   <div id="mnone" class="mnone" hidden>No page matches that. Try a different word — or Ctrl-F, every tile carries its keywords.</div>
   <section class="mgroup" data-cat="analog" aria-labelledby="mg-analog">
-    <h3 id="mg-analog"><a href="#analog">📘 Analog Circuit Design</a> <span class="n">11</span></h3>
+    <h3 id="mg-analog"><a href="#analog">📘 Analog Circuit Design</a> <span class="n">12</span></h3>
     <div class="mosaic">
       <a href="https://borenw.github.io/gbw-power-area-tradeoff/" title="GBW · Power · Area"><img src="img/mosaic/gbw.jpg" alt="GBW · Power · Area" loading="lazy" width="320" height="320"><span class="cap">GBW · Power · Area</span><span class="kw">GBW · Power · Area — 📘 Analog Circuit Design — gain bandwidth product GBW power area tradeoff op-amp opamp amplifier design space current budget figure of merit</span></a>
       <a href="https://borenw.github.io/ibis-model-builder/" title="IBIS Model Builder"><img src="img/mosaic/ibis.jpg" alt="IBIS Model Builder" loading="lazy" width="320" height="320"><span class="cap">IBIS Model Builder</span><span class="kw">IBIS Model Builder — 📘 Analog Circuit Design — IBIS buffer model signal integrity I/O driver receiver IV curve VT waveform package parasitics .ibs</span></a>
       <a href="https://borenw.github.io/Bode_Plot_Sandbox/" title="Bode Plot Sandbox"><img src="img/mosaic/bode.jpg" alt="Bode Plot Sandbox" loading="lazy" width="320" height="320"><span class="cap">Bode Plot Sandbox</span><span class="kw">Bode Plot Sandbox — 📘 Analog Circuit Design — Bode plot poles zeros magnitude phase margin gain margin transfer function frequency response stability compensation</span></a>
+      <a href="https://borenw.github.io/rc-noise-bandwidth/" title="RC Noise Bandwidth · kT/C"><img src="img/mosaic/noise-bw.jpg" alt="RC Noise Bandwidth · kT/C" loading="lazy" width="320" height="320"><span class="cap">RC Noise Bandwidth · kT/C</span><span class="kw">RC Noise Bandwidth · kT/C — 📘 Analog Circuit Design — thermal noise 4kTR kT/C equivalent noise bandwidth ENBW pi/2 1/(4RC) spot noise integrated rms quarter circle arctan brick wall Thevenin TIA SNR</span></a>
       <a href="https://borenw.github.io/ota-inverting-amp-explorer/" title="OTA Inverting Amp"><img src="img/mosaic/ota.jpg" alt="OTA Inverting Amp" loading="lazy" width="320" height="320"><span class="cap">OTA Inverting Amp</span><span class="kw">OTA Inverting Amp — 📘 Analog Circuit Design — OTA operational transconductance amplifier inverting closed loop gain feedback factor loading virtual ground</span></a>
       <a href="file:///Users/boren_wang/Claude/AnalogLeetcode/Photodiode%20TIA%20Explorer.html" title="Photodiode TIA · local file"><img src="img/mosaic/tia.jpg" alt="Photodiode TIA · local file" loading="lazy" width="320" height="320"><span class="cap">Photodiode TIA <span class="mpv">· local file</span></span><span class="kw">Photodiode TIA · private repo — 📘 Analog Circuit Design — TIA transimpedance amplifier photodiode Rf Cf feedback capacitor Cp input capacitance noise gain 1/beta phase margin peaking GBW Zin Rf/A virtual ground private GitHub repo</span></a>
       <a href="https://borenw.github.io/inverter-self-bias-animation/" title="Inverter Self-Bias"><img src="img/mosaic/inverter-selfbias.jpg" alt="Inverter Self-Bias" loading="lazy" width="320" height="320"><span class="cap">Inverter Self-Bias</span><span class="kw">Inverter Self-Bias &mdash; 📘 Analog Circuit Design &mdash; self-biased CMOS inverter operating point V_M switching threshold VTC transfer curve unity gain feedback animation leakage droop settling</span></a>
@@ -560,7 +561,7 @@
       <tr><td class="ch">Ch. 4</td><td><a href="https://borenw.github.io/inverter-self-bias-animation/">Inverter Self-Bias Animation</a> <span class="desc">&mdash; short a CMOS inverter's output back to its own input and watch the operating point slide along the V<sub>I</sub>-vs-V<sub>O</sub> transfer curve until V<sub>I</sub> = V<sub>O</sub> = V<sub>M</sub>, the switching threshold. Schematic and VTC animate together (scrub, step, 0.5&times;/1&times;/2&times;, ping-pong); the gain notes <i>A</i> and slope = &minus;<i>A</i> fade in while the loop settles, then input leakage I<sub>Leak</sub> droops the node linearly and walks it back to the start frame</span></td><td><span class="badge live">LIVE</span> <span class="badge repo">GITHUB</span> <span class="badge public">PUBLIC</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/clamp-protection-loop">Feedback &amp; Stability — Delayed Hysteretic Shunt-Clamp Protection Loop (SKY130)</a> <span class="desc">— an LDO overvoltage clamp as a relay-feedback loop: hysteresis + loop delay → a bounded limit cycle. Time-domain SKY130/ngspice study showing overshoot = slew·τ<sub>loop</sub> and a max-safe-delay damage bound. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
       <tr><td class="ch">Ch. 4</td><td><a href="https://github.com/borenw/amplifier-current-loop">PadCs Error-Amp Current Loop — Stability Analysis</a> <span class="desc">— multi-stage Miller-compensated transconductance loop (I<sub>in</sub>→1→2→3→4→I<sub>in</sub>): pole/zero map sorted from 0 Hz, phase-budget pie, magnitude/phase Bode. The nulling resistor R<sub>z</sub> parks a LHP zero at ≈4.2 MHz for phase lead → PM ≈ 64° at f<sub>c</sub> = 13.8 MHz (Allen Ex 23-1 device values). <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
-      <tr class="placeholder"><td class="ch">Ch. 5</td><td>Noise Analysis</td><td><span class="badge soon">PLANNED</span></td></tr>
+      <tr><td class="ch">Ch. 5</td><td><a href="https://borenw.github.io/rc-noise-bandwidth/">RC Noise Bandwidth: where 4kTR becomes kT/C</a> <span class="desc">· why the 4, the R and the π cancel exactly, and why a single pole's noise bandwidth is π/2 × f<sub>3dB</sub> = 1/(4RC), shown four ways: linear equal-area brick wall, θ = arctan(f/f<sub>c</sub>) flattening, quarter circle vs triangle, and a rolling-arc animation (arc length = wall height). Plus spot vs integrated noise, 4kT(R₁∥R₂) as the Thevenin R (not "cancellation"), and ENBW by filter order.</span></td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td class="ch">Ch. 6</td><td><a href="https://borenw.github.io/Biquad-Sandbox/">Biquad Sandbox</a> <span class="desc">— play with biquad coefficients to create filters</span></td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td class="ch">Ch. 7</td><td><a href="https://borenw.github.io/Crystal-Oscillator/">Crystal Oscillator</a> <span class="desc">— oscillator visualizer</span></td><td><span class="badge live">LIVE</span></td></tr>
       <tr><td class="ch">Ch. 7</td><td><a href="https://borenw.github.io/ring-oscillator-model/">Ring Oscillator — Phase-Shift Model</a> <span class="desc">— why an even ring stalls at −356° while an odd ring crosses −180° and oscillates; a parallel helper 3rd inverter averages the phase past 180° to set f<sub>osc</sub></span></td><td><span class="badge live">LIVE</span></td></tr>
@@ -882,6 +883,7 @@
       <tr><td class="ch">52</td><td><a href="https://borenw.github.io/light-grid-puzzle/">🟧 Tile Pixel Painter — 5×5 LED Tile Grid</a></td></tr>
       <tr><td class="ch">53</td><td><a href="https://borenw.github.io/inverter-self-bias-animation/">Inverter Self-Bias Animation — operating point settling to V<sub>M</sub></a></td></tr>
       <tr><td class="ch">54</td><td><a href="https://borenw.github.io/ldo-loadreg-setup/">LDO LDR Checklist — 15 simulation checks and load-regulation SKILL script</a></td></tr>
+      <tr><td class="ch">55</td><td><a href="https://borenw.github.io/rc-noise-bandwidth/">RC Noise Bandwidth: where 4kTR becomes kT/C</a></td></tr>
     </table>
     <p style="font-size:12.5px;color:var(--text-sub);margin-top:8px">Page numbers are permanent and append-only — a new page always takes the next number (29, 30, …), existing pages are never renumbered. Each page also shows its number in its own footer.</p>
   </div>
