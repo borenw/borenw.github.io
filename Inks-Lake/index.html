@@ -48,9 +48,11 @@ figure{margin:14px 0 18px}
 figure > a > img{width:100%;height:auto;border:1px solid var(--line);border-radius:4px;display:block}
 figcaption{font-size:13px;color:var(--sub);margin-top:6px}
 figcaption b{color:var(--ink)}
+.hero{max-width:560px;margin:0 auto;padding:16px 16px 4px}
+.hero figure{margin:0}
+figure.closeup{max-width:700px}
 #routemap{height:440px;border:1px solid var(--line);border-radius:4px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media (max-width:760px){.grid2{grid-template-columns:1fr}#routemap{height:340px}}
+@media (max-width:760px){#routemap{height:340px}}
 .pie-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin:8px 0}
 .pie{width:120px;height:120px;border-radius:50%;flex:none;border:1px solid var(--line)}
 .legend{font-size:13px}
@@ -69,6 +71,10 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;font-si
 </style>
 </head>
 <body>
+<div class="hero"><figure id="fig1">
+  <a href="inks_zoom_entrance_to_site.jpg"><img src="inks_zoom_entrance_to_site.jpg" alt="Zoomed park map from the entrance gate to headquarters to site 090"></a>
+  <figcaption><b>Figure 1 · Entrance (1) → HQ check-in (2) → Site 090 (3).</b> Follow the park road north past headquarters toward the boat ramp; the 83 to 94 loop is at the north end, past the cabins and restroom #4. Tap to open full size.</figcaption>
+</figure></div>
 <header class="top"><div class="wrap">
   <h1>🏕️ Inks Lake State Park: Fall Camping Trip</h1>
   <p>Fri Oct 30 to Sun Nov 1, 2026 · Lakeside site 090 · Burnet, Texas · about 66 miles from downtown Austin</p>
@@ -82,9 +88,9 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;font-si
   <ol>
     <li><a href="#glance">Trip at a glance</a></li>
     <li><a href="#drive">Getting there from Austin</a>
-      <ul><li><a href="#fig1">Figure 1 · Route map</a></li><li><a href="#legs">Route by road (table)</a></li><li><a href="#timing">When to leave</a></li></ul></li>
+      <ul><li><a href="#fig2">Figure 2 · Route map</a></li><li><a href="#legs">Route by road (table)</a></li><li><a href="#timing">When to leave</a></li></ul></li>
     <li><a href="#sitemap">Park map and site 090</a>
-      <ul><li><a href="#fig2">Figure 2 · Whole park</a></li><li><a href="#fig3">Figure 3 · Entrance to site</a></li><li><a href="#fig4">Figure 4 · Site close-up</a></li><li><a href="#nearby">What is near the site</a></li></ul></li>
+      <ul><li><a href="#fig3">Figure 3 · Whole park</a></li><li><a href="#fig1">Figure 1 · Entrance to site (top of page)</a></li><li><a href="#fig4">Figure 4 · Site close-up</a></li><li><a href="#nearby">What is near the site</a></li></ul></li>
     <li><a href="#plan">Day-by-day plan</a>
       <ul><li><a href="#fri">Friday 10/30</a></li><li><a href="#sat">Saturday 10/31 (Halloween)</a></li><li><a href="#sun">Sunday 11/1</a></li></ul></li>
     <li><a href="#events">Ranger programs on Oct 31</a></li>
@@ -111,9 +117,9 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;font-si
 <h2 class="banner" id="drive">2 · Getting there from Austin</h2>
 <div class="panel info">🚗 <b>About 66 miles, roughly 1 hr 25 min</b> without traffic: MoPac north, US-183 / 183A toll roads through Cedar Park, then TX-29 west through Liberty Hill, Bertram and Burnet, then left (south) on Park Road 4 for 3 miles to the park. Coming from Cedar Park you join the route on 183A and save about 25 minutes.</div>
 
-<figure id="fig1">
+<figure id="fig2">
   <div id="routemap" role="img" aria-label="Map of the driving route from downtown Austin to Inks Lake State Park"></div>
-  <figcaption><b>Figure 1 · Driving route, downtown Austin to Inks Lake State Park.</b> Blue line is the route; pins mark the main waypoints. Map data © OpenStreetMap contributors; route from OSRM.</figcaption>
+  <figcaption><b>Figure 2 · Driving route, downtown Austin to Inks Lake State Park.</b> Blue line is the route; pins mark the main waypoints. Map data © OpenStreetMap contributors; route from OSRM.</figcaption>
 </figure>
 
 <h3 id="legs">Route by road</h3>
@@ -149,20 +155,14 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;font-si
 
 <h2 class="banner" id="sitemap">3 · Park map and site 090</h2>
 <p>From the official Texas Parks and Wildlife park map (PWD MP P4507-015K). Site 090 is on the small loop of sites 83 to 94 on the north shore, right by the boat ramp, park store and restroom/shower building #4. Lake on three sides, with a short walk to everything.</p>
-<figure id="fig2">
+<figure id="fig3">
   <a href="inks_park_map_overview.jpg"><img src="inks_park_map_overview.jpg" alt="Full Inks Lake State Park map with the zoom area and site 090 outlined in red" loading="lazy"></a>
-  <figcaption><b>Figure 2 · Whole park.</b> Red box is the zoom area used in Figures 3 and 4; red circle is site 090. Tap to open full size.</figcaption>
+  <figcaption><b>Figure 3 · Whole park.</b> Red box is the zoom area used in Figures 1 and 4; red circle is site 090. Tap to open full size.</figcaption>
 </figure>
-<div class="grid2">
-  <figure id="fig3">
-    <a href="inks_zoom_entrance_to_site.jpg"><img src="inks_zoom_entrance_to_site.jpg" alt="Zoomed map from the entrance gate to headquarters to site 090" loading="lazy"></a>
-    <figcaption><b>Figure 3 · Entrance (1) → HQ check-in (2) → Site 090 (3).</b> Follow the park road north past the headquarters toward the boat ramp; the 83 to 94 loop is at the north end, past the cabins and restroom #4.</figcaption>
-  </figure>
-  <figure id="fig4">
+<figure id="fig4" class="closeup">
     <a href="inks_zoom_site090.jpg"><img src="inks_zoom_site090.jpg" alt="Close-up of site 090 on the lakeside loop" loading="lazy"></a>
     <figcaption><b>Figure 4 · Site 090 close-up.</b> Outer (lake) side of the loop, between sites 88 and 92.</figcaption>
   </figure>
-</div>
 
 <h3 id="nearby">What is near the site</h3>
 <div class="tbl-scroll"><table>
@@ -181,7 +181,7 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;font-si
 <div class="tbl-scroll"><table>
   <tr><th style="width:110px">Time</th><th>Plan</th></tr>
   <tr><td class="time">12:30 PM</td><td>Leave Austin (fill gas and grab lunch on the way; Burnet has plenty of options)</td></tr>
-  <tr><td class="time">2:00 PM</td><td>Check in at headquarters, then drive to site 090 (Figure 3)</td></tr>
+  <tr><td class="time">2:00 PM</td><td>Check in at headquarters, then drive to site 090 (Figure 1, top of page)</td></tr>
   <tr><td class="time">2:30 PM</td><td>Pitch the tent, set up the kitchen, hook up to the site's water and electric</td></tr>
   <tr><td class="time">4:00 PM</td><td>Walk to the park store and boat ramp; buy ice and firewood (do not bring firewood from home)</td></tr>
   <tr><td class="time">6:47 PM</td><td>Sunset over the lake from the site</td></tr>
