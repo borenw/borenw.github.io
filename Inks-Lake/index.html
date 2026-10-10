@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inks Lake Camping Trip</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --blue:#0052CC; --blue-dk:#0747A6; --blue-lt:#DEEBFF; --ink:#172B4D; --sub:#5E6C84;
+  --line:#DFE1E6; --bg:#FFFFFF; --panel:#F4F5F7; --green:#00875A; --green-lt:#E3FCEF;
+  --amber:#FF991F; --amber-lt:#FFFAE6; --red:#DE350B; --red-lt:#FFEBE6; --purple:#5243AA;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 48px}
+header.top{background:var(--blue);color:#fff}
+header.top .wrap{padding:22px 16px 18px}
+header.top h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.01em}
+header.top p{margin:6px 0 0;opacity:.92}
+.crumbs{background:var(--blue-dk);color:#cfe0ff;font-size:13px}
+.crumbs .wrap{padding:6px 16px}
+.crumbs a{color:#fff}
+h2.banner{background:var(--blue);color:#fff;font-size:18px;margin:34px 0 14px;padding:9px 14px;border-radius:4px;scroll-margin-top:12px}
+h3{font-size:16px;margin:22px 0 8px;color:var(--blue-dk)}
+a{color:var(--blue)}
+.toc{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:4px;padding:12px 18px;margin-top:20px}
+.toc strong{display:block;margin-bottom:4px}
+.toc ol{margin:0;padding-left:22px}
+.toc ul{margin:2px 0 4px;padding-left:18px;font-size:14px}
+.toc li{margin:2px 0}
+.panel{border:1px solid var(--line);border-radius:4px;padding:12px 16px;margin:12px 0}
+.info{background:var(--blue-lt);border-color:#B3D4FF}
+.note{background:var(--amber-lt);border-color:#FFE380}
+.ok{background:var(--green-lt);border-color:#ABF5D1}
+.warn{background:var(--red-lt);border-color:#FFBDAD}
+table{border-collapse:collapse;width:100%;margin:8px 0 6px;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel);font-weight:600;color:var(--ink)}
+td.rank{width:46px;text-align:center;font-weight:700;color:var(--blue-dk)}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.n-hi{color:var(--red)} .n-mid{color:var(--amber)} .n-lo{color:var(--green)}
+.bar{height:12px;background:var(--panel);border-radius:6px;overflow:hidden;min-width:90px}
+.bar span{display:block;height:100%;border-radius:6px;background:var(--blue)}
+.tbl-scroll{overflow-x:auto}
+figure{margin:14px 0 18px}
+figure img{width:100%;height:auto;border:1px solid var(--line);border-radius:4px;display:block}
+figcaption{font-size:13px;color:var(--sub);margin-top:6px}
+figcaption b{color:var(--ink)}
+#routemap{height:440px;border:1px solid var(--line);border-radius:4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}#routemap{height:340px}}
+.pie-row{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.pie{width:120px;height:120px;border-radius:50%;flex:none;border:1px solid var(--line)}
+.legend{font-size:13px}
+.legend div{display:flex;align-items:center;gap:6px;margin:2px 0}
+.legend i{width:12px;height:12px;border-radius:2px;display:inline-block}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:1px 7px;border-radius:3px;background:var(--blue-lt);color:var(--blue-dk)}
+.tag.g{background:var(--green-lt);color:var(--green)} .tag.a{background:var(--amber-lt);color:#974F0C} .tag.r{background:var(--red-lt);color:var(--red)}
+.check li{list-style:none;margin:3px 0}
+.check{padding-left:4px}
+.check label{cursor:pointer}
+.check input{margin-right:8px;transform:scale(1.1)}
+.cols3{columns:3 230px;column-gap:24px}
+.cols3 h4{margin:6px 0 2px;font-size:14px;color:var(--blue-dk);break-after:avoid}
+footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;font-size:13px;color:var(--sub)}
+.time{white-space:nowrap;font-weight:600;color:var(--blue-dk)}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <h1>🏕️ Inks Lake State Park: Fall Camping Trip</h1>
+  <p>Fri Oct 30 to Sun Nov 1, 2026 · Lakeside site 090 · Burnet, Texas · about 66 miles from downtown Austin</p>
+</div></header>
+<div class="crumbs"><div class="wrap"><a href="https://borenw.github.io/">Bo's Engineering Curriculum</a> › Recess › Trip pages › Inks Lake &nbsp;·&nbsp; sister page: <a href="https://borenw.github.io/Lake-Fulmore/">Lake Fulmor</a></div></div>
+
+<div class="wrap">
+
+<nav class="toc" aria-label="Contents">
+  <strong>📑 Contents</strong>
+  <ol>
+    <li><a href="#glance">Trip at a glance</a></li>
+    <li><a href="#drive">Getting there from Austin</a>
+      <ul><li><a href="#fig1">Figure 1 · Route map</a></li><li><a href="#legs">Route by road (table)</a></li><li><a href="#timing">When to leave</a></li></ul></li>
+    <li><a href="#sitemap">Park map and site 090</a>
+      <ul><li><a href="#fig2">Figure 2 · Whole park</a></li><li><a href="#fig3">Figure 3 · Entrance to site</a></li><li><a href="#fig4">Figure 4 · Site close-up</a></li><li><a href="#nearby">What is near the site</a></li></ul></li>
+    <li><a href="#plan">Day-by-day plan</a>
+      <ul><li><a href="#fri">Friday 10/30</a></li><li><a href="#sat">Saturday 10/31 (Halloween)</a></li><li><a href="#sun">Sunday 11/1</a></li></ul></li>
+    <li><a href="#events">Ranger programs on Oct 31</a></li>
+    <li><a href="#costs">Costs</a></li>
+    <li><a href="#packing">Packing checklist</a></li>
+    <li><a href="#rules">Know before you go</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ol>
+</nav>
+
+<h2 class="banner" id="glance">1 · Trip at a glance</h2>
+<div class="tbl-scroll"><table>
+  <tr><th style="width:190px">Item</th><th>Detail</th></tr>
+  <tr><td>📍 Park</td><td>Inks Lake State Park, 3480 Park Road 4 West, Burnet, TX 78611 · park office (512) 793-2223</td></tr>
+  <tr><td>🏕️ Site</td><td><b>090</b>, Campsite Electric (water + electric), North Loop, on the lakeside loop of sites 83 to 94 next to the boat ramp</td></tr>
+  <tr><td>📅 Dates</td><td>Arrive <b>Fri Oct 30</b>, check-in from <span class="time">2:00 PM</span> · depart <b>Sun Nov 1</b>, check-out by <span class="time">12:00 PM</span> · 2 nights</td></tr>
+  <tr><td>⛺ Setup</td><td>1 tent, 2 vehicles, no pets</td></tr>
+  <tr><td>🏢 Office</td><td>Headquarters open 8:30 AM to 5:00 PM daily. Front gate open 6 AM to 10 PM; after 10 PM use the gate code in the reservation email (it changes on Nov 1).</td></tr>
+  <tr><td>🌅 Sun</td><td>Fri sunset <span class="time">6:47 PM</span> · Sat sunrise <span class="time">7:47 AM</span>, sunset <span class="time">6:46 PM</span> · Sun sunrise <span class="time">6:48 AM</span> (clocks fall back Sat night)</td></tr>
+  <tr><td>🌡️ Weather</td><td>Late October in Burnet is usually mild: highs in the mid 70s °F, lows near the low 50s °F. Check the forecast around Oct 23, when it starts to be reliable.</td></tr>
+  <tr><td>🕑 Time change</td><td><span class="tag a">DST ends</span> 2:00 AM Sunday Nov 1. Phones adjust on their own; you gain an hour of sleep and check-out is noon CST.</td></tr>
+</table></div>
+
+<h2 class="banner" id="drive">2 · Getting there from Austin</h2>
+<div class="panel info">🚗 <b>About 66 miles, roughly 1 hr 25 min</b> without traffic: MoPac north, US-183 / 183A toll roads through Cedar Park, then TX-29 west through Liberty Hill, Bertram and Burnet, then left (south) on Park Road 4 for 3 miles to the park. Coming from Cedar Park you join the route on 183A and save about 25 minutes.</div>
+
+<figure id="fig1">
+  <div id="routemap" role="img" aria-label="Map of the driving route from downtown Austin to Inks Lake State Park"></div>
+  <figcaption><b>Figure 1 · Driving route, downtown Austin to Inks Lake State Park.</b> Blue line is the route; pins mark the main waypoints. Map data © OpenStreetMap contributors; route from OSRM.</figcaption>
+</figure>
+
+<h3 id="legs">Route by road</h3>
+<div class="pie-row">
+  <div class="pie" style="background:conic-gradient(#0052CC 0 50.1%,#00875A 50.1% 70.5%,#FF991F 70.5% 82.4%,#5243AA 82.4% 93.0%,#DE350B 93.0% 97.7%,#97A0AF 97.7% 100%)" role="img" aria-label="Share of miles by road"></div>
+  <div class="legend">
+    <div><i style="background:#0052CC"></i>TX-29 West · 32.4 mi</div>
+    <div><i style="background:#00875A"></i>183A Toll · 13.2 mi</div>
+    <div><i style="background:#FF991F"></i>US-183 Express Toll · 7.7 mi</div>
+    <div><i style="background:#5243AA"></i>MoPac (Loop 1) · 6.9 mi</div>
+    <div><i style="background:#DE350B"></i>Park Road 4 · 3.0 mi</div>
+    <div><i style="background:#97A0AF"></i>Downtown streets · 1.5 mi</div>
+  </div>
+</div>
+<div class="tbl-scroll"><table>
+  <tr><th>Rank</th><th>🛣️ Road</th><th>📏 Miles</th><th>Share</th><th>🧭 What happens</th></tr>
+  <tr><td class="rank">#1</td><td>TX-29 West</td><td class="num n-hi">32.4</td><td><div class="bar"><span style="width:100%"></span></div></td><td>Turn left off 183A near Liberty Hill, straight through Bertram and Burnet (TX-29 becomes Polk St, then Buchanan Dr in town)</td></tr>
+  <tr><td class="rank">#2</td><td>183A Toll</td><td class="num n-mid">13.2</td><td><div class="bar"><span style="width:41%"></span></div></td><td>Cedar Park and Leander. Toll road (TxTag or pay by mail); free US-183 runs alongside</td></tr>
+  <tr><td class="rank">#3</td><td>US-183 Express Toll</td><td class="num n-mid">7.7</td><td><div class="bar"><span style="width:24%"></span></div></td><td>Express lanes north of MoPac; the general lanes are free</td></tr>
+  <tr><td class="rank">#4</td><td>MoPac (Loop 1)</td><td class="num n-lo">6.9</td><td><div class="bar"><span style="width:21%"></span></div></td><td>North from Enfield Rd, then MoPac Express lane up to US-183</td></tr>
+  <tr><td class="rank">#5</td><td>Park Road 4</td><td class="num n-lo">3.0</td><td><div class="bar"><span style="width:9%"></span></div></td><td>Left (south) off TX-29 about 9 mi west of Burnet. No stopping along Park Road 4</td></tr>
+  <tr><td class="rank">#6</td><td>Downtown streets</td><td class="num n-lo">1.5</td><td><div class="bar"><span style="width:5%"></span></div></td><td>W 6th St to Enfield Rd</td></tr>
+</table></div>
+<p style="font-size:13px;color:var(--sub)">The legs above add up to about 64.7 mi; the last 1.5 mi are short ramps and connectors. Want to skip tolls? Stay on free US-183 north to TX-29 in Liberty Hill. It adds a few minutes and some traffic lights.</p>
+
+<h3 id="timing">When to leave</h3>
+<div class="tbl-scroll"><table>
+  <tr><th>⏰ Leave Austin</th><th>🏁 Arrive (approx.)</th><th>Notes</th></tr>
+  <tr><td class="time">12:30 PM Fri</td><td class="time">2:00 PM</td><td><span class="tag g">Best</span> Check-in opens, daylight to set up, office still open</td></tr>
+  <tr><td class="time">3:00 PM Fri</td><td class="time">4:45 PM</td><td><span class="tag a">OK</span> Friday traffic on MoPac/183 adds 20 to 30 min; arrive before the office closes at 5</td></tr>
+  <tr><td class="time">After 5 PM Fri</td><td class="time">~7:00 PM</td><td><span class="tag r">Late</span> Setting up after sunset (6:47 PM). Go straight to the site; check in at HQ 8:30 to 9:30 AM Saturday</td></tr>
+</table></div>
+
+<h2 class="banner" id="sitemap">3 · Park map and site 090</h2>
+<p>From the official Texas Parks and Wildlife park map (PWD MP P4507-015K). Site 090 is on the small loop of sites 83 to 94 on the north shore, right by the boat ramp, park store and restroom/shower building #4. Lake on three sides, with a short walk to everything.</p>
+<figure id="fig2">
+  <a href="inks_park_map_overview.jpg"><img src="inks_park_map_overview.jpg" alt="Full Inks Lake State Park map with the zoom area and site 090 outlined in red" loading="lazy"></a>
+  <figcaption><b>Figure 2 · Whole park.</b> Red box is the zoom area used in Figures 3 and 4; red circle is site 090. Tap to open full size.</figcaption>
+</figure>
+<div class="grid2">
+  <figure id="fig3">
+    <a href="inks_zoom_entrance_to_site.jpg"><img src="inks_zoom_entrance_to_site.jpg" alt="Zoomed map from the entrance gate to headquarters to site 090" loading="lazy"></a>
+    <figcaption><b>Figure 3 · Entrance (1) → HQ check-in (2) → Site 090 (3).</b> Follow the park road north past the headquarters toward the boat ramp; the 83 to 94 loop is at the north end, past the cabins and restroom #4.</figcaption>
+  </figure>
+  <figure id="fig4">
+    <a href="inks_zoom_site090.jpg"><img src="inks_zoom_site090.jpg" alt="Close-up of site 090 on the lakeside loop" loading="lazy"></a>
+    <figcaption><b>Figure 4 · Site 090 close-up.</b> Outer (lake) side of the loop, between sites 88 and 92.</figcaption>
+  </figure>
+</div>
+
+<h3 id="nearby">What is near the site</h3>
+<div class="tbl-scroll"><table>
+  <tr><th>Rank</th><th>📌 Place</th><th>🚶 Walk (approx.)</th><th>Closeness</th><th>Why it matters</th></tr>
+  <tr><td class="rank">#1</td><td>🚻 Restrooms + showers #4, Wi-Fi</td><td class="num n-lo">2 min</td><td><div class="bar"><span style="width:15%"></span></div></td><td>Closest bathhouse, wheelchair accessible</td></tr>
+  <tr><td class="rank">#2</td><td>🚤 Boat ramp</td><td class="num n-lo">3 min</td><td><div class="bar"><span style="width:22%"></span></div></td><td>Launch for kayaks and canoes</td></tr>
+  <tr><td class="rank">#3</td><td>🛶 Park store + watercraft rental</td><td class="num n-lo">4 min</td><td><div class="bar"><span style="width:30%"></span></div></td><td>Ice, firewood, snacks; kayaks, canoes, paddleboards, paddle boats</td></tr>
+  <tr><td class="rank">#4</td><td>🛝 Playground</td><td class="num n-mid">5 min</td><td><div class="bar"><span style="width:38%"></span></div></td><td>South of restroom #4</td></tr>
+  <tr><td class="rank">#5</td><td>⭐ Headquarters</td><td class="num n-hi">10 min</td><td><div class="bar"><span style="width:75%"></span></div></td><td>Check-in, maps, ranger program info; easier by car</td></tr>
+  <tr><td class="rank">#6</td><td>🏞️ Devil's Waterhole</td><td class="num n-hi">short drive</td><td><div class="bar"><span style="width:100%"></span></div></td><td>Scenic swimming/paddling cove on the east side; trailhead near sites 250s</td></tr>
+</table></div>
+<p style="font-size:13px;color:var(--sub)">Walking times are estimates from the map scale.</p>
+
+<h2 class="banner" id="plan">4 · Day-by-day plan</h2>
+<h3 id="fri">🗓️ Friday, Oct 30: arrive and set up</h3>
+<div class="tbl-scroll"><table>
+  <tr><th style="width:110px">Time</th><th>Plan</th></tr>
+  <tr><td class="time">12:30 PM</td><td>Leave Austin (fill gas and grab lunch on the way; Burnet has plenty of options)</td></tr>
+  <tr><td class="time">2:00 PM</td><td>Check in at headquarters, then drive to site 090 (Figure 3)</td></tr>
+  <tr><td class="time">2:30 PM</td><td>Pitch the tent, set up the kitchen, hook up to the site's water and electric</td></tr>
+  <tr><td class="time">4:00 PM</td><td>Walk to the park store and boat ramp; buy ice and firewood (do not bring firewood from home)</td></tr>
+  <tr><td class="time">6:47 PM</td><td>Sunset over the lake from the site</td></tr>
+  <tr><td class="time">7:00 PM</td><td>Dinner, campfire if there is no burn ban, s'mores</td></tr>
+  <tr><td class="time">10:00 PM</td><td>Quiet hours begin</td></tr>
+</table></div>
+
+<h3 id="sat">🎃 Saturday, Oct 31: Halloween at the park</h3>
+<div class="tbl-scroll"><table>
+  <tr><th style="width:110px">Time</th><th>Plan</th></tr>
+  <tr><td class="time">7:47 AM</td><td>Sunrise; pancakes at camp</td></tr>
+  <tr><td class="time">8:30 AM</td><td>Short hike or bike loop before it warms up</td></tr>
+  <tr><td class="time">10:00 AM</td><td>🎣 <b>Fishing with a Ranger</b> (learn the basics). No fishing license is needed to fish from the bank or a pier inside a Texas state park</td></tr>
+  <tr><td class="time">12:00 PM</td><td>🪨 <b>Texas Rocks!</b> with a geologist; then lunch at camp</td></tr>
+  <tr><td class="time">1:30 PM</td><td>🛶 Rent kayaks or a canoe at the park store (rentals until 3 PM, boats back by 4 PM). <i>Or</i> drive 15 min to Longhorn Cavern State Park for a cave tour</td></tr>
+  <tr><td class="time">4:30 PM</td><td>Early dinner; costumes and glow sticks on</td></tr>
+  <tr><td class="time">6:00 PM</td><td>🦉 <b>Creatures of the Night</b> hike</td></tr>
+  <tr><td class="time">8:00 PM</td><td>🦋 <b>Moth Madness</b> with Ranger Sam</td></tr>
+  <tr><td class="time">Night</td><td>Clocks fall back at 2 AM: an extra hour of sleep</td></tr>
+</table></div>
+
+<h3 id="sun">🧺 Sunday, Nov 1: pack up and head home</h3>
+<div class="tbl-scroll"><table>
+  <tr><th style="width:110px">Time (CST)</th><th>Plan</th></tr>
+  <tr><td class="time">6:48 AM</td><td>Sunrise (new standard time)</td></tr>
+  <tr><td class="time">8:00 AM</td><td>Breakfast, then a last paddle or walk along the shore</td></tr>
+  <tr><td class="time">10:00 AM</td><td>Pack up; let the tent dry in the sun before folding</td></tr>
+  <tr><td class="time">12:00 PM</td><td>Check-out deadline (no need to stop at HQ)</td></tr>
+  <tr><td class="time">12:30 PM</td><td>Optional stop: Buchanan Dam overlook or lunch in Burnet, then drive home</td></tr>
+</table></div>
+
+<h2 class="banner" id="events">5 · Ranger programs on Saturday, Oct 31</h2>
+<div class="tbl-scroll"><table>
+  <tr><th>Rank</th><th>🕑 Time</th><th>🎟️ Program</th><th>What it is</th><th>Fit</th></tr>
+  <tr><td class="rank">#1</td><td class="time">6:00 PM</td><td>🦉 Creatures of the Night</td><td>Guided evening hike about nocturnal animals. Perfect for Halloween</td><td><span class="tag g">Must do</span></td></tr>
+  <tr><td class="rank">#2</td><td class="time">10:00 AM</td><td>🎣 Fishing with a Ranger</td><td>A park volunteer teaches fishing basics</td><td><span class="tag g">Great for kids</span></td></tr>
+  <tr><td class="rank">#3</td><td class="time">8:00 PM</td><td>🦋 Moth Madness</td><td>Evening "mothing" with Ranger Sam: lights, sheets, and lots of moths</td><td><span class="tag">Night owls</span></td></tr>
+  <tr><td class="rank">#4</td><td class="time">12:00 PM</td><td>🪨 Texas Rocks!</td><td>A geologist on the pink granite and other Central Texas rocks</td><td><span class="tag">Curious minds</span></td></tr>
+</table></div>
+<p style="font-size:13px;color:var(--sub)">Meeting spots are listed at HQ and on the park events page. Programs can change, so check at check-in.</p>
+
+<h2 class="banner" id="costs">6 · Costs</h2>
+<div class="pie-row">
+  <div class="pie" style="background:conic-gradient(#0052CC 0 62.2%,#00875A 62.2% 100%)" role="img" aria-label="Paid: site fee 62 percent, entrance fees 38 percent"></div>
+  <div class="legend">
+    <div><i style="background:#0052CC"></i>Site use fee · $46.00</div>
+    <div><i style="background:#00875A"></i>Entrance fees · $28.00</div>
+    <div><b>Total paid · $74.00</b></div>
+  </div>
+</div>
+<div class="tbl-scroll"><table>
+  <tr><th>Rank</th><th>💵 Item</th><th>Amount</th><th>Share</th><th>Status</th></tr>
+  <tr><td class="rank">#1</td><td>🏕️ Campsite use fee (2 nights)</td><td class="num n-hi">$46.00</td><td><div class="bar"><span style="width:100%"></span></div></td><td><span class="tag g">Paid</span></td></tr>
+  <tr><td class="rank">#2</td><td>🎫 Entrance, 2 adults × 2 days × $7</td><td class="num n-mid">$28.00</td><td><div class="bar"><span style="width:61%"></span></div></td><td><span class="tag g">Paid</span> Kids 12 and under are free</td></tr>
+  <tr><td class="rank">#3</td><td>🛶 Kayak/canoe rental, 2 hours (optional)</td><td class="num n-lo">$30.00</td><td><div class="bar"><span style="width:65%"></span></div></td><td><span class="tag a">Estimate</span> $20 first hour, $10 each extra hour, per boat</td></tr>
+  <tr><td class="rank">#4</td><td>🪵 Firewood and ice (optional)</td><td class="num n-lo">varies</td><td><div class="bar"><span style="width:0%"></span></div></td><td>Park store or firewood vending machine</td></tr>
+</table></div>
+<div class="panel note">💡 A Texas State Parks Pass covers daily entrance fees for the pass holder and guests in the same vehicle. If you hold a pass now, bring the card and ask at HQ whether entrance fees paid before the pass was bought can be credited.</div>
+
+<h2 class="banner" id="packing">7 · Packing checklist</h2>
+<p style="font-size:13px;color:var(--sub)">Tick items as you pack; ticks are saved in this browser only.</p>
+<div class="cols3 check" id="checklist">
+  <h4>⛺ Shelter and sleep</h4>
+  <ul class="check">
+    <li><label><input type="checkbox">Tent, footprint, stakes, mallet</label></li>
+    <li><label><input type="checkbox">Sleeping bags rated to 40 °F</label></li>
+    <li><label><input type="checkbox">Sleeping pads, pillows</label></li>
+    <li><label><input type="checkbox">Extension cord for site electric</label></li>
+    <li><label><input type="checkbox">Lantern and headlamps</label></li>
+  </ul>
+  <h4>🍳 Kitchen</h4>
+  <ul class="check">
+    <li><label><input type="checkbox">Stove, fuel, lighter</label></li>
+    <li><label><input type="checkbox">Cooler (buy ice at the park store)</label></li>
+    <li><label><input type="checkbox">Water jug for filling at the site</label></li>
+    <li><label><input type="checkbox">Pot, pan, utensils, plates, cups</label></li>
+    <li><label><input type="checkbox">S'mores kit and roasting sticks</label></li>
+    <li><label><input type="checkbox">Trash bags, dish soap, paper towels</label></li>
+  </ul>
+  <h4>👕 Clothing</h4>
+  <ul class="check">
+    <li><label><input type="checkbox">Layers and a warm jacket for 50 °F nights</label></li>
+    <li><label><input type="checkbox">Rain shell</label></li>
+    <li><label><input type="checkbox">Water shoes for the granite shoreline</label></li>
+    <li><label><input type="checkbox">Halloween costumes 🎃</label></li>
+  </ul>
+  <h4>🎣 Fun</h4>
+  <ul class="check">
+    <li><label><input type="checkbox">Fishing rods, tackle, bait</label></li>
+    <li><label><input type="checkbox">Glow sticks and flashlight for the night hike</label></li>
+    <li><label><input type="checkbox">Camp chairs, table cloth</label></li>
+    <li><label><input type="checkbox">Movie night gear (see <a href="https://borenw.github.io/Campsite-Movies/">Campsite Movies</a>)</label></li>
+  </ul>
+  <h4>🧴 Safety and admin</h4>
+  <ul class="check">
+    <li><label><input type="checkbox">Reservation email (gate code)</label></li>
+    <li><label><input type="checkbox">State Parks Pass card, ID</label></li>
+    <li><label><input type="checkbox">First aid kit, sunscreen, bug spray</label></li>
+    <li><label><input type="checkbox">TxTag or plan for toll by mail</label></li>
+  </ul>
+</div>
+
+<h2 class="banner" id="rules">8 · Know before you go</h2>
+<div class="tbl-scroll"><table>
+  <tr><th>Rank</th><th>📋 Rule</th><th>Detail</th></tr>
+  <tr><td class="rank">#1</td><td>🚪 Gate hours</td><td>Front gate 6 AM to 10 PM. Arriving later: gate code from the reservation email; the code changes on Nov 1. Late arrivals check in at HQ 8:30 to 9:30 AM next morning</td></tr>
+  <tr><td class="rank">#2</td><td>🌙 Quiet hours</td><td>10 PM to 6 AM. Visitors must leave by 10 PM</td></tr>
+  <tr><td class="rank">#3</td><td>🔥 Fires</td><td>Fires only in the site's fire ring, and only when there is no burn ban. Ask at check-in</td></tr>
+  <tr><td class="rank">#4</td><td>👥 Site limits</td><td>Up to 8 people per site; extra parking fee for more than two vehicles; park in the center of the pad</td></tr>
+  <tr><td class="rank">#5</td><td>🍺 Alcohol</td><td>Public consumption or display of alcohol is prohibited</td></tr>
+  <tr><td class="rank">#6</td><td>🏊 Water</td><td>No lifeguards. Jumping off rocks at Devil's Waterhole is at your own risk (underwater hazards). Watch for algae in still water</td></tr>
+  <tr><td class="rank">#7</td><td>🧾 Cancel or change</td><td>Cancel 5+ days ahead (by Oct 25): $10 penalty. Less than 5 days: $10 per night. No-show: whole fee forfeited</td></tr>
+</table></div>
+
+<h2 class="banner" id="sources">9 · Sources</h2>
+<ul>
+  <li><a href="https://tpwd.texas.gov/state-parks/inks-lake">Inks Lake State Park, TPWD</a></li>
+  <li><a href="https://tpwd.texas.gov/publications/pwdpubs/media/park_maps/pwd_mp_p4507_015k.pdf">Official park map, PWD MP P4507-015K (PDF)</a></li>
+  <li><a href="https://tpwd.texas.gov/state-parks/inks-lake/park_events">Inks Lake park events</a></li>
+  <li><a href="https://tpwd.texas.gov/state-parks/longhorn-cavern">Longhorn Cavern State Park, TPWD</a> · tours via VisitLonghornCavern.com</li>
+  <li><a href="https://tpwd.texas.gov/state-parks/park-reservation-information/changes-cancellations">TPWD change and cancellation policy</a></li>
+  <li>Driving route: <a href="https://project-osrm.org/">OSRM</a> on <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> data</li>
+</ul>
+
+<footer>
+  <a href="https://borenw.github.io/">Page 56 · Bo's Engineering Curriculum</a> · Inks Lake trip page, built Oct 2026
+</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+  var route = [[30.2672,-97.7431],[30.2684,-97.744],[30.2691,-97.7464],[30.2699,-97.7494],[30.2704,-97.7511],[30.2715,-97.7539],[30.2728,-97.7534],[30.2739,-97.7528],[30.2751,-97.7523],[30.2766,-97.7515],[30.2773,-97.7512],[30.279,-97.7518],[30.2795,-97.7523],[30.2802,-97.7533],[30.282,-97.7561],[30.2829,-97.7581],[30.2837,-97.7607],[30.2847,-97.7619],[30.2858,-97.7633],[30.2892,-97.7614],[30.2937,-97.7593],[30.3002,-97.758],[30.3037,-97.7582],[30.3144,-97.7564],[30.3324,-97.7554],[30.3374,-97.7551],[30.3433,-97.7521],[30.3498,-97.7494],[30.3529,-97.7484],[30.3565,-97.7462],[30.3644,-97.7433],[30.3692,-97.7421],[30.3765,-97.7396],[30.3824,-97.7414],[30.3937,-97.7464],[30.4084,-97.7451],[30.4219,-97.7474],[30.434,-97.7689],[30.447,-97.7897],[30.4576,-97.7925],[30.4734,-97.7989],[30.484,-97.8044],[30.4883,-97.8042],[30.4936,-97.8023],[30.4988,-97.8042],[30.5045,-97.8091],[30.5161,-97.8138],[30.5224,-97.8155],[30.5284,-97.8168],[30.5346,-97.8166],[30.5431,-97.8166],[30.557,-97.8208],[30.5722,-97.8298],[30.5865,-97.8384],[30.5914,-97.8447],[30.5981,-97.8552],[30.6026,-97.859],[30.6098,-97.8607],[30.6183,-97.8597],[30.6278,-97.864],[30.6413,-97.8706],[30.6507,-97.8744],[30.6523,-97.8751],[30.6555,-97.8814],[30.658,-97.8887],[30.6589,-97.8909],[30.6607,-97.8956],[30.6619,-97.8985],[30.6645,-97.9045],[30.6661,-97.9077],[30.6678,-97.9111],[30.6688,-97.9129],[30.67,-97.9153],[30.6713,-97.9179],[30.673,-97.9212],[30.6745,-97.9243],[30.6751,-97.926],[30.6752,-97.9279],[30.6748,-97.9311],[30.6747,-97.9341],[30.6754,-97.938],[30.6761,-97.9404],[30.6776,-97.9438],[30.6792,-97.9482],[30.68,-97.9522],[30.6811,-97.9562],[30.6834,-97.9602],[30.6862,-97.9646],[30.6901,-97.9708],[30.6939,-97.9793],[30.6972,-97.987],[30.6991,-97.9901],[30.7053,-97.9984],[30.7109,-98.0043],[30.7148,-98.0076],[30.7169,-98.0094],[30.7207,-98.0127],[30.7254,-98.019],[30.7296,-98.0248],[30.7332,-98.0296],[30.7348,-98.0328],[30.7348,-98.0358],[30.7352,-98.0385],[30.7373,-98.043],[30.7396,-98.048],[30.7406,-98.0502],[30.7416,-98.052],[30.7436,-98.0546],[30.7452,-98.0581],[30.7471,-98.0644],[30.7474,-98.0688],[30.748,-98.0796],[30.7484,-98.0858],[30.7463,-98.098],[30.747,-98.1044],[30.7494,-98.1186],[30.7508,-98.1262],[30.7514,-98.13],[30.7523,-98.1354],[30.7521,-98.1376],[30.7503,-98.143],[30.7494,-98.1465],[30.7494,-98.1587],[30.7495,-98.165],[30.7499,-98.1706],[30.7509,-98.1806],[30.7511,-98.1831],[30.7513,-98.1853],[30.7518,-98.1903],[30.7524,-98.197],[30.753,-98.2006],[30.755,-98.2054],[30.7566,-98.2088],[30.7579,-98.2117],[30.759,-98.2141],[30.7597,-98.2162],[30.76,-98.2184],[30.7595,-98.2216],[30.7589,-98.2252],[30.7582,-98.2283],[30.7575,-98.2322],[30.7575,-98.234],[30.7585,-98.2386],[30.7592,-98.2416],[30.7596,-98.2451],[30.7599,-98.2488],[30.7604,-98.2545],[30.7606,-98.2626],[30.7609,-98.2737],[30.7617,-98.2803],[30.7622,-98.2865],[30.7605,-98.2953],[30.7612,-98.3009],[30.7617,-98.3073],[30.7638,-98.3107],[30.766,-98.3134],[30.7666,-98.3157],[30.7661,-98.3192],[30.7663,-98.3208],[30.7671,-98.3237],[30.7668,-98.3273],[30.7668,-98.3306],[30.7664,-98.3413],[30.7678,-98.345],[30.7669,-98.3486],[30.7632,-98.3515],[30.7597,-98.3574],[30.76,-98.3612],[30.7593,-98.3663],[30.7574,-98.3711],[30.7548,-98.375],[30.7531,-98.3768],[30.7516,-98.377],[30.7507,-98.376],[30.7495,-98.3701],[30.7478,-98.3679],[30.7477,-98.3617],[30.7494,-98.3591],[30.7499,-98.3546],[30.7487,-98.3528],[30.7476,-98.3537],[30.7451,-98.3603],[30.7412,-98.3623],[30.7405,-98.3645],[30.7405,-98.3654]];
+  var el = document.getElementById('routemap');
+  if (!window.L) { el.innerHTML = '<p style="padding:16px">Map could not load. Route: MoPac N → US-183 / 183A N → TX-29 W through Liberty Hill, Bertram, Burnet → Park Rd 4 S.</p>'; return; }
+  var map = L.map(el, {scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18, attribution:'© OpenStreetMap contributors'}).addTo(map);
+  L.polyline(route, {color:'#ffffff', weight:9, opacity:.9}).addTo(map);
+  var line = L.polyline(route, {color:'#0052CC', weight:5}).addTo(map);
+  var pts = [
+    ['🏙️ Start: downtown Austin', 30.2672,-97.7431, '#0747A6'],
+    ['Cedar Park (183A)', 30.5045,-97.8091, '#5E6C84'],
+    ['Turn left: TX-29 West', 30.6523,-97.8751, '#5E6C84'],
+    ['Bertram', 30.7436,-98.0546, '#5E6C84'],
+    ['Burnet', 30.7582,-98.2283, '#5E6C84'],
+    ['Turn left: Park Road 4 South', 30.7669,-98.3486, '#FF991F'],
+    ['🏕️ Inks Lake State Park HQ', 30.7405,-98.3654, '#DE350B']
+  ];
+  pts.forEach(function(p,i){
+    var big = (i===0||i===pts.length-1);
+    L.circleMarker([p[1],p[2]], {radius: big?9:6, color:'#fff', weight:2, fillColor:p[3], fillOpacity:1})
+      .addTo(map).bindTooltip(p[0], {permanent: big, direction: i===0?'right':'left'});
+  });
+  map.fitBounds(line.getBounds(), {padding:[24,24]});
+})();
+(function(){
+  var KEY='inks-lake-2026-checklist', boxes=[].slice.call(document.querySelectorAll('#checklist input'));
+  var saved={}; try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
+  boxes.forEach(function(b,i){ b.checked=!!saved[i]; b.addEventListener('change',function(){ saved[i]=b.checked; try{ localStorage.setItem(KEY, JSON.stringify(saved)); }catch(e){} }); });
+})();
+</script>
+</body>
+</html>
