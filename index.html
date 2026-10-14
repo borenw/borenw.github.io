@@ -283,8 +283,8 @@
 <div class="banner">
   <div class="revbadges">
     <span class="chk" id="sitecheck" title="Checking this page against the latest pushed build…">checking…</span>
-    <span class="age" id="siteage" data-built="2026-10-10T11:42:47Z">built …</span>
-    <span class="rev" id="siterev">rev 124</span>
+    <span class="age" id="siteage" data-built="2026-10-14T15:17:13Z">built …</span>
+    <span class="rev" id="siterev">rev 125</span>
   </div>
   <h1>📚 Bo's Engineering Curriculum</h1>
   <p>Interactive toys, sandboxes &amp; notebooks — organized as college courses and textbook chapters</p>
@@ -648,7 +648,7 @@
       <tr class="placeholder"><td class="ch">Ch. 1</td><td>Feedback &amp; Block Diagrams</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr class="placeholder"><td class="ch">Ch. 2</td><td>Stability &amp; Root Locus</td><td><span class="badge soon">PLANNED</span></td></tr>
       <tr><td class="ch">Ch. 3</td><td><a href="https://github.com/borenw/clamp-protection-loop">Relay Feedback &amp; Limit Cycles — Delayed Hysteretic Clamp Loop (SKY130)</a> <span class="desc">— a hysteretic (relay) shunt-clamp with transport delay: the classic relay-plus-delay limit-cycle oscillator, worked in the time domain on real SKY130 devices. Derives the overshoot law V<sub>peak</sub>=V<sub>on</sub>+slew·τ and a maximum-loop-delay stability bound, all verified in ngspice. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
-      <tr class="placeholder"><td class="ch">Ch. 4</td><td>PID &amp; Loop Shaping</td><td><span class="badge soon">PLANNED</span></td></tr>
+      <tr><td class="ch">Ch. 4</td><td>🔒 <a href="https://github.com/borenw/ramp-sync-type2-loop">Ramp-Sync Type-II Loop: syncing a ramp oscillator to clk_ref</a> <span class="desc">· sample V<sub>c</sub> − V<sub>trip</sub> at each clk_ref edge (it equals the next cycle's equivalent V<sub>init</sub>), close a PI loop on it. z-domain model P(z) = z<sup>−1</sup>/(1 − z<sup>−1</sup>), D(z) = K<sub>p</sub> + K<sub>i</sub>/(1 − z<sup>−1</sup>); delay-cell block diagram; switched-cap charge-amp build with K<sub>p</sub> = C<sub>p</sub>/C<sub>f</sub>, K<sub>i</sub> = C<sub>I</sub>/C<sub>f</sub>; cycle-by-cycle transient, FFT-extracted spectrum vs analytic |S|; phase noise L(f) type-II vs first-order. <em>Private repo.</em></span></td><td><span class="badge repo">GITHUB</span> <span class="badge private">PRIVATE</span></td></tr>
     </table>
   </div>
 
@@ -887,6 +887,7 @@
       <tr><td class="ch">54</td><td><a href="https://borenw.github.io/ldo-loadreg-setup/">LDO LDR Checklist — 15 simulation checks and load-regulation SKILL script</a></td></tr>
       <tr><td class="ch">55</td><td><a href="https://borenw.github.io/rc-noise-bandwidth/">RC Noise Bandwidth: where 4kTR becomes kT/C</a></td></tr>
       <tr><td class="ch">56</td><td><a href="https://borenw.github.io/Inks-Lake/">Inks Lake Camping: site 090 map, route from Austin, weekend plan</a></td></tr>
+      <tr><td class="ch">57</td><td>🔒 <a href="https://github.com/borenw/ramp-sync-type2-loop">Ramp-Sync Type-II Loop</a> <span class="desc">(private, offline)</span></td></tr>
     </table>
     <p style="font-size:12.5px;color:var(--text-sub);margin-top:8px">Page numbers are permanent and append-only — a new page always takes the next number (29, 30, …), existing pages are never renumbered. Each page also shows its number in its own footer.</p>
   </div>
