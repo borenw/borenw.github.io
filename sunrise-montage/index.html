@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sunrise Sine Montage</title>
+<meta name="description" content="Turn a year of webcam photos into a montage where sunrise traces a sine wave.">
+<style>
+:root{--blue:#0052CC;--blue-dk:#0747A6;--blue-lt:#DEEBFF;--ink:#172B4D;--sub:#5E6C84;--line:#DFE1E6;--panel:#F4F5F7}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header.banner{background:var(--blue);color:#fff;padding:18px 16px}
+header.banner h1{margin:0;font-size:22px}
+header.banner p{margin:4px 0 0;opacity:.92;font-size:14px}
+main{max-width:1100px;margin:0 auto;padding:16px}
+nav.toc{border:1px solid var(--line);border-left:4px solid var(--blue);background:var(--panel);padding:10px 14px;border-radius:3px;margin-bottom:18px}
+nav.toc b{font-size:14px}
+nav.toc ol{margin:4px 0 0;padding-left:20px}
+nav.toc ul{margin:0;padding-left:18px}
+nav.toc a{color:var(--blue);text-decoration:none}
+nav.toc a:hover{text-decoration:underline}
+section{margin:24px 0}
+h2.sec{background:var(--blue-lt);color:var(--blue-dk);border-left:4px solid var(--blue);padding:6px 10px;font-size:17px;margin:0 0 12px;border-radius:2px}
+h3{font-size:15px;margin:16px 0 8px;color:var(--blue-dk)}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:8px}
+label.f{display:flex;flex-direction:column;font-size:13px;color:var(--sub)}
+label.f input,label.f select{margin-top:3px;padding:7px 8px;border:1px solid #C1C7D0;border-radius:3px;font-size:16px;color:var(--ink);background:#fff;width:100%}
+.checks{display:flex;flex-wrap:wrap;gap:16px;margin:8px 0;font-size:14px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+button,.filebtn{background:var(--blue);color:#fff;border:0;border-radius:3px;padding:10px 14px;font-size:15px;cursor:pointer;font-family:inherit}
+button.alt,.filebtn.alt{background:#fff;color:var(--blue);border:1px solid var(--blue)}
+button:disabled{opacity:.45;cursor:default}
+.filebtn input{display:none}
+#status{font-size:14px;color:var(--sub);min-height:1.5em}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:6px 0 10px}
+.bar>div{height:100%;width:0;background:var(--blue)}
+.canvas-wrap{overflow:auto;border:1px solid var(--line);background:#0b1020;border-radius:3px;min-height:60px}
+canvas{display:block;max-width:100%;height:auto;margin:0 auto}
+.canvas-wrap.full canvas{max-width:none}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--blue-lt);color:var(--blue-dk)}
+.note{background:#FFFAE6;border-left:4px solid #FFAB00;padding:8px 12px;font-size:14px;border-radius:2px;margin:10px 0}
+code{background:var(--panel);padding:1px 4px;border-radius:3px;font-size:13px}
+a{color:var(--blue)}
+footer{color:var(--sub);font-size:13px;text-align:center;padding:24px 16px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header class="banner">
+  <h1>🌅 Sunrise Sine Montage</h1>
+  <p>One year of webcam photos, one column per day or week. Where night turns to day, sunrise draws a sine wave.</p>
+</header>
+
+<main>
+<nav class="toc" aria-label="Contents">
+  <b>📑 Contents</b>
+  <ol>
+    <li><a href="#make">Make a montage</a>
+      <ul><li><a href="#settings">Settings</a></li><li><a href="#result">Result</a></li></ul></li>
+    <li><a href="#photos">Get a year of photos</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#tips">Tips and troubleshooting</a></li>
+  </ol>
+</nav>
+
+<section id="make">
+  <h2 class="sec">1. 🎨 Make a montage</h2>
+  <p>Tap <b>Try demo</b> to see a simulated year right away, or pick your own webcam photos. Everything runs in your browser. Your photos are never uploaded.</p>
+
+  <div class="btns">
+    <button id="demoBtn" type="button">✨ Try demo</button>
+    <label class="filebtn alt">📷 Pick photos<input id="pickFiles" type="file" accept="image/*" multiple></label>
+    <label class="filebtn alt" id="folderLbl">📁 Pick folder<input id="pickFolder" type="file" webkitdirectory multiple></label>
+    <button id="genBtn" type="button" disabled>▶️ Generate from photos</button>
+    <button id="dlBtn" type="button" class="alt" disabled>⬇️ Download PNG</button>
+  </div>
+  <div id="status">No photos loaded yet.</div>
+  <div class="bar"><div id="prog"></div></div>
+
+  <h3 id="settings">⚙️ Settings</h3>
+  <div class="controls">
+    <label class="f">🕓 Window start<input id="start" type="time" value="04:00"></label>
+    <label class="f">🕘 Window end<input id="end" type="time" value="09:00"></label>
+    <label class="f">⏱️ Row every
+      <select id="slot"><option value="10">10 min</option><option value="15">15 min</option><option value="30" selected>30 min</option><option value="60">60 min</option></select></label>
+    <label class="f">📅 Column every
+      <select id="step"><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="7" selected>1 week</option></select></label>
+    <label class="f">↔️ Cell width (px)<input id="cw" type="number" min="2" max="200" value="24"></label>
+    <label class="f">↕️ Cell height (px)<input id="ch" type="number" min="2" max="200" value="32"></label>
+    <label class="f">🖼️ Each cell shows
+      <select id="fit"><option value="slice" selected>Center slice</option><option value="whole">Whole photo</option></select></label>
+    <label class="f">🌐 Latitude<input id="lat" type="number" step="0.1" value="40"></label>
+    <label class="f">🌐 Longitude<input id="lon" type="number" step="0.1" value="-105"></label>
+    <label class="f">🕰️ UTC offset (standard time)<input id="tz" type="number" step="0.5" value="-7"></label>
+  </div>
+  <div class="checks">
+    <label><input id="labels" type="checkbox" checked> 🏷️ Time and month labels</label>
+    <label><input id="curve" type="checkbox"> 〰️ Overlay computed sunrise curve</label>
+    <label><input id="full" type="checkbox"> 🔍 Show full size (scroll)</label>
+  </div>
+  <p style="font-size:13px;color:var(--sub);margin:4px 0 0">Latitude, longitude and UTC offset are used for the demo and for the optional sunrise curve. Set them to your camera's location.</p>
+
+  <h3 id="result">🖼️ Figure 1 · Sunrise montage: morning time (rows) across the year (columns)</h3>
+  <div class="canvas-wrap" id="wrap"><canvas id="cv" width="10" height="10"></canvas></div>
+</section>
+
+<section id="photos">
+  <h2 class="sec">2. 📥 Get a year of photos</h2>
+  <p>The <a href="https://phenocam.nau.edu/webcam/" target="_blank" rel="noopener">PhenoCam Network</a> has 700+ fixed cameras, most shooting every 30 minutes (NEON sites every 15), many with years of continuous images. A free account lets you download in bulk.</p>
+  <table>
+    <tr><th>#</th><th>📋 Step</th><th>💡 Detail</th></tr>
+    <tr><td>1</td><td>Create a free PhenoCam account</td><td>Needed to download images.</td></tr>
+    <tr><td>2</td><td>Pick a scenic site</td><td>Choose one that keeps shooting before sunrise all year. Some only shoot in full daylight, which hides the wave.</td></tr>
+    <tr><td>3</td><td>Download one full year</td><td>Set the date range to 12 months and the time window to about 04:00 to 09:00.</td></tr>
+    <tr><td>4</td><td>Unzip and load</td><td>On a computer, use <b>Pick folder</b>. On a phone, save the JPGs to the Files app and use <b>Pick photos</b>.</td></tr>
+    <tr><td>5</td><td>Generate</td><td>Set latitude and longitude to the site and turn on the sunrise curve to check alignment.</td></tr>
+  </table>
+  <div class="note">⚠️ Dates and times are read from file names such as <code>site_2025_06_01_053006.jpg</code>, <code>IMG_20250601_053006.jpg</code> or <code>2025-06-01 05-30.jpg</code>. If a name has no date, the file's modified time is used, which is often wrong for downloaded files.</div>
+</section>
+
+<section id="how">
+  <h2 class="sec">3. 🔬 How it works</h2>
+  <table>
+    <tr><th>🧩 Part</th><th>📐 What it does</th></tr>
+    <tr><td>➡️ Columns</td><td>Days of the year, left to right, one per day or per chosen step.</td></tr>
+    <tr><td>⬇️ Rows</td><td>Time of morning, top to bottom, one per time slot.</td></tr>
+    <tr><td>🌗 The edge</td><td>Cells above sunrise are dark, cells below are lit. The boundary is sunrise time, which swings early in summer and late in winter.</td></tr>
+    <tr><td>〰️ Why a sine</td><td>Sun declination follows the year almost like a sine (period 365 days), so sunrise time does too, plus a small wobble from the equation of time.</td></tr>
+    <tr><td>📏 Amplitude</td><td>Grows with latitude. Near the equator the wave is nearly flat; far north it is tall.</td></tr>
+  </table>
+</section>
+
+<section id="tips">
+  <h2 class="sec">4. 🛠️ Tips and troubleshooting</h2>
+  <table>
+    <tr><th>❓ Issue</th><th>✅ Fix</th></tr>
+    <tr><td>Black cells</td><td>No photo for that slot. Missing photos look like night, so pick a site with few gaps, or use 1 week columns to bridge them.</td></tr>
+    <tr><td>Staircase look</td><td>Use 10 or 15 minute rows and 1 day columns for a smoother wave.</td></tr>
+    <tr><td>A jump in March and November</td><td>The camera clock follows daylight saving time. The jump is real data, not a bug.</td></tr>
+    <tr><td>Slow on a phone</td><td>Every photo is decoded in the browser. Use 1 week columns or a computer for a full daily year.</td></tr>
+    <tr><td>Photos picked from the iPhone Photos app have wrong dates</td><td>The picker can rename files. Save them to the Files app first and pick from there.</td></tr>
+  </table>
+</section>
+</main>
+
+<footer><a href="https://borenw.github.io/">Page 58 · Bo's Engineering Curriculum</a> · Sunrise Sine Montage, runs entirely in your browser</footer>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const cv=$('cv'), ctx=cv.getContext('2d');
+let files=[], busy=false;
+
+/* hide folder button where unsupported (iOS) */
+if(!('webkitdirectory' in document.createElement('input')) || /iPhone|iPad|iPod/.test(navigator.userAgent)) $('folderLbl').style.display='none';
+
+function toMin(s){const p=(s||'0:0').split(':').map(Number);return p[0]*60+(p[1]||0);}
+function cfg(){
+  const c={startMin:toMin($('start').value),endMin:toMin($('end').value),slot:+$('slot').value,step:+$('step').value,
+    cw:Math.max(2,Math.min(200,+$('cw').value||24)),ch:Math.max(2,Math.min(200,+$('ch').value||32)),fit:$('fit').value,
+    labels:$('labels').checked,curve:$('curve').checked,lat:+$('lat').value||0,lon:+$('lon').value||0,tz:+$('tz').value||0};
+  if(c.endMin<=c.startMin) c.endMin=c.startMin+c.slot;
+  return c;
+}
+function status(t){$('status').textContent=t;}
+function prog(f){$('prog').style.width=(Math.max(0,Math.min(1,f))*100).toFixed(1)+'%';}
+const tick=()=>new Promise(r=>setTimeout(r,0));
+
+/* ---------- date parsing from file names ---------- */
+const PATS=[
+  /(\d{4})[-_.](\d{2})[-_.](\d{2})[ T_\-.]?(\d{2})[-_:.]?(\d{2})(?:[-_:.]?(\d{2}))?/,
+  /(\d{4})(\d{2})(\d{2})[ T_\-]?(\d{2})(\d{2})(\d{2})?/
+];
+function parseName(n){
+  for(const p of PATS){
+    const m=n.match(p);
+    if(m){const y=+m[1],mo=+m[2],d=+m[3],h=+m[4],mi=+m[5];
+      if(y>1990&&y<2100&&mo>=1&&mo<=12&&d>=1&&d<=31&&h<24&&mi<60) return {day:Date.UTC(y,mo-1,d)/864e5,min:h*60+mi};}
+  }
+  return null;
+}
+
+/* ---------- sun math (local standard time) ---------- */
+function sunriseMin(dayNum,lat,lon,tz){
+  const rad=Math.PI/180, t=dayNum*864e5, yr=new Date(t).getUTCFullYear();
+  const N=Math.round((t-Date.UTC(yr,0,0))/864e5);
+  const decl=23.44*Math.sin(2*Math.PI*(284+N)/365)*rad;
+  const B=2*Math.PI*(N-81)/364, eot=9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B);
+  const phi=lat*rad, cosw=(Math.sin(-0.833*rad)-Math.sin(phi)*Math.sin(decl))/(Math.cos(phi)*Math.cos(decl));
+  if(cosw>1) return Infinity; if(cosw<-1) return -Infinity;
+  const w=Math.acos(cosw)/rad;
+  return 720-4*lon-eot+tz*60-4*w;
+}
+
+/* ---------- canvas layout ---------- */
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function layout(c,nCols,nRows){
+  const m=c.labels?{l:46,t:8,r:8,b:24}:{l:0,t:0,r:0,b:0};
+  let W=m.l+nCols*c.cw+m.r, H=m.t+nRows*c.ch+m.b;
+  const MAXPX=16e6;
+  if(W*H>MAXPX){const s=Math.sqrt(MAXPX/(W*H));c.cw=Math.max(1,Math.floor(c.cw*s));c.ch=Math.max(1,Math.floor(c.ch*s));W=m.l+nCols*c.cw+m.r;H=m.t+nRows*c.ch+m.b;}
+  cv.width=W;cv.height=H;
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  return {m,nCols,nRows,x:col=>m.l+col*c.cw,y:row=>m.t+row*c.ch};
+}
+function decorate(c,L,d0){
+  const {m,nCols,nRows}=L;
+  if(c.curve){
+    ctx.save();ctx.strokeStyle='#FFD43B';ctx.lineWidth=Math.max(1.5,c.cw/8);ctx.setLineDash([6,4]);ctx.beginPath();
+    let pen=false;
+    for(let col=0;col<nCols;col++){
+      const sr=sunriseMin(d0+col*c.step+(c.step-1)/2,c.lat,c.lon,c.tz);
+      if(!isFinite(sr)){pen=false;continue;}
+      const yy=m.t+(sr-c.startMin)/c.slot*c.ch, xx=m.l+(col+0.5)*c.cw;
+      if(pen) ctx.lineTo(xx,yy); else {ctx.moveTo(xx,yy);pen=true;}
+    }
+    ctx.stroke();ctx.restore();
+  }
+  if(!c.labels) return;
+  ctx.save();ctx.fillStyle='#fff';ctx.fillRect(0,0,m.l,cv.height);ctx.fillRect(0,cv.height-m.b,cv.width,m.b);
+  ctx.fillRect(cv.width-m.r,0,m.r,cv.height);ctx.fillRect(0,0,cv.width,m.t);
+  ctx.fillStyle='#172B4D';ctx.font='11px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  const pxPerMin=c.ch/c.slot, every=pxPerMin*60>=14?60:120;
+  for(let t=Math.ceil(c.startMin/every)*every;t<=c.endMin;t+=every){
+    const yy=m.t+(t-c.startMin)*pxPerMin;
+    ctx.fillText(String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'),m.l-6,Math.min(Math.max(yy,m.t+5),m.t+nRows*c.ch-5));
+    ctx.fillRect(m.l-4,yy,3,1);
+  }
+  ctx.textAlign='left';ctx.textBaseline='top';
+  let lastMonth=-1,lastX=-99;
+  for(let col=0;col<nCols;col++){
+    const dt=new Date((d0+col*c.step)*864e5), mo=dt.getUTCMonth();
+    if(mo!==lastMonth){const xx=m.l+col*c.cw; if(xx-lastX>26){ctx.fillText(MONTHS[mo],xx,cv.height-m.b+6);ctx.fillRect(xx,cv.height-m.b,1,4);lastX=xx;} lastMonth=mo;}
+  }
+  ctx.restore();
+}
+
+/* ---------- demo: simulated sky ---------- */
+function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];}
+function rgb(c,f){f=f==null?1:f;return 'rgb('+(c[0]*f|0)+','+(c[1]*f|0)+','+(c[2]*f|0)+')';}
+function rnd(n){const s=Math.sin(n*12.9898)*43758.5453;return s-Math.floor(s);}
+function synthCell(x,y,w,h,t,sr,day){
+  const b=1/(1+Math.exp(-(t-sr)/16));
+  const glow=Math.exp(-Math.pow((t-sr-6)/28,2));
+  const r=rnd(day), cloud=r>0.72?(r-0.72)/0.28:0, dim=1-0.45*cloud;
+  const top=mix([6,10,32],[62,124,206],b);
+  let hor=mix([14,20,52],[150,196,240],b); hor=mix(hor,[255,146,64],glow*(0.9-0.6*cloud));
+  const g=ctx.createLinearGradient(0,y,0,y+h*0.72);
+  g.addColorStop(0,rgb(top,dim));g.addColorStop(1,rgb(hor,dim));
+  ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
+  if(b<0.35){ctx.fillStyle='rgba(255,255,255,'+(0.5*(1-b/0.35)*(1-cloud)).toFixed(2)+')';
+    if(rnd(day*3.1+t)>0.5) ctx.fillRect(x+w*rnd(day+t*0.7),y+h*0.25*rnd(t*1.3+day),1,1);}
+  ctx.fillStyle=rgb(mix([4,6,14],[40,62,36],b),dim);
+  ctx.beginPath();ctx.moveTo(x,y+h*0.74);ctx.lineTo(x+w*0.22,y+h*0.6);ctx.lineTo(x+w*0.42,y+h*0.7);
+  ctx.lineTo(x+w*0.68,y+h*0.55);ctx.lineTo(x+w,y+h*0.69);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();
+}
+async function runDemo(){
+  if(busy) return; busy=true; toggle(true);
+  const c=cfg(), d0=Date.UTC(2025,0,1)/864e5;
+  const nCols=Math.ceil(365/c.step), nRows=Math.ceil((c.endMin-c.startMin)/c.slot);
+  const L=layout(c,nCols,nRows);
+  status('Drawing a simulated year at latitude '+c.lat+'°…');
+  for(let col=0;col<nCols;col++){
+    const day=d0+col*c.step, sr=sunriseMin(day,c.lat,c.lon,c.tz);
+    for(let row=0;row<nRows;row++){
+      const t=c.startMin+row*c.slot+c.slot/2;
+      synthCell(L.x(col),L.y(row),c.cw,c.ch,t,isFinite(sr)?sr:(sr>0?1e9:-1e9),day);
+    }
+    if(col%8===0){prog(col/nCols);await tick();}
+  }
+  decorate(c,L,d0);prog(1);
+  status('Demo done: simulated sky, '+nCols+' columns × '+nRows+' rows. Try changing latitude or turning on the sunrise curve.');
+  busy=false;toggle(false);$('dlBtn').disabled=false;
+}
+
+/* ---------- real photos ---------- */
+async function drawFile(f,x,y,w,h,fit){
+  let bmp;
+  try{bmp=await createImageBitmap(f);}catch(e){
+    try{bmp=await new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=URL.createObjectURL(f);});}catch(e2){return false;}
+  }
+  const sw=bmp.width||bmp.naturalWidth, sh=bmp.height||bmp.naturalHeight;
+  let sx=0,sy=0,cw=sw,ch=sh;
+  if(fit==='slice'){const a=w/h; if(sw/sh>a){cw=sh*a;sx=(sw-cw)/2;}else{ch=sw/a;sy=(sh-ch)/2;}}
+  ctx.drawImage(bmp,sx,sy,cw,ch,x,y,w,h);
+  if(bmp.close) bmp.close(); else if(bmp.src) URL.revokeObjectURL(bmp.src);
+  return true;
+}
+async function runPhotos(){
+  if(busy||!files.length) return; busy=true; toggle(true);
+  const c=cfg(); let fallback=0;
+  const items=[];
+  for(const f of files){
+    let p=parseName(f.name);
+    if(!p){const d=new Date(f.lastModified);p={day:Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5,min:d.getHours()*60+d.getMinutes()};fallback++;}
+    if(p.min>=c.startMin&&p.min<c.endMin) items.push({f,day:p.day,min:p.min});
+  }
+  if(!items.length){status('None of the '+files.length+' photos fall between '+$('start').value+' and '+$('end').value+'.');busy=false;toggle(false);return;}
+  let d0=Infinity,d1=-Infinity;for(const i of items){if(i.day<d0)d0=i.day;if(i.day>d1)d1=i.day;}
+  const nCols=Math.floor((d1-d0)/c.step)+1, nRows=Math.ceil((c.endMin-c.startMin)/c.slot);
+  const best=new Map();
+  for(const i of items){
+    const col=Math.floor((i.day-d0)/c.step), row=Math.floor((i.min-c.startMin)/c.slot);
+    const score=(i.day-d0-col*c.step)*1440+Math.abs(i.min-(c.startMin+row*c.slot+c.slot/2));
+    const k=col*10000+row, cur=best.get(k);
+    if(!cur||score<cur.score) best.set(k,{col,row,f:i.f,score});
+  }
+  const L=layout(c,nCols,nRows), cells=[...best.values()];
+  let ok=0,bad=0;
+  for(let n=0;n<cells.length;n++){
+    const e=cells[n];
+    if(await drawFile(e.f,L.x(e.col),L.y(e.row),c.cw,c.ch,c.fit)) ok++; else bad++;
+    if(n%4===0){prog(n/cells.length);status('Drawing photo '+(n+1)+' of '+cells.length+'…');await tick();}
+  }
+  decorate(c,L,d0);prog(1);
+  const filled=(100*ok/(nCols*nRows)).toFixed(0);
+  let msg='Done: '+ok+' photos placed in '+nCols+' × '+nRows+' cells ('+filled+'% filled), '+(d1-d0+1)+' days.';
+  if(bad) msg+=' '+bad+' could not be decoded.';
+  if(fallback) msg+=' '+fallback+' had no date in the name, so file time was used.';
+  status(msg);busy=false;toggle(false);$('dlBtn').disabled=false;
+}
+
+/* ---------- UI ---------- */
+function toggle(on){$('demoBtn').disabled=on;$('genBtn').disabled=on||!files.length;}
+function setFiles(list){
+  files=[...list].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp)$/i.test(f.name));
+  $('genBtn').disabled=!files.length;
+  status(files.length?files.length+' photos loaded. Tap Generate.':'No image files found in that selection.');
+  if(files.length) runPhotos();
+}
+$('pickFiles').addEventListener('change',e=>setFiles(e.target.files));
+$('pickFolder').addEventListener('change',e=>setFiles(e.target.files));
+$('demoBtn').addEventListener('click',runDemo);
+$('genBtn').addEventListener('click',runPhotos);
+$('full').addEventListener('change',e=>$('wrap').classList.toggle('full',e.target.checked));
+$('dlBtn').addEventListener('click',()=>{
+  cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sunrise-montage.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);},'image/png');
+});
+['labels','curve'].forEach(id=>$(id).addEventListener('change',()=>{if(!busy&&!files.length)runDemo();}));
+runDemo();
+})();
+</script>
+</body>
+</html>
