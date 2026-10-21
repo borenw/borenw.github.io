@@ -25,6 +25,8 @@ h3{font-size:15px;margin:16px 0 8px;color:var(--blue-dk)}
 .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:8px}
 label.f{display:flex;flex-direction:column;font-size:13px;color:var(--sub)}
 label.f input,label.f select{margin-top:3px;padding:7px 8px;border:1px solid #C1C7D0;border-radius:3px;font-size:16px;color:var(--ink);background:#fff;width:100%}
+label.f input:disabled{background:var(--panel);color:#A5ADBA}
+.preset{max-width:420px;margin-bottom:6px}
 .checks{display:flex;flex-wrap:wrap;gap:16px;margin:8px 0;font-size:14px}
 .btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 button,.filebtn{background:var(--blue);color:#fff;border:0;border-radius:3px;padding:10px 14px;font-size:15px;cursor:pointer;font-family:inherit}
@@ -37,10 +39,15 @@ button:disabled{opacity:.45;cursor:default}
 .canvas-wrap{overflow:auto;border:1px solid var(--line);background:#0b1020;border-radius:3px;min-height:60px}
 canvas{display:block;max-width:100%;height:auto;margin:0 auto}
 .canvas-wrap.full canvas{max-width:none}
+.figsub{font-weight:normal;color:var(--sub);font-size:13px}
 table{border-collapse:collapse;width:100%;font-size:14px}
 th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
 th{background:var(--blue-lt);color:var(--blue-dk)}
 .note{background:#FFFAE6;border-left:4px solid #FFAB00;padding:8px 12px;font-size:14px;border-radius:2px;margin:10px 0}
+.cmd{position:relative;background:#172B4D;color:#E6EDF7;border-radius:4px;margin:6px 0 14px;padding:12px 12px 12px 12px}
+.cmd pre{margin:0 0 8px;white-space:pre-wrap;word-break:break-all;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.cmd button{padding:6px 12px;font-size:14px}
+.cmd .lbl{font-size:12px;color:#B3BAC5;margin-bottom:4px}
 code{background:var(--panel);padding:1px 4px;border-radius:3px;font-size:13px}
 a{color:var(--blue)}
 footer{color:var(--sub);font-size:13px;text-align:center;padding:24px 16px;border-top:1px solid var(--line)}
@@ -49,7 +56,7 @@ footer{color:var(--sub);font-size:13px;text-align:center;padding:24px 16px;borde
 <body>
 <header class="banner">
   <h1>🌅 Sunrise Sine Montage</h1>
-  <p>One year of webcam photos, one column per day or week. Where night turns to day, sunrise draws a sine wave.</p>
+  <p>One year of webcam photos, one column per day. Where night turns to day, sunrise draws a sine wave.</p>
 </header>
 
 <main>
@@ -57,8 +64,9 @@ footer{color:var(--sub);font-size:13px;text-align:center;padding:24px 16px;borde
   <b>📑 Contents</b>
   <ol>
     <li><a href="#make">Make a montage</a>
-      <ul><li><a href="#settings">Settings</a></li><li><a href="#result">Result</a></li></ul></li>
-    <li><a href="#photos">Get a year of photos</a></li>
+      <ul><li><a href="#presets">Park presets</a></li><li><a href="#settings">Settings</a></li><li><a href="#result">Figure 1 · Result</a></li></ul></li>
+    <li><a href="#photos">Get a real year of photos</a>
+      <ul><li><a href="#command">Copy-ready download command</a></li><li><a href="#options">Script options</a></li></ul></li>
     <li><a href="#how">How it works</a></li>
     <li><a href="#tips">Tips and troubleshooting</a></li>
   </ol>
@@ -66,68 +74,115 @@ footer{color:var(--sub);font-size:13px;text-align:center;padding:24px 16px;borde
 
 <section id="make">
   <h2 class="sec">1. 🎨 Make a montage</h2>
-  <p>Tap <b>Try demo</b> to see a simulated year right away, or pick your own webcam photos. Everything runs in your browser. Your photos are never uploaded.</p>
+  <p>The demo draws a simulated year for the chosen park. To use real photos, download a year with the <a href="#command">command below</a> and pick them here. Everything runs in your browser; photos are never uploaded.</p>
+
+  <h3 id="presets">🏞️ Park presets</h3>
+  <label class="f preset">📍 Location
+    <select id="preset">
+      <optgroup label="Simulated parks">
+        <option value="smokies" selected>Great Smoky Mountains NP, TN/NC</option>
+        <option value="acadia">Acadia NP, Maine (ocean sunrise)</option>
+        <option value="grandcanyon">Grand Canyon NP, Arizona</option>
+        <option value="bigbend">Big Bend NP, Texas</option>
+        <option value="everglades">Everglades NP, Florida (nearly flat wave)</option>
+        <option value="denali">Denali NP, Alaska (huge wave)</option>
+      </optgroup>
+      <optgroup label="NEON tower cameras (15 min, real data via script)">
+        <option value="neon_grsm">NEON GRSM · Great Smoky Mountains</option>
+        <option value="neon_rmnp">NEON RMNP · Rocky Mountain NP</option>
+      </optgroup>
+      <option value="custom">Custom (use the fields below)</option>
+    </select>
+  </label>
 
   <div class="btns">
-    <button id="demoBtn" type="button">✨ Try demo</button>
+    <button id="demoBtn" type="button">✨ Draw demo</button>
     <label class="filebtn alt">📷 Pick photos<input id="pickFiles" type="file" accept="image/*" multiple></label>
     <label class="filebtn alt" id="folderLbl">📁 Pick folder<input id="pickFolder" type="file" webkitdirectory multiple></label>
     <button id="genBtn" type="button" disabled>▶️ Generate from photos</button>
     <button id="dlBtn" type="button" class="alt" disabled>⬇️ Download PNG</button>
   </div>
-  <div id="status">No photos loaded yet.</div>
+  <div id="status">Loading…</div>
   <div class="bar"><div id="prog"></div></div>
 
   <h3 id="settings">⚙️ Settings</h3>
   <div class="controls">
-    <label class="f">🕓 Window start<input id="start" type="time" value="04:00"></label>
-    <label class="f">🕘 Window end<input id="end" type="time" value="09:00"></label>
+    <label class="f">🕓 Window start<input id="start" type="time" value="04:00" step="300"></label>
+    <label class="f">🕘 Window end<input id="end" type="time" value="09:00" step="300"></label>
     <label class="f">⏱️ Row every
-      <select id="slot"><option value="10">10 min</option><option value="15">15 min</option><option value="30" selected>30 min</option><option value="60">60 min</option></select></label>
+      <select id="slot"><option value="7.5" selected>7.5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option></select></label>
     <label class="f">📅 Column every
-      <select id="step"><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="7" selected>1 week</option></select></label>
-    <label class="f">↔️ Cell width (px)<input id="cw" type="number" min="2" max="200" value="24"></label>
-    <label class="f">↕️ Cell height (px)<input id="ch" type="number" min="2" max="200" value="32"></label>
+      <select id="step"><option value="1">1 day</option><option value="2" selected>2 days</option><option value="3">3 days</option><option value="7">1 week</option></select></label>
+    <label class="f">📐 Picture shape
+      <select id="aspect"><option value="16:9">16:9 wide</option><option value="3:2" selected>3:2</option><option value="4:3">4:3</option><option value="1:1">1:1 square</option><option value="4:5">4:5 phone</option><option value="custom">Custom cell size</option></select></label>
+    <label class="f">🖥️ Output width (px)<input id="outW" type="number" min="300" max="8000" step="100" value="1800"></label>
+    <label class="f">↔️ Cell width (px)<input id="cw" type="number" min="1" max="200" value="9" disabled></label>
+    <label class="f">↕️ Cell height (px)<input id="ch" type="number" min="1" max="200" value="27" disabled></label>
     <label class="f">🖼️ Each cell shows
       <select id="fit"><option value="slice" selected>Center slice</option><option value="whole">Whole photo</option></select></label>
-    <label class="f">🌐 Latitude<input id="lat" type="number" step="0.1" value="40"></label>
-    <label class="f">🌐 Longitude<input id="lon" type="number" step="0.1" value="-105"></label>
-    <label class="f">🕰️ UTC offset (standard time)<input id="tz" type="number" step="0.5" value="-7"></label>
+    <label class="f">🌐 Latitude<input id="lat" type="number" step="0.01" value="35.61"></label>
+    <label class="f">🌐 Longitude<input id="lon" type="number" step="0.01" value="-83.49"></label>
+    <label class="f">🕰️ UTC offset (standard)<input id="tz" type="number" step="0.5" value="-5"></label>
   </div>
   <div class="checks">
     <label><input id="labels" type="checkbox" checked> 🏷️ Time and month labels</label>
-    <label><input id="curve" type="checkbox"> 〰️ Overlay computed sunrise curve</label>
-    <label><input id="full" type="checkbox"> 🔍 Show full size (scroll)</label>
+    <label><input id="curve" type="checkbox"> 〰️ Computed sunrise curve</label>
+    <label><input id="fill" type="checkbox" checked> 🧩 Fill gaps with nearest photo</label>
+    <label><input id="full" type="checkbox"> 🔍 Full size (scroll)</label>
   </div>
-  <p style="font-size:13px;color:var(--sub);margin:4px 0 0">Latitude, longitude and UTC offset are used for the demo and for the optional sunrise curve. Set them to your camera's location.</p>
+  <p style="font-size:13px;color:var(--sub);margin:4px 0 0">Choosing a preset sets the location and a time window that covers the whole year's sunrise. Picture shape sizes the cells for you; pick Custom to set cell size by hand.</p>
 
-  <h3 id="result">🖼️ Figure 1 · Sunrise montage: morning time (rows) across the year (columns)</h3>
+  <h3 id="result">🖼️ Figure 1 · Sunrise montage: time of morning (rows) across the year (columns) <span class="figsub" id="figsub"></span></h3>
   <div class="canvas-wrap" id="wrap"><canvas id="cv" width="10" height="10"></canvas></div>
 </section>
 
 <section id="photos">
-  <h2 class="sec">2. 📥 Get a year of photos</h2>
-  <p>The <a href="https://phenocam.nau.edu/webcam/" target="_blank" rel="noopener">PhenoCam Network</a> has 700+ fixed cameras, most shooting every 30 minutes (NEON sites every 15), many with years of continuous images. A free account lets you download in bulk.</p>
+  <h2 class="sec">2. 📥 Get a real year of photos</h2>
+  <p>The <a href="https://phenocam.nau.edu/webcam/" target="_blank" rel="noopener">PhenoCam Network</a> keeps years of photos from 700+ fixed cameras. Most shoot every 30 minutes; NEON tower cameras shoot every 15. The script below downloads one year of morning photos from one site. It needs only Python 3 (built into macOS and Linux), nothing to install.</p>
+
+  <h3 id="command">📋 Copy-ready download command</h3>
+  <div class="cmd">
+    <div class="lbl">Paste into Terminal (Mac or Linux). Installs the script, prints its version, then downloads <span id="cmdSiteLbl">NEON GRSM</span> for 2025.</div>
+    <pre id="cmdOne">mkdir -p ~/bin && curl -fsSL https://borenw.github.io/sunrise-montage/phenocam_sunrise.py -o ~/bin/phenocam_sunrise.py && chmod +x ~/bin/phenocam_sunrise.py && python3 ~/bin/phenocam_sunrise.py -V && python3 ~/bin/phenocam_sunrise.py NEON.D07.GRSM.DP1.00033 2025</pre>
+    <button type="button" data-copy="cmdOne">📋 Copy</button>
+  </div>
+  <div class="cmd">
+    <div class="lbl">Run again later (resumes where it stopped, skips photos you already have):</div>
+    <pre id="cmdRerun">python3 ~/bin/phenocam_sunrise.py NEON.D07.GRSM.DP1.00033 2025</pre>
+    <button type="button" data-copy="cmdRerun">📋 Copy</button>
+  </div>
   <table>
     <tr><th>#</th><th>📋 Step</th><th>💡 Detail</th></tr>
-    <tr><td>1</td><td>Create a free PhenoCam account</td><td>Needed to download images.</td></tr>
-    <tr><td>2</td><td>Pick a scenic site</td><td>Choose one that keeps shooting before sunrise all year. Some only shoot in full daylight, which hides the wave.</td></tr>
-    <tr><td>3</td><td>Download one full year</td><td>Set the date range to 12 months and the time window to about 04:00 to 09:00.</td></tr>
-    <tr><td>4</td><td>Unzip and load</td><td>On a computer, use <b>Pick folder</b>. On a phone, save the JPGs to the Files app and use <b>Pick photos</b>.</td></tr>
-    <tr><td>5</td><td>Generate</td><td>Set latitude and longitude to the site and turn on the sunrise curve to check alignment.</td></tr>
+    <tr><td>1</td><td>Paste the command</td><td>Photos land in <code>phenocam_&lt;SITE&gt;_&lt;YEAR&gt;/</code> in the folder you ran it from. A status line every 5 seconds shows progress, rate and time left.</td></tr>
+    <tr><td>2</td><td>Wait</td><td>A full year at 15 minutes from 04:00 to 09:00 is about 7,000 photos and roughly 1 to 3 GB.</td></tr>
+    <tr><td>3</td><td>Load</td><td>Choose the matching NEON preset above, then <b>Pick folder</b> (computer) or <b>Pick photos</b> (phone, from the Files app).</td></tr>
+    <tr><td>4</td><td>Generate</td><td>Rows switch to 15 minutes to match the camera. Turn on the sunrise curve to check that the edge lines up.</td></tr>
   </table>
-  <div class="note">⚠️ Dates and times are read from file names such as <code>site_2025_06_01_053006.jpg</code>, <code>IMG_20250601_053006.jpg</code> or <code>2025-06-01 05-30.jpg</code>. If a name has no date, the file's modified time is used, which is often wrong for downloaded files.</div>
+
+  <h3 id="options">🔧 Script options</h3>
+  <table>
+    <tr><th>⚙️ Option</th><th>📝 What it does</th><th>🔢 Default</th></tr>
+    <tr><td><code>SITE</code></td><td>Any PhenoCam site name, for example <code>NEON.D10.RMNP.DP1.00033</code></td><td><code>NEON.D07.GRSM.DP1.00033</code></td></tr>
+    <tr><td><code>YEAR</code></td><td>Calendar year to download</td><td><code>2025</code></td></tr>
+    <tr><td><code>--start</code> / <code>--end</code></td><td>Time window, camera time (local standard time)</td><td><code>04:00</code> / <code>09:00</code></td></tr>
+    <tr><td><code>--every N</code></td><td>Keep every Nth day to save space (2 matches the default columns)</td><td><code>1</code></td></tr>
+    <tr><td><code>--out DIR</code></td><td>Where to save the photos</td><td><code>phenocam_SITE_YEAR</code></td></tr>
+    <tr><td><code>--no-progress</code> / <code>-q</code></td><td>Hide the 5-second status line / print nothing</td><td>off</td></tr>
+    <tr><td><code>-V</code></td><td>Print the version</td><td></td></tr>
+  </table>
+  <p style="font-size:13px;color:var(--sub)">Script source: <a href="phenocam_sunrise.py">phenocam_sunrise.py</a> · notes: <a href="https://github.com/borenw/borenw.github.io/tree/main/sunrise-montage">README on GitHub</a></p>
 </section>
 
 <section id="how">
   <h2 class="sec">3. 🔬 How it works</h2>
   <table>
     <tr><th>🧩 Part</th><th>📐 What it does</th></tr>
-    <tr><td>➡️ Columns</td><td>Days of the year, left to right, one per day or per chosen step.</td></tr>
-    <tr><td>⬇️ Rows</td><td>Time of morning, top to bottom, one per time slot.</td></tr>
-    <tr><td>🌗 The edge</td><td>Cells above sunrise are dark, cells below are lit. The boundary is sunrise time, which swings early in summer and late in winter.</td></tr>
-    <tr><td>〰️ Why a sine</td><td>Sun declination follows the year almost like a sine (period 365 days), so sunrise time does too, plus a small wobble from the equation of time.</td></tr>
-    <tr><td>📏 Amplitude</td><td>Grows with latitude. Near the equator the wave is nearly flat; far north it is tall.</td></tr>
+    <tr><td>➡️ Columns</td><td>Days of the year, left to right.</td></tr>
+    <tr><td>⬇️ Rows</td><td>Time of morning, top to bottom.</td></tr>
+    <tr><td>🌗 The edge</td><td>Cells above sunrise are dark, cells below are lit. The boundary is sunrise time, early in summer and late in winter.</td></tr>
+    <tr><td>〰️ Why a sine</td><td>The sun's declination follows the year almost like a sine (period 365 days), so sunrise time does too, plus a small wobble from the equation of time.</td></tr>
+    <tr><td>📏 Amplitude</td><td>Grows with latitude: nearly flat in the Everglades, enormous at Denali.</td></tr>
+    <tr><td>🍂 Seasons</td><td>The demo also browns the trees in winter and adds snow at Denali and Rocky Mountain, like a real camera would see.</td></tr>
   </table>
 </section>
 
@@ -135,11 +190,11 @@ footer{color:var(--sub);font-size:13px;text-align:center;padding:24px 16px;borde
   <h2 class="sec">4. 🛠️ Tips and troubleshooting</h2>
   <table>
     <tr><th>❓ Issue</th><th>✅ Fix</th></tr>
-    <tr><td>Black cells</td><td>No photo for that slot. Missing photos look like night, so pick a site with few gaps, or use 1 week columns to bridge them.</td></tr>
-    <tr><td>Staircase look</td><td>Use 10 or 15 minute rows and 1 day columns for a smoother wave.</td></tr>
-    <tr><td>A jump in March and November</td><td>The camera clock follows daylight saving time. The jump is real data, not a bug.</td></tr>
-    <tr><td>Slow on a phone</td><td>Every photo is decoded in the browser. Use 1 week columns or a computer for a full daily year.</td></tr>
-    <tr><td>Photos picked from the iPhone Photos app have wrong dates</td><td>The picker can rename files. Save them to the Files app first and pick from there.</td></tr>
+    <tr><td>Black cells</td><td>No photo for that slot. Keep <b>Fill gaps</b> on; it copies the nearest photo in time (within 30 minutes) or from a neighbouring day.</td></tr>
+    <tr><td>Rows finer than the camera</td><td>At 7.5 minutes with a 15 minute camera, every other row is a copy. Use 15 minute rows for real NEON data.</td></tr>
+    <tr><td>A jump in March and November</td><td>That camera follows daylight saving time. PhenoCam uses standard time, so its data should not jump.</td></tr>
+    <tr><td>Slow on a phone</td><td>Every photo is decoded in the browser. Use 1 week columns on a phone, or a computer for a full daily year.</td></tr>
+    <tr><td>Photos from the iPhone Photos app have wrong dates</td><td>The picker can rename files. Save them to the Files app first and pick from there.</td></tr>
   </table>
 </section>
 </main>
@@ -151,22 +206,38 @@ footer{color:var(--sub);font-size:13px;text-align:center;padding:24px 16px;borde
 "use strict";
 const $=id=>document.getElementById(id);
 const cv=$('cv'), ctx=cv.getContext('2d');
-let files=[], busy=false;
+const SIN=Math.sin, ABS=Math.abs, PI=Math.PI;
+let files=[], busy=false, mode='demo', redrawTimer=null;
 
-/* hide folder button where unsupported (iOS) */
 if(!('webkitdirectory' in document.createElement('input')) || /iPhone|iPad|iPod/.test(navigator.userAgent)) $('folderLbl').style.display='none';
 
+/* ---------- presets ---------- */
+const PRESETS={
+  smokies:{name:'Great Smoky Mountains NP',lat:35.61,lon:-83.49,tz:-5,scene:'ridges'},
+  acadia:{name:'Acadia NP',lat:44.35,lon:-68.22,tz:-5,scene:'ocean'},
+  grandcanyon:{name:'Grand Canyon NP',lat:36.06,lon:-112.11,tz:-7,scene:'canyon'},
+  bigbend:{name:'Big Bend NP',lat:29.25,lon:-103.25,tz:-6,scene:'desert'},
+  everglades:{name:'Everglades NP',lat:25.39,lon:-80.58,tz:-5,scene:'flat'},
+  denali:{name:'Denali NP',lat:63.73,lon:-148.9,tz:-9,scene:'peak'},
+  neon_grsm:{name:'NEON GRSM tower, Great Smoky Mountains',short:'NEON GRSM',lat:35.69,lon:-83.50,tz:-5,scene:'canopy',site:'NEON.D07.GRSM.DP1.00033',slot:15},
+  neon_rmnp:{name:'NEON RMNP tower, Rocky Mountain NP',short:'NEON RMNP',lat:40.28,lon:-105.55,tz:-7,scene:'alpine',site:'NEON.D10.RMNP.DP1.00033',slot:15}
+};
+
+/* ---------- helpers ---------- */
 function toMin(s){const p=(s||'0:0').split(':').map(Number);return p[0]*60+(p[1]||0);}
-function cfg(){
-  const c={startMin:toMin($('start').value),endMin:toMin($('end').value),slot:+$('slot').value,step:+$('step').value,
-    cw:Math.max(2,Math.min(200,+$('cw').value||24)),ch:Math.max(2,Math.min(200,+$('ch').value||32)),fit:$('fit').value,
-    labels:$('labels').checked,curve:$('curve').checked,lat:+$('lat').value||0,lon:+$('lon').value||0,tz:+$('tz').value||0};
-  if(c.endMin<=c.startMin) c.endMin=c.startMin+c.slot;
-  return c;
-}
+function hhmm(m){m=Math.max(0,Math.min(1439,Math.round(m)));return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
 function status(t){$('status').textContent=t;}
 function prog(f){$('prog').style.width=(Math.max(0,Math.min(1,f))*100).toFixed(1)+'%';}
 const tick=()=>new Promise(r=>setTimeout(r,0));
+function cfg(){
+  const c={startMin:toMin($('start').value),endMin:toMin($('end').value),slot:parseFloat($('slot').value),step:+$('step').value,
+    aspect:$('aspect').value,outW:Math.max(300,Math.min(8000,+$('outW').value||1800)),
+    cw:Math.max(1,Math.min(200,+$('cw').value||9)),ch:Math.max(1,Math.min(200,+$('ch').value||27)),fit:$('fit').value,
+    labels:$('labels').checked,curve:$('curve').checked,fill:$('fill').checked,
+    lat:+$('lat').value||0,lon:+$('lon').value||0,tz:+$('tz').value||0,preset:$('preset').value};
+  if(c.endMin<=c.startMin) c.endMin=Math.min(1440,c.startMin+60);
+  return c;
+}
 
 /* ---------- date parsing from file names ---------- */
 const PATS=[
@@ -174,41 +245,52 @@ const PATS=[
   /(\d{4})(\d{2})(\d{2})[ T_\-]?(\d{2})(\d{2})(\d{2})?/
 ];
 function parseName(n){
-  for(const p of PATS){
-    const m=n.match(p);
+  for(const p of PATS){const m=n.match(p);
     if(m){const y=+m[1],mo=+m[2],d=+m[3],h=+m[4],mi=+m[5];
-      if(y>1990&&y<2100&&mo>=1&&mo<=12&&d>=1&&d<=31&&h<24&&mi<60) return {day:Date.UTC(y,mo-1,d)/864e5,min:h*60+mi};}
-  }
+      if(y>1990&&y<2100&&mo>=1&&mo<=12&&d>=1&&d<=31&&h<24&&mi<60) return {day:Date.UTC(y,mo-1,d)/864e5,min:h*60+mi};}}
   return null;
 }
 
 /* ---------- sun math (local standard time) ---------- */
+function doy(dayNum){const t=dayNum*864e5;return Math.round((t-Date.UTC(new Date(t).getUTCFullYear(),0,0))/864e5);}
 function sunriseMin(dayNum,lat,lon,tz){
-  const rad=Math.PI/180, t=dayNum*864e5, yr=new Date(t).getUTCFullYear();
-  const N=Math.round((t-Date.UTC(yr,0,0))/864e5);
-  const decl=23.44*Math.sin(2*Math.PI*(284+N)/365)*rad;
-  const B=2*Math.PI*(N-81)/364, eot=9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B);
-  const phi=lat*rad, cosw=(Math.sin(-0.833*rad)-Math.sin(phi)*Math.sin(decl))/(Math.cos(phi)*Math.cos(decl));
+  const rad=PI/180, N=doy(dayNum);
+  const decl=23.44*SIN(2*PI*(284+N)/365)*rad;
+  const B=2*PI*(N-81)/364, eot=9.87*SIN(2*B)-7.53*Math.cos(B)-1.5*SIN(B);
+  const phi=lat*rad, cosw=(SIN(-0.833*rad)-SIN(phi)*SIN(decl))/(Math.cos(phi)*Math.cos(decl));
   if(cosw>1) return Infinity; if(cosw<-1) return -Infinity;
-  const w=Math.acos(cosw)/rad;
-  return 720-4*lon-eot+tz*60-4*w;
+  return 720-4*lon-eot+tz*60-4*Math.acos(cosw)/rad;
+}
+function autoWindow(lat,lon,tz){
+  const d0=Date.UTC(2025,0,1)/864e5; let mn=1e9,mx=-1e9;
+  for(let i=0;i<365;i+=2){const s=sunriseMin(d0+i,lat,lon,tz);if(isFinite(s)){mn=Math.min(mn,s);mx=Math.max(mx,s);}}
+  if(mn>mx) return [240,540];
+  return [Math.max(0,Math.floor((mn-40)/30)*30),Math.min(1440,Math.ceil((mx+50)/30)*30)];
 }
 
 /* ---------- canvas layout ---------- */
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function layout(c,nCols,nRows){
-  const m=c.labels?{l:46,t:8,r:8,b:24}:{l:0,t:0,r:0,b:0};
+  const fs=c.labels?Math.max(11,Math.round((c.aspect==='custom'?nCols*c.cw:c.outW)/150)):0;
+  const m=c.labels?{l:Math.round(fs*4.2),t:Math.round(fs*0.8),r:Math.round(fs*0.8),b:Math.round(fs*2.2)}:{l:0,t:0,r:0,b:0};
+  if(c.aspect!=='custom'){
+    const a=c.aspect.split(':').map(Number), ratio=a[0]/a[1];
+    const plotW=Math.max(nCols,c.outW-m.l-m.r);
+    c.cw=Math.max(1,Math.floor(plotW/nCols));
+    c.ch=Math.max(1,Math.round(nCols*c.cw/(ratio*nRows)));
+  }
   let W=m.l+nCols*c.cw+m.r, H=m.t+nRows*c.ch+m.b;
   const MAXPX=16e6;
   if(W*H>MAXPX){const s=Math.sqrt(MAXPX/(W*H));c.cw=Math.max(1,Math.floor(c.cw*s));c.ch=Math.max(1,Math.floor(c.ch*s));W=m.l+nCols*c.cw+m.r;H=m.t+nRows*c.ch+m.b;}
   cv.width=W;cv.height=H;
   ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
-  return {m,nCols,nRows,x:col=>m.l+col*c.cw,y:row=>m.t+row*c.ch};
+  if(c.aspect!=='custom'){$('cw').value=c.cw;$('ch').value=c.ch;}
+  return {m,fs,nCols,nRows,x:col=>m.l+col*c.cw,y:row=>m.t+row*c.ch};
 }
 function decorate(c,L,d0){
-  const {m,nCols,nRows}=L;
+  const {m,fs,nCols,nRows}=L;
   if(c.curve){
-    ctx.save();ctx.strokeStyle='#FFD43B';ctx.lineWidth=Math.max(1.5,c.cw/8);ctx.setLineDash([6,4]);ctx.beginPath();
+    ctx.save();ctx.strokeStyle='#FFD43B';ctx.lineWidth=Math.max(2,Math.min(c.cw,c.ch)/3);ctx.setLineDash([8,5]);ctx.beginPath();
     let pen=false;
     for(let col=0;col<nCols;col++){
       const sr=sunriseMin(d0+col*c.step+(c.step-1)/2,c.lat,c.lon,c.tz);
@@ -219,60 +301,105 @@ function decorate(c,L,d0){
     ctx.stroke();ctx.restore();
   }
   if(!c.labels) return;
-  ctx.save();ctx.fillStyle='#fff';ctx.fillRect(0,0,m.l,cv.height);ctx.fillRect(0,cv.height-m.b,cv.width,m.b);
+  ctx.save();ctx.fillStyle='#fff';
+  ctx.fillRect(0,0,m.l,cv.height);ctx.fillRect(0,cv.height-m.b,cv.width,m.b);
   ctx.fillRect(cv.width-m.r,0,m.r,cv.height);ctx.fillRect(0,0,cv.width,m.t);
-  ctx.fillStyle='#172B4D';ctx.font='11px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+  ctx.fillStyle='#172B4D';ctx.font=fs+'px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
   ctx.textAlign='right';ctx.textBaseline='middle';
-  const pxPerMin=c.ch/c.slot, every=pxPerMin*60>=14?60:120;
+  const pxPerMin=c.ch/c.slot, plotH=nRows*c.ch;
+  const every=pxPerMin*30>=fs*1.6?30:pxPerMin*60>=fs*1.6?60:120;
   for(let t=Math.ceil(c.startMin/every)*every;t<=c.endMin;t+=every){
-    const yy=m.t+(t-c.startMin)*pxPerMin;
-    ctx.fillText(String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'),m.l-6,Math.min(Math.max(yy,m.t+5),m.t+nRows*c.ch-5));
-    ctx.fillRect(m.l-4,yy,3,1);
+    const yy=m.t+(t-c.startMin)*pxPerMin; if(yy>m.t+plotH+1) break;
+    ctx.fillText(hhmm(t),m.l-fs*0.5,Math.min(Math.max(yy,m.t+fs*0.5),m.t+plotH-fs*0.5));
+    ctx.fillRect(m.l-fs*0.35,yy,fs*0.3,1);
   }
   ctx.textAlign='left';ctx.textBaseline='top';
-  let lastMonth=-1,lastX=-99;
+  let lastMonth=-1,lastX=-999;
   for(let col=0;col<nCols;col++){
     const dt=new Date((d0+col*c.step)*864e5), mo=dt.getUTCMonth();
-    if(mo!==lastMonth){const xx=m.l+col*c.cw; if(xx-lastX>26){ctx.fillText(MONTHS[mo],xx,cv.height-m.b+6);ctx.fillRect(xx,cv.height-m.b,1,4);lastX=xx;} lastMonth=mo;}
+    if(mo!==lastMonth){const xx=m.l+col*c.cw; if(xx-lastX>fs*2.6){ctx.fillText(MONTHS[mo],xx,cv.height-m.b+fs*0.5);ctx.fillRect(xx,cv.height-m.b,1,fs*0.35);lastX=xx;} lastMonth=mo;}
   }
   ctx.restore();
 }
 
-/* ---------- demo: simulated sky ---------- */
+/* ---------- demo scenes ---------- */
 function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];}
 function rgb(c,f){f=f==null?1:f;return 'rgb('+(c[0]*f|0)+','+(c[1]*f|0)+','+(c[2]*f|0)+')';}
-function rnd(n){const s=Math.sin(n*12.9898)*43758.5453;return s-Math.floor(s);}
-function synthCell(x,y,w,h,t,sr,day){
-  const b=1/(1+Math.exp(-(t-sr)/16));
-  const glow=Math.exp(-Math.pow((t-sr-6)/28,2));
+function rnd(n){const s=SIN(n*12.9898)*43758.5453;return s-Math.floor(s);}
+const sig=x=>1/(1+Math.exp(-x));
+function palms(u){let y=0.8+0.006*SIN(37*u);for(const [c,hgt] of [[0.2,0.09],[0.27,0.06],[0.78,0.08]]){const d=ABS(u-c);if(d<0.006)y=Math.min(y,0.8-hgt);if(d<0.035)y=Math.min(y,0.8-hgt-0.01+0.03*(d/0.035));}return y;}
+/* each layer: p(u)=horizon height (fraction from top), n=night color, w=winter day color, s=summer day color, hz=haze, snow=lit earlier with alpenglow */
+const SCENES={
+  ridges:{layers:[
+    {p:u=>0.52+0.035*SIN(6*u+1)+0.015*SIN(17*u),n:[10,14,30],w:[96,106,126],s:[82,112,132],hz:0.55},
+    {p:u=>0.6+0.035*SIN(5*u+3)+0.01*SIN(23*u),n:[7,10,22],w:[84,74,62],s:[50,90,54],hz:0.3},
+    {p:u=>0.7+0.025*SIN(9*u)+0.012*SIN(31*u),n:[4,6,14],w:[74,60,44],s:[34,74,34],hz:0}]},
+  ocean:{water:0.66,layers:[
+    {p:u=>(u>0.48&&u<0.92)?0.66-0.08*Math.pow(SIN(PI*(u-0.48)/0.44),0.7):0.662,n:[6,8,18],w:[60,66,58],s:[42,78,46],hz:0.35},
+    {p:u=>0.88+0.035*SIN(9*u+0.5)+0.015*SIN(27*u),n:[5,5,9],w:[118,106,98],s:[126,110,98],hz:0}]},
+  canyon:{layers:[
+    {p:u=>(u>0.14&&u<0.26)?0.46:(u>0.6&&u<0.73)?0.49:0.56+0.006*SIN(40*u),n:[12,8,14],w:[150,92,62],s:[166,96,58],hz:0.4},
+    {p:u=>0.68+0.03*SIN(7*u+2)+0.015*SIN(29*u),n:[8,5,8],w:[122,64,42],s:[134,66,40],hz:0.15},
+    {p:u=>0.86+0.02*SIN(13*u),n:[4,3,5],w:[92,62,46],s:[98,74,50],hz:0}]},
+  desert:{layers:[
+    {p:u=>0.57-0.08*ABS(SIN(4.5*u+0.3))-0.03*ABS(SIN(17*u)),n:[12,10,24],w:[132,106,106],s:[142,112,100],hz:0.45},
+    {p:u=>0.78+0.008*SIN(25*u),n:[6,5,10],w:[152,126,90],s:[162,136,92],hz:0}]},
+  flat:{layers:[
+    {p:palms,n:[4,8,8],w:[104,102,62],s:[62,112,52],hz:0}]},
+  peak:{layers:[
+    {p:u=>0.64-0.36*Math.pow(Math.max(0,1-ABS(u-0.58)/0.3),1.3)-0.008*SIN(40*u),n:[16,18,34],w:[232,238,250],s:[222,230,244],hz:0.25,snow:true},
+    {p:u=>0.72+0.02*SIN(8*u+1),n:[5,6,12],w:[226,232,242],s:[78,98,58],hz:0}]},
+  canopy:{layers:[
+    {p:u=>0.5+0.035*SIN(6*u+1)+0.015*SIN(17*u),n:[10,14,30],w:[98,108,128],s:[84,114,134],hz:0.55},
+    {p:u=>0.7-0.045*ABS(SIN(23*u))-0.02*ABS(SIN(57*u+1)),n:[3,5,8],w:[94,80,62],s:[30,86,34],hz:0}]},
+  alpine:{layers:[
+    {p:u=>0.55-0.1*ABS(SIN(3.6*u+0.5))-0.03*ABS(SIN(13*u)),n:[14,16,32],w:[226,232,246],s:[176,180,192],hz:0.3,snow:true},
+    {p:u=>0.76-0.06*ABS(SIN(29*u))-0.02*ABS(SIN(71*u)),n:[3,5,7],w:[30,52,40],s:[26,62,34],hz:0}]}
+};
+SCENES.plain=SCENES.ridges;
+function synthCell(x,y,w,h,t,sr,day,scene){
+  const b=sig((t-sr)/16), glow=Math.exp(-Math.pow((t-sr-6)/28,2));
   const r=rnd(day), cloud=r>0.72?(r-0.72)/0.28:0, dim=1-0.45*cloud;
+  const season=0.5+0.5*Math.cos(2*PI*(doy(day)-200)/365);
   const top=mix([6,10,32],[62,124,206],b);
   let hor=mix([14,20,52],[150,196,240],b); hor=mix(hor,[255,146,64],glow*(0.9-0.6*cloud));
   const g=ctx.createLinearGradient(0,y,0,y+h*0.72);
   g.addColorStop(0,rgb(top,dim));g.addColorStop(1,rgb(hor,dim));
   ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
-  if(b<0.35){ctx.fillStyle='rgba(255,255,255,'+(0.5*(1-b/0.35)*(1-cloud)).toFixed(2)+')';
-    if(rnd(day*3.1+t)>0.5) ctx.fillRect(x+w*rnd(day+t*0.7),y+h*0.25*rnd(t*1.3+day),1,1);}
-  ctx.fillStyle=rgb(mix([4,6,14],[40,62,36],b),dim);
-  ctx.beginPath();ctx.moveTo(x,y+h*0.74);ctx.lineTo(x+w*0.22,y+h*0.6);ctx.lineTo(x+w*0.42,y+h*0.7);
-  ctx.lineTo(x+w*0.68,y+h*0.55);ctx.lineTo(x+w,y+h*0.69);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();
+  if(b<0.35&&cloud<0.5&&rnd(day*3.1+t)>0.55){ctx.fillStyle='rgba(255,255,255,'+(0.6*(1-b/0.35)).toFixed(2)+')';ctx.fillRect(x+w*rnd(day+t*0.7),y+h*0.3*rnd(t*1.3+day),1,1);}
+  if(scene.water){
+    const wy=y+h*scene.water, wg=ctx.createLinearGradient(0,wy,0,y+h);
+    wg.addColorStop(0,rgb(mix(hor,[0,0,0],0.3),dim));wg.addColorStop(1,rgb(mix(top,[0,0,0],0.6),dim));
+    ctx.fillStyle=wg;ctx.fillRect(x,wy,w,y+h-wy);
+    if(glow>0.05&&cloud<0.6){ctx.fillStyle='rgba(255,170,90,'+(0.5*glow).toFixed(2)+')';ctx.fillRect(x+w*0.3,wy+1,w*0.15,(y+h-wy)*0.6);}
+  }
+  const K=Math.max(6,Math.min(48,Math.round(w)));
+  for(const L of scene.layers){
+    const bl=L.snow?sig((t-sr+18)/14):b;
+    let col=mix(L.n,mix(L.w,L.s,season),bl);
+    if(L.snow){const ag=Math.exp(-Math.pow((t-sr+6)/22,2));col=mix(col,[255,165,150],ag*0.55*(1-cloud));}
+    if(L.hz) col=mix(col,hor,L.hz*(0.4+0.6*b));
+    ctx.fillStyle=rgb(col,dim);ctx.beginPath();ctx.moveTo(x,y+h);
+    for(let k=0;k<=K;k++){const u=k/K;ctx.lineTo(x+w*u,y+h*L.p(u));}
+    ctx.lineTo(x+w,y+h);ctx.closePath();ctx.fill();
+  }
 }
 async function runDemo(){
-  if(busy) return; busy=true; toggle(true);
-  const c=cfg(), d0=Date.UTC(2025,0,1)/864e5;
+  if(busy) return; busy=true; toggle(true); mode='demo';
+  const c=cfg(), P=PRESETS[c.preset], scene=SCENES[(P&&P.scene)||'plain'];
+  const d0=Date.UTC(2025,0,1)/864e5;
   const nCols=Math.ceil(365/c.step), nRows=Math.ceil((c.endMin-c.startMin)/c.slot);
   const L=layout(c,nCols,nRows);
-  status('Drawing a simulated year at latitude '+c.lat+'°…');
+  const name=P?P.name:'Custom location';
+  $('figsub').textContent='· simulated, '+name;
+  status('Drawing a simulated year for '+name+'…');
   for(let col=0;col<nCols;col++){
-    const day=d0+col*c.step, sr=sunriseMin(day,c.lat,c.lon,c.tz);
-    for(let row=0;row<nRows;row++){
-      const t=c.startMin+row*c.slot+c.slot/2;
-      synthCell(L.x(col),L.y(row),c.cw,c.ch,t,isFinite(sr)?sr:(sr>0?1e9:-1e9),day);
-    }
-    if(col%8===0){prog(col/nCols);await tick();}
+    const day=d0+col*c.step, sr0=sunriseMin(day,c.lat,c.lon,c.tz), sr=isFinite(sr0)?sr0:(sr0>0?1e9:-1e9);
+    for(let row=0;row<nRows;row++) synthCell(L.x(col),L.y(row),c.cw,c.ch,c.startMin+row*c.slot+c.slot/2,sr,day,scene);
+    if(col%6===0){prog(col/nCols);await tick();}
   }
   decorate(c,L,d0);prog(1);
-  status('Demo done: simulated sky, '+nCols+' columns × '+nRows+' rows. Try changing latitude or turning on the sunrise curve.');
+  status('Demo: '+name+', '+nCols+' columns × '+nRows+' rows ('+c.slot+' min rows, every '+c.step+' day'+(c.step>1?'s':'')+'), '+cv.width+'×'+cv.height+' px.');
   busy=false;toggle(false);$('dlBtn').disabled=false;
 }
 
@@ -289,8 +416,19 @@ async function drawFile(f,x,y,w,h,fit){
   if(bmp.close) bmp.close(); else if(bmp.src) URL.revokeObjectURL(bmp.src);
   return true;
 }
+function fillGaps(c,L,filled){
+  const R=Math.max(1,Math.floor(30/c.slot)); let n=0;
+  for(let col=0;col<L.nCols;col++) for(let row=0;row<L.nRows;row++){
+    if(filled.has(col*10000+row)) continue;
+    let src=null;
+    for(let d=1;d<=R&&!src;d++) for(const rr of [row-d,row+d]) if(!src&&rr>=0&&rr<L.nRows&&filled.has(col*10000+rr)) src=[col,rr];
+    for(let d=1;d<=2&&!src;d++) for(const cc of [col-d,col+d]) if(!src&&cc>=0&&cc<L.nCols&&filled.has(cc*10000+row)) src=[cc,row];
+    if(src){ctx.drawImage(cv,L.x(src[0]),L.y(src[1]),c.cw,c.ch,L.x(col),L.y(row),c.cw,c.ch);n++;}
+  }
+  return n;
+}
 async function runPhotos(){
-  if(busy||!files.length) return; busy=true; toggle(true);
+  if(busy||!files.length) return; busy=true; toggle(true); mode='photos';
   const c=cfg(); let fallback=0;
   const items=[];
   for(const f of files){
@@ -298,26 +436,27 @@ async function runPhotos(){
     if(!p){const d=new Date(f.lastModified);p={day:Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5,min:d.getHours()*60+d.getMinutes()};fallback++;}
     if(p.min>=c.startMin&&p.min<c.endMin) items.push({f,day:p.day,min:p.min});
   }
-  if(!items.length){status('None of the '+files.length+' photos fall between '+$('start').value+' and '+$('end').value+'.');busy=false;toggle(false);return;}
+  if(!items.length){status('None of the '+files.length+' photos fall between '+$('start').value+' and '+$('end').value+'. Widen the window.');busy=false;toggle(false);return;}
   let d0=Infinity,d1=-Infinity;for(const i of items){if(i.day<d0)d0=i.day;if(i.day>d1)d1=i.day;}
   const nCols=Math.floor((d1-d0)/c.step)+1, nRows=Math.ceil((c.endMin-c.startMin)/c.slot);
   const best=new Map();
   for(const i of items){
     const col=Math.floor((i.day-d0)/c.step), row=Math.floor((i.min-c.startMin)/c.slot);
-    const score=(i.day-d0-col*c.step)*1440+Math.abs(i.min-(c.startMin+row*c.slot+c.slot/2));
+    const score=(i.day-d0-col*c.step)*1440+ABS(i.min-(c.startMin+row*c.slot+c.slot/2));
     const k=col*10000+row, cur=best.get(k);
     if(!cur||score<cur.score) best.set(k,{col,row,f:i.f,score});
   }
-  const L=layout(c,nCols,nRows), cells=[...best.values()];
+  const L=layout(c,nCols,nRows), cells=[...best.values()], filled=new Set();
+  $('figsub').textContent='· your photos, '+(d1-d0+1)+' days';
   let ok=0,bad=0;
   for(let n=0;n<cells.length;n++){
     const e=cells[n];
-    if(await drawFile(e.f,L.x(e.col),L.y(e.row),c.cw,c.ch,c.fit)) ok++; else bad++;
+    if(await drawFile(e.f,L.x(e.col),L.y(e.row),c.cw,c.ch,c.fit)){ok++;filled.add(e.col*10000+e.row);} else bad++;
     if(n%4===0){prog(n/cells.length);status('Drawing photo '+(n+1)+' of '+cells.length+'…');await tick();}
   }
+  const nf=c.fill?fillGaps(c,L,filled):0;
   decorate(c,L,d0);prog(1);
-  const filled=(100*ok/(nCols*nRows)).toFixed(0);
-  let msg='Done: '+ok+' photos placed in '+nCols+' × '+nRows+' cells ('+filled+'% filled), '+(d1-d0+1)+' days.';
+  let msg='Done: '+ok+' photos in '+nCols+' × '+nRows+' cells ('+(100*ok/(nCols*nRows)).toFixed(0)+'% from photos'+(nf?', '+nf+' gaps filled':'')+'), '+(d1-d0+1)+' days.';
   if(bad) msg+=' '+bad+' could not be decoded.';
   if(fallback) msg+=' '+fallback+' had no date in the name, so file time was used.';
   status(msg);busy=false;toggle(false);$('dlBtn').disabled=false;
@@ -325,12 +464,38 @@ async function runPhotos(){
 
 /* ---------- UI ---------- */
 function toggle(on){$('demoBtn').disabled=on;$('genBtn').disabled=on||!files.length;}
+function updateCmds(){
+  const P=PRESETS[$('preset').value]; const site=(P&&P.site)||'NEON.D07.GRSM.DP1.00033';
+  const short=(P&&P.short)||'NEON GRSM';
+  $('cmdOne').textContent='mkdir -p ~/bin && curl -fsSL https://borenw.github.io/sunrise-montage/phenocam_sunrise.py -o ~/bin/phenocam_sunrise.py && chmod +x ~/bin/phenocam_sunrise.py && python3 ~/bin/phenocam_sunrise.py -V && python3 ~/bin/phenocam_sunrise.py '+site+' 2025';
+  $('cmdRerun').textContent='python3 ~/bin/phenocam_sunrise.py '+site+' 2025';
+  $('cmdSiteLbl').textContent=short;
+}
+function applyPreset(){
+  const P=PRESETS[$('preset').value];
+  updateCmds();
+  if(!P) return;
+  $('lat').value=P.lat;$('lon').value=P.lon;$('tz').value=P.tz;
+  const w=autoWindow(P.lat,P.lon,P.tz);$('start').value=hhmm(w[0]);$('end').value=hhmm(w[1]);
+  $('slot').value=String(P.slot||7.5);
+}
+function syncAspect(){const custom=$('aspect').value==='custom';$('cw').disabled=!custom;$('ch').disabled=!custom;$('outW').disabled=custom;}
 function setFiles(list){
   files=[...list].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp)$/i.test(f.name));
   $('genBtn').disabled=!files.length;
-  status(files.length?files.length+' photos loaded. Tap Generate.':'No image files found in that selection.');
-  if(files.length) runPhotos();
+  if(!files.length){status('No image files found in that selection.');return;}
+  let note='';
+  if(parseFloat($('slot').value)<15){$('slot').value='15';note=' Rows set to 15 min to match the camera.';}
+  status(files.length+' photos loaded.'+note);
+  runPhotos();
 }
+function scheduleRedraw(){if(mode!=='demo')return;clearTimeout(redrawTimer);redrawTimer=setTimeout(()=>{if(!busy)runDemo();},250);}
+
+$('preset').addEventListener('change',()=>{applyPreset();if(mode==='demo')runDemo();else status('Preset applied. Tap Generate to redraw your photos, or Draw demo.');});
+$('aspect').addEventListener('change',()=>{syncAspect();scheduleRedraw();});
+['start','end','slot','step','outW','cw','ch','lat','lon','tz','labels','curve'].forEach(id=>$(id).addEventListener('change',()=>{
+  if(['lat','lon','tz'].includes(id)){$('preset').value='custom';updateCmds();}
+  scheduleRedraw();}));
 $('pickFiles').addEventListener('change',e=>setFiles(e.target.files));
 $('pickFolder').addEventListener('change',e=>setFiles(e.target.files));
 $('demoBtn').addEventListener('click',runDemo);
@@ -339,8 +504,13 @@ $('full').addEventListener('change',e=>$('wrap').classList.toggle('full',e.targe
 $('dlBtn').addEventListener('click',()=>{
   cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sunrise-montage.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);},'image/png');
 });
-['labels','curve'].forEach(id=>$(id).addEventListener('change',()=>{if(!busy&&!files.length)runDemo();}));
-runDemo();
+document.querySelectorAll('[data-copy]').forEach(btn=>btn.addEventListener('click',async()=>{
+  const txt=$(btn.dataset.copy).textContent;
+  try{await navigator.clipboard.writeText(txt);}catch(e){const ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e2){}ta.remove();}
+  btn.textContent='✅ Copied';setTimeout(()=>{btn.textContent='📋 Copy';},1600);
+}));
+
+syncAspect();applyPreset();runDemo();
 })();
 </script>
 </body>
