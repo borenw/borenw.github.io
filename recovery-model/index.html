@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recovery RC Model</title>
+<meta name="description" content="Five-branch RC model of training recovery (phosphocreatine, vagal tone, muscle glycogen, muscle fibre repair, biofitness), driven by Strava runs with heart rate and weather, corrected by an on-demand step-test calibration.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --blue:#0052CC; --blue-dk:#0747A6; --blue-lt:#DEEBFF; --blue-mid:#4C9AFF;
+  --ink:#172B4D; --ink-2:#42526E; --ink-3:#6B778C;
+  --line:#DFE1E6; --surface:#FFFFFF; --ground:#FFFFFF; --card:#FAFBFC;
+  --good:#00875A; --good-bg:#E3FCEF; --warn:#974F0C; --warn-bg:#FFF0B3; --bad:#BF2600; --bad-bg:#FFEBE6;
+  --c-vagal:#C9372C; --c-gly:#E2B203; --c-fibre:#6E5DC6; --c-bio:#00875A; --c-pcr:#0C66E4; --c-load:#8993A4;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px 56px}
+.banner{background:var(--blue);color:#fff;margin:0 -16px;padding:26px 16px 22px}
+.banner .inner{max-width:948px;margin:0 auto}
+.banner h1{margin:0 0 6px;font-size:26px;font-weight:700;letter-spacing:-.01em}
+.banner p{margin:0;color:#DEEBFF;max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.meta span{background:rgba(255,255,255,.16);border-radius:3px;padding:3px 9px;font-size:12px;font-weight:500}
+.secbar{background:var(--blue);color:#fff;font-weight:600;font-size:16px;padding:9px 14px;border-radius:3px;margin:34px 0 12px;scroll-margin-top:12px}
+.secbar small{font-weight:400;color:#DEEBFF;margin-left:8px;font-size:12px}
+h3{font-size:14px;font-weight:600;margin:20px 0 8px;color:var(--ink-2)}
+p{color:var(--ink-2);max-width:72ch}
+a{color:var(--blue-dk)}
+.toc{background:var(--blue-lt);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:3px;padding:14px 20px;margin-top:18px}
+.toc h4{margin:0 0 6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue-dk)}
+.toc ol{margin:0;padding-left:20px}.toc ol ul{margin:2px 0 6px;padding-left:18px;list-style:disc}
+.toc li{margin:2px 0}.toc a{text-decoration:none}.toc a:hover{text-decoration:underline}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:16px;margin-top:12px}
+.figt{font-size:12.5px;font-weight:600;color:var(--ink-2);margin:0 0 8px}
+.chartbox{position:relative;height:320px;width:100%}
+.chartbox.small{height:240px}
+.tablewrap{overflow-x:auto;margin-top:10px;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th{background:var(--blue-lt);color:var(--ink);text-align:left;font-weight:600;font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--line);color:var(--ink-2);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.top td{background:#F4F8FF}
+td.num,th.num{text-align:right}
+td.nw{white-space:nowrap}
+.rank{font-weight:700;color:var(--ink-3);width:1%}
+.bar{display:flex;align-items:center;gap:8px;min-width:140px}
+.bar i{display:block;height:9px;border-radius:2px;background:var(--blue-mid);flex:none}
+.pill{display:inline-block;padding:1px 7px;border-radius:3px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.g{background:var(--good-bg);color:var(--good)}.pill.y{background:var(--warn-bg);color:var(--warn)}.pill.r{background:var(--bad-bg);color:var(--bad)}.pill.n{background:#F1F2F4;color:var(--ink-3)}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--blue);border-radius:3px;padding:10px 12px}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);font-weight:600}
+.stat .v{font-size:22px;font-weight:700;color:var(--ink);margin-top:2px}
+.stat .s{font-size:12px;color:var(--ink-3)}
+.note{background:var(--blue-lt);border-left:3px solid var(--blue);border-radius:3px;padding:11px 14px;margin-top:12px}
+.note p{margin:0}
+.warnbox{background:var(--warn-bg);border-left:3px solid var(--warn);border-radius:3px;padding:11px 14px;margin-top:12px}
+.warnbox p{margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2>*{min-width:0}
+.form{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 12px;margin-top:8px}
+label{display:flex;flex-direction:column;font-size:12px;font-weight:600;color:var(--ink-2);gap:3px}
+label.chk{flex-direction:row;align-items:center;gap:6px;font-weight:500}
+input,select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid #C1C7D0;border-radius:3px;background:#fff;color:var(--ink);min-width:0}
+input:focus,select:focus{outline:2px solid var(--blue-mid);outline-offset:0;border-color:var(--blue)}
+input.tau{width:80px;padding:3px 6px;font-size:13px}
+button{font:inherit;font-size:13.5px;font-weight:600;border:1px solid var(--blue);background:var(--blue);color:#fff;border-radius:3px;padding:7px 14px;cursor:pointer}
+button.sec{background:#fff;color:var(--blue-dk)}
+button.danger{background:#fff;color:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.5;cursor:default}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.status{font-size:12.5px;color:var(--ink-3)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-3);margin-top:8px}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:14px;height:3px;border-radius:2px;display:block}
+.timer{font-size:56px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;color:var(--blue-dk);margin:6px 0 0}
+.timer-sub{text-align:center;color:var(--ink-3);font-size:13px;margin-bottom:6px}
+.beat{width:18px;height:18px;border-radius:50%;background:var(--line);margin:0 auto;transition:background .05s}
+.beat.on{background:var(--blue)}
+.pred{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.eq{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--card);border:1px solid var(--line);border-radius:3px;padding:10px 12px;font-size:12.5px;overflow-x:auto;white-space:pre;color:var(--ink)}
+.hidden{display:none!important}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-3)}
+@media (max-width:700px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid2,.pred{grid-template-columns:1fr}
+  .banner h1{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="banner"><div class="inner">
+  <h1>🔋 Recovery RC Model</h1>
+  <p>Training drains five parallel RC branches, each with its own time constant. Sleep speeds the charging, stress and alcohol leak it away, and a three-minute step test closes the loop by correcting the model against your actual heart.</p>
+  <div class="meta" id="meta"></div>
+</div></div>
+
+<nav class="toc">
+  <h4>On this page</h4>
+  <ol>
+    <li><a href="#today">Today</a>
+      <ul><li><a href="#today">Readiness by branch</a></li><li><a href="#back90">Back to 90%</a></li><li><a href="#fig1">Figure 1 · Recovery curves</a></li></ul></li>
+    <li><a href="#calibrate">Calibrate</a>
+      <ul><li><a href="#calibrate">Step test, predicted first</a></li><li><a href="#callog">Calibration log</a></li><li><a href="#fig2">Figure 2 · Predicted vs measured</a></li></ul></li>
+    <li><a href="#log">Daily log</a>
+      <ul><li><a href="#log">Sleep, stress, HRV</a></li><li><a href="#manual">Add a session by hand</a></li></ul></li>
+    <li><a href="#sessions">Sessions</a>
+      <ul><li><a href="#strava">Strava connect</a></li><li><a href="#sesstable">Sessions ranked by load</a></li></ul></li>
+    <li><a href="#model">The RC model</a>
+      <ul><li><a href="#branches">Branch table</a></li><li><a href="#fig4">Figure 4 · Impulse response</a></li><li><a href="#equations">Equations</a></li></ul></li>
+    <li><a href="#fitness">Biofitness trend</a></li>
+    <li><a href="#settings">Settings and data</a></li>
+    <li><a href="#limits">Known limits</a></li>
+  </ol>
+</nav>
+
+<!-- ================= 1. TODAY ================= -->
+<div class="secbar" id="today">1 · Today <small>where each branch sits right now</small></div>
+<div class="stats" id="tiles"></div>
+<div id="emptyNote" class="note hidden"><p>No sessions yet, so every branch reads full. Connect Strava in <a href="#strava">section 4</a>, or add a session by hand in <a href="#manual">section 3</a>. The impulse response in <a href="#fig4">Figure 4</a> works without any data.</p></div>
+
+<h3 id="back90">⏳ Back to 90%, assuming no more training and normal sleep</h3>
+<div class="tablewrap"><table>
+  <thead><tr><th>#</th><th>Branch</th><th class="num">Now</th><th>Readiness</th><th class="num">Back to 90% in</th><th>When</th></tr></thead>
+  <tbody id="back90Body"></tbody>
+</table></div>
+
+<div class="card" id="fig1">
+  <p class="figt">Figure 1 · Recovery curves by branch, last 28 days plus a 7-day projection (dashed)</p>
+  <div class="chartbox"><canvas id="curveChart"></canvas></div>
+  <div class="legend">
+    <span><i class="sw" style="background:var(--c-vagal)"></i>💓 Vagal tone</span>
+    <span><i class="sw" style="background:var(--c-gly)"></i>🍞 Muscle glycogen</span>
+    <span><i class="sw" style="background:var(--c-fibre)"></i>🧵 Muscle fibre repair</span>
+    <span><i class="sw" style="background:var(--c-load);height:9px"></i>Session load (right axis)</span>
+  </div>
+</div>
+
+<!-- ================= 2. CALIBRATE ================= -->
+<div class="secbar" id="calibrate">2 · Calibrate <small>the model predicts first, then you measure</small></div>
+<p>The test only means something if it is the same every time: same stairs or step, same 96 bpm metronome (one foot per click, so 24 full steps a minute), same time of day, rested and not straight after a meal. Wear the watch with a workout running so heart rate samples every second.</p>
+<div class="pred" id="predBox"></div>
+<div class="card">
+  <div class="timer" id="timer">3:00</div>
+  <div class="timer-sub" id="timerSub">Press start, then step with the clicks</div>
+  <div class="beat" id="beat"></div>
+  <div class="btnrow" style="justify-content:center">
+    <button id="btnStart">▶ Start 3-minute test</button>
+    <button class="sec" id="btnStop">■ Stop</button>
+    <label class="chk"><input type="checkbox" id="sound" checked> Metronome sound</label>
+  </div>
+</div>
+<div class="card">
+  <p class="figt">Enter what the watch shows</p>
+  <div class="form">
+    <label>⏱️ Test time<input type="datetime-local" id="cTime"></label>
+    <label>🔺 HR at end of 3 min (bpm)<input type="number" id="cEnd" min="60" max="220" placeholder="e.g. 128"></label>
+    <label>🔻 HR 60 s later (bpm)<input type="number" id="c60" min="40" max="220" placeholder="e.g. 98"></label>
+    <label>💓 HRV now, optional (ms)<input type="number" id="cHrv" min="5" max="250" placeholder="optional"></label>
+  </div>
+  <div class="btnrow"><button id="btnCal">🎯 Save and correct the model</button><span class="status" id="calStatus"></span></div>
+</div>
+
+<h3 id="callog">📒 Calibration log, newest first</h3>
+<div class="tablewrap"><table>
+  <thead><tr><th>#</th><th>📅 When</th><th>🔬 Signal</th><th class="num">Predicted</th><th class="num">Measured</th><th>Residual</th><th class="num">Vagal fix</th><th></th></tr></thead>
+  <tbody id="calBody"></tbody>
+</table></div>
+
+<div class="card" id="fig2">
+  <p class="figt">Figure 2 · Model prediction vs measurement, step-test end HR (left axis) and HRV (right axis)</p>
+  <div class="chartbox small"><canvas id="calChart"></canvas></div>
+</div>
+
+<!-- ================= 3. DAILY LOG ================= -->
+<div class="secbar" id="log">3 · Daily log <small>the disturbances the watch cannot see</small></div>
+<p>One entry per morning. Sleep is the night that ended that morning, drinks are the evening before. HRV and resting HR are optional, but every entry you add is another correction to the vagal branch.</p>
+<div class="card">
+  <div class="form">
+    <label>📅 Morning of<input type="date" id="lDate"></label>
+    <label>😴 Sleep (hours)<input type="number" id="lSleep" step="0.25" min="0" max="14" value="7.5"></label>
+    <label>🧠 Life stress<select id="lStress"><option value="0">0 · none</option><option value="1">1 · low</option><option value="2">2 · medium</option><option value="3">3 · high</option></select></label>
+    <label>🍷 Drinks last night<input type="number" id="lDrinks" min="0" max="10" value="0"></label>
+    <label>💓 Morning HRV (ms)<input type="number" id="lHrv" min="5" max="250" placeholder="optional"></label>
+    <label>❤️ Resting HR (bpm)<input type="number" id="lRhr" min="30" max="110" placeholder="optional"></label>
+    <label class="chk"><input type="checkbox" id="lSick"> 🤒 Feeling ill</label>
+  </div>
+  <div class="btnrow"><button id="btnLog">💾 Save day</button><span class="status" id="logStatus"></span></div>
+</div>
+<div class="tablewrap"><table>
+  <thead><tr><th>#</th><th>📅 Morning</th><th>😴 Sleep</th><th class="num">🧠 Stress</th><th class="num">🍷 Drinks</th><th class="num">💓 HRV</th><th class="num">❤️ RHR</th><th></th></tr></thead>
+  <tbody id="logBody"></tbody>
+</table></div>
+
+<h3 id="manual">✍️ Add a session by hand (rings, strength, anything not on Strava)</h3>
+<div class="card">
+  <div class="form">
+    <label>⏱️ Start<input type="datetime-local" id="mTime"></label>
+    <label>🏷️ Type<select id="mType"><option value="Run">🏃 Run</option><option value="Strength">🏋️ Strength</option><option value="Rings">⭕ Rings</option><option value="Ride">🚴 Ride</option><option value="Walk">🚶 Walk</option><option value="Other">✳️ Other</option></select></label>
+    <label>⌛ Minutes<input type="number" id="mMin" min="1" max="600" value="45"></label>
+    <label>❤️ Avg HR (optional)<input type="number" id="mHr" min="50" max="210" placeholder="optional"></label>
+    <label>📏 Distance (mi)<input type="number" id="mDist" step="0.01" min="0" placeholder="optional"></label>
+    <label>⛰️ Elev gain (ft)<input type="number" id="mElev" min="0" placeholder="optional"></label>
+    <label>💪 Effort, RPE 1–10<input type="number" id="mRpe" min="1" max="10" value="6"></label>
+    <label class="chk"><input type="checkbox" id="mEcc"> Heavy eccentric (slow negatives)</label>
+  </div>
+  <div class="btnrow"><button id="btnManual">➕ Add session</button><span class="status" id="manStatus"></span></div>
+</div>
+
+<!-- ================= 4. SESSIONS ================= -->
+<div class="secbar" id="sessions">4 · Sessions <small>inputs to the model</small></div>
+<h3 id="strava">🟧 Strava connect</h3>
+<p>Uses your own Strava API app. In Strava, Settings, My API Application, set the Authorization Callback Domain to <code>borenw.github.io</code>. The client secret stays in this browser's storage and is sent only to Strava. Weather for every run comes from Open-Meteo at the run's start point and hour.</p>
+<div class="card">
+  <div class="form">
+    <label>Client ID<input type="text" id="sId" autocomplete="off"></label>
+    <label>Client secret<input type="password" id="sSecret" autocomplete="off"></label>
+    <label>Fetch since<input type="date" id="sSince"></label>
+  </div>
+  <div class="btnrow">
+    <button id="btnConnect">🔗 Connect</button>
+    <button class="sec" id="btnFetch">⬇️ Fetch activities</button>
+    <span class="status" id="stravaStatus"></span>
+  </div>
+</div>
+
+<div class="grid2" id="sesstable">
+  <div class="card">
+    <p class="figt">Figure 3 · Share of total load by session type, last 42 days</p>
+    <div class="chartbox small"><canvas id="pieType"></canvas></div>
+  </div>
+  <div class="card">
+    <p class="figt">Load totals by type, last 42 days</p>
+    <div class="tablewrap" style="margin-top:0;border:none"><table>
+      <thead><tr><th>#</th><th>🏷️ Type</th><th class="num">Sessions</th><th>⚖️ Load</th><th class="num">Share</th></tr></thead>
+      <tbody id="typeBody"></tbody>
+    </table></div>
+  </div>
+</div>
+<h3>🏅 Sessions ranked by load, last 42 days</h3>
+<div class="tablewrap"><table>
+  <thead><tr><th>#</th><th>📅 Date</th><th>🏷️ Type</th><th class="num">⌛ Min</th><th class="num">📏 Mi</th><th class="num">❤️ HR</th><th class="num">🌡️ T+Td °F</th><th>⚖️ Load (TRIMP)</th><th class="num">🧵 Fibre</th><th></th></tr></thead>
+  <tbody id="sessBody"></tbody>
+</table></div>
+
+<!-- ================= 5. MODEL ================= -->
+<div class="secbar" id="model">5 · The RC model <small>five branches, one representative process each</small></div>
+<div class="grid2">
+  <div class="card">
+    <p class="figt">Figure 5 · Today's recovery debt, share by branch</p>
+    <div class="chartbox small"><canvas id="pieDebt"></canvas></div>
+  </div>
+  <div class="card">
+    <p class="figt">How to read it</p>
+    <p style="margin:0">Each branch is a capacitor. A session pulls charge out of it, and it recharges through its own time constant τ. The pie shows which branch holds most of the missing charge right now, so it tells you what is actually limiting you today. Phosphocreatine refills in minutes, so it never shows up at day scale.</p>
+  </div>
+</div>
+
+<h3 id="branches">🔋 Branch table, time constants editable</h3>
+<div class="tablewrap"><table>
+  <thead><tr><th>#</th><th>🔋 Branch</th><th class="num">⏱️ τ</th><th>🔬 What it means physically</th><th>📡 What senses it</th><th>🏁 90% back after a half</th><th>📊 Today</th></tr></thead>
+  <tbody id="branchBody"></tbody>
+</table></div>
+<div class="note"><p>Notes. Phosphocreatine also stands in for metabolite clearance and nerve drive, which recover on a similar clock. Liver glycogen refills in about 12 hours with ordinary meals and only matters in long efforts or fasted training. Biofitness also covers red blood cell mass, tendon and bone, which sit closer to three or four months. Muscle glycogen refills more slowly while fibre damage is high, so those two branches are coupled.</p></div>
+
+<div class="card" id="fig4">
+  <p class="figt">Figure 4 · Impulse response to one half marathon at 8 am, normal sleep, using the τ values above</p>
+  <div class="chartbox"><canvas id="impChart"></canvas></div>
+</div>
+
+<h3 id="equations">🧮 Equations</h3>
+<div class="eq" id="eqBox">Per hour, for each branch b with fatigue state x_b:
+  x_b  ←  x_b · exp(−m_b / τ_b)  +  load_b(session)  +  leak_b(stress, alcohol, illness)
+  m_b  =  sleep boost while asleep, lower while awake, chosen so 7.5 h of sleep averages to 1
+  readiness_b  =  100 · S_b / (S_b + x_b)          (S_b is the load that halves readiness)
+
+Loads per session:
+  TRIMP  =  minutes · HRr · 0.64 · e^(1.92·HRr),   HRr = (HRavg − HRrest) / (HRmax − HRrest)
+         or minutes · RPE · 0.3 when there is no heart rate
+  vagal  =  TRIMP · (1 + heat),   heat = 0.15 · clamp((T + Td − 100) / 90, 0, 1)
+  glyco  =  TRIMP · 0.8
+  fibre  =  2 · km · (1 + gain_m / 200)   for runs,   minutes · RPE / 10 · 1.5 · (2 if eccentric)  for strength
+Biofitness  =  42-day exponential average of daily TRIMP
+
+Closed loop (extended Kalman filter on x_vagal):
+  ln HRV  ≈ μ − 0.40 · d          d = x_v / (S_v + x_v)
+  HR_end  ≈ H0 + 12 · d           HR drop in 60 s ≈ R0 − 10 · d          RHR ≈ RHR0 + 6 · d
+  each measurement nudges x_v by K · residual, and the baselines μ, H0, R0, RHR0 drift slowly</div>
+
+<!-- ================= 6. FITNESS ================= -->
+<div class="secbar" id="fitness">6 · Biofitness trend <small>the slow branch, τ ≈ 6 weeks</small></div>
+<div class="card">
+  <p class="figt">Figure 6 · Biofitness (42-day load average) and daily load, last 120 days</p>
+  <div class="chartbox"><canvas id="fitChart"></canvas></div>
+</div>
+
+<!-- ================= 7. SETTINGS ================= -->
+<div class="secbar" id="settings">7 · Settings and data</div>
+<div class="card">
+  <div class="form">
+    <label>❤️ Resting HR (bpm)<input type="number" id="pRest" min="30" max="100"></label>
+    <label>🔺 Max HR (bpm)<input type="number" id="pMax" min="120" max="220"></label>
+    <label>⏰ Usual wake time<input type="time" id="pWake"></label>
+    <label>📍 Home latitude<input type="number" id="pLat" step="0.01"></label>
+    <label>📍 Home longitude<input type="number" id="pLon" step="0.01"></label>
+  </div>
+  <div class="btnrow">
+    <button id="btnSaveSet">💾 Save settings</button>
+    <button class="sec" id="btnExport">📤 Export backup</button>
+    <label class="sec" style="flex-direction:row"><span class="pill n" style="cursor:pointer;padding:7px 12px">📥 Import backup</span><input type="file" id="fileImport" accept="application/json" class="hidden"></label>
+    <button class="sec" id="btnDemo">🧪 Load demo data</button>
+    <button class="danger" id="btnReset">🗑️ Clear all data</button>
+    <span class="status" id="setStatus"></span>
+  </div>
+</div>
+<p class="status">Everything lives in this browser's local storage. Export a backup before switching phone or computer.</p>
+
+<!-- ================= 8. LIMITS ================= -->
+<div class="secbar" id="limits">8 · Known limits</div>
+<div class="tablewrap"><table>
+  <thead><tr><th>#</th><th>⚠️ Limit</th><th>What to do about it</th></tr></thead>
+  <tbody>
+    <tr><td class="rank">1</td><td>The loads are linear. Real overreaching is not: past a point, extra load produces a delayed collapse that a sum of exponentials cannot show.</td><td>Treat a week of falling HRV despite rest as a red flag the model will understate.</td></tr>
+    <tr><td class="rank">2</td><td>HRV mostly sees the vagal branch. It barely registers glycogen or fibre damage.</td><td>The step test adds a second sensor; soreness and grip strength are worth a note in the log.</td></tr>
+    <tr><td class="rank">3</td><td>Apple Watch reports HRV as SDNN, most apps report rMSSD. They are different numbers.</td><td>Pick one source and never mix them. The baseline is learned, so the absolute level does not matter.</td></tr>
+    <tr><td class="rank">4</td><td>Gains like 0.40, 12 bpm and the branch scales are starting points from the literature, not fitted to you.</td><td>After a month of calibrations, the residuals show which way they are off.</td></tr>
+    <tr><td class="rank">5</td><td>Nutrition and hydration are invisible to the model, and they move HRV just like fatigue does.</td><td>Log big days of under-eating as stress, and note dehydration before a calibration.</td></tr>
+  </tbody>
+</table></div>
+
+<footer>
+  <a href="https://borenw.github.io/">Page 59 · Bo's Engineering Curriculum</a> ·
+  Built on the Banister fitness-fatigue model, split into branches, with Kalman feedback from a step test.
+</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------------- storage ---------------- */
+const KEY = "recoveryModel.v1";
+const DEF_SET = {rest:55, max:180, wake:"06:30", lat:30.27, lon:-97.74};
+const DEF_TAU = {pcr:0.05, vagal:24, gly:12, fibre:60, bio:42*24};   // hours
+function load(){
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(KEY) || "null"); } catch(e) {}
+  d = d || {};
+  d.sessions = d.sessions || []; d.logs = d.logs || {}; d.cals = d.cals || [];
+  d.set = Object.assign({}, DEF_SET, d.set || {}); d.tau = Object.assign({}, DEF_TAU, d.tau || {});
+  d.strava = d.strava || {}; d.wx = d.wx || {};
+  return d;
+}
+let DB = load();
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e) { console.warn(e); } }
+
+/* ---------------- helpers ---------------- */
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,"0");
+const ymd = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const localISO = d => ymd(d)+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
+const parseLocal = s => { const [a,b="00:00"] = s.split("T"); const [y,m,dd] = a.split("-").map(Number); const [h,mi] = b.split(":").map(Number); return new Date(y,m-1,dd,h||0,mi||0); };
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmtD = d => MON[d.getMonth()]+" "+d.getDate();
+const fmtDT = d => fmtD(d)+" "+pad(d.getHours())+":"+pad(d.getMinutes());
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const cls = v => v>=80 ? "g" : v>=60 ? "y" : "r";
+const pill = (v,txt) => `<span class="pill ${cls(v)}">${txt ?? v.toFixed(0)+"%"}</span>`;
+const barCell = (v,max,color,txt,w=120) => `<div class="bar" style="min-width:${w+50}px"><i style="width:${Math.max(2,Math.round(clamp(v/max,0,1)*w))}px;background:${color||"var(--blue-mid)"}"></i>${txt}</div>`;
+const css = k => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+const TYPE_ICON = {Run:"🏃",TrailRun:"🏃",Ride:"🚴",VirtualRide:"🚴",Walk:"🚶",Hike:"🥾",Strength:"🏋️",WeightTraining:"🏋️",Rings:"⭕",Workout:"✳️",Other:"✳️",Swim:"🏊",StairStepper:"🪜"};
+const icon = t => TYPE_ICON[t] || "✳️";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------------- branch definitions ---------------- */
+const BR = [
+  {id:"pcr",   name:"Phosphocreatine",     icon:"⚡", color:"--c-pcr",
+   phys:"The small energy buffer in each muscle refilling, about 10 s of all-out work. Also covers metabolite clearance and nerve drive.",
+   sense:"Power available for the next set", S:null},
+  {id:"vagal", name:"Vagal tone",          icon:"💓", color:"--c-vagal",
+   phys:"The parasympathetic brake taking control back from the stress response after training, racing, poor sleep or life stress.",
+   sense:"HRV, resting HR, step-test HR", S:120, boost:2.0},
+  {id:"gly",   name:"Muscle glycogen",     icon:"🍞", color:"--c-gly",
+   phys:"Carbohydrate fuel stored in each muscle refilling. Each muscle can only use its own store.",
+   sense:"Energy late in long or hard efforts", S:150, boost:1.0},
+  {id:"fibre", name:"Muscle fibre repair", icon:"🧵", color:"--c-fibre",
+   phys:"Micro-tears from hard sets, especially the lowering phase, cleared by immune cells and rebuilt by protein synthesis.",
+   sense:"Soreness (weak), grip or pull-up reps (better)", S:60, boost:1.5},
+  {id:"bio",   name:"Biofitness",          icon:"🫀", color:"--c-bio",
+   phys:"Real adaptation: more mitochondria and capillaries, a stronger heart, stronger muscle. The gain the other branches pay for.",
+   sense:"Weekly HRV trend, step-test HR drift, race pace", S:null}
+];
+const SIM_BR = ["vagal","gly","fibre"];
+const SLEEP_DEFAULT = 7.5;
+
+/* ---------------- session loads ---------------- */
+function heatPen(T,Td){ if (T==null || Td==null) return 0; return 0.15*clamp((T+Td-100)/90,0,1); }
+function trimp(s, set){
+  if (s.hr && s.hr > set.rest){
+    const hrr = clamp((s.hr-set.rest)/(set.max-set.rest), 0, 1.05);
+    return s.min * hrr * 0.64 * Math.exp(1.92*hrr);
+  }
+  const rpe = s.rpe || (s.type==="Walk" ? 3 : 6);
+  return s.min * rpe * 0.3;
+}
+function loads(s, set){
+  const tr = trimp(s, set);
+  const wx = s.wx || {};
+  const heat = heatPen(wx.T, wx.Td);
+  let fibre;
+  const km = (s.mi || 0) * 1.609, gain = (s.elevFt || 0) * 0.3048;
+  if (["Run","TrailRun","Hike","Walk"].includes(s.type) && km > 0){
+    fibre = 2 * km * (1 + gain/200) * (s.type==="Walk" ? 0.3 : 1);
+  } else if (["Strength","WeightTraining","Rings","Workout"].includes(s.type)){
+    fibre = s.min * (s.rpe || 6)/10 * 1.5 * (s.ecc ? 2 : 1);
+  } else {
+    fibre = tr * 0.08;
+  }
+  return {trimp:tr, vagal:tr*(1+heat), gly:tr*0.8, fibre, heat};
+}
+
+/* ---------------- simulation ---------------- */
+function wakeHour(set){ const [h,m] = (set.wake||"06:30").split(":").map(Number); return h + (m||0)/60; }
+function morningOf(t, wake){ // date string of the morning that ends the sleep covering hour t
+  const d = new Date(t); const hod = d.getHours() + d.getMinutes()/60;
+  if (hod >= wake) d.setDate(d.getDate()+1);
+  return ymd(d);
+}
+function simulate(opt){
+  const set = opt.set, tau = opt.tau, sessions = opt.sessions, logs = opt.logs || {}, cals = opt.cals || [];
+  const wake = wakeHour(set);
+  const t0 = new Date(opt.start); t0.setMinutes(0,0,0);
+  const t1 = new Date(opt.end);
+  const H = 3600e3;
+  // awake multipliers so that a default night averages to 1
+  const awake = {}; SIM_BR.forEach(id => { const b = BR.find(x=>x.id===id); awake[id] = (24 - SLEEP_DEFAULT*b.boost)/(24 - SLEEP_DEFAULT); });
+  // events
+  const sess = sessions.map(s => ({t:parseLocal(s.start).getTime(), s, L:loads(s,set)})).filter(e=>e.t>=t0.getTime()-H && e.t<=t1.getTime()).sort((a,b)=>a.t-b.t);
+  const meas = [];
+  if (opt.withMeas !== false){
+    Object.entries(logs).forEach(([day,l]) => {
+      const t = parseLocal(day+"T"+set.wake).getTime() + 15*60e3;
+      if (l.hrv) meas.push({t, kind:"hrv", y:Math.log(l.hrv), raw:l.hrv, src:"log", day});
+      if (l.rhr) meas.push({t, kind:"rhr", y:l.rhr, raw:l.rhr, src:"log", day});
+    });
+    cals.forEach(c => {
+      const t = parseLocal(c.time).getTime();
+      if (c.hrEnd) meas.push({t, kind:"end", y:c.hrEnd, raw:c.hrEnd, src:"step", id:c.id});
+      if (c.hrEnd && c.hr60) meas.push({t:t+1, kind:"hrr", y:c.hrEnd-c.hr60, raw:c.hrEnd-c.hr60, src:"step", id:c.id});
+      if (c.hrv) meas.push({t:t+2, kind:"hrv", y:Math.log(c.hrv), raw:c.hrv, src:"step", id:c.id});
+    });
+    meas.sort((a,b)=>a.t-b.t);
+  }
+  const MODEL = {hrv:{g:-0.40, R:0.12**2}, end:{g:12, R:4**2}, hrr:{g:-10, R:5**2}, rhr:{g:6, R:2.5**2}};
+  const base = {}; const nSeen = {hrv:0,end:0,hrr:0,rhr:0};
+  const x = {vagal:0, gly:0, fibre:0}; let P = 100; const Q = 4; const PMAX = 900;
+  // biofitness: initialise to average daily TRIMP of first 28 days so it does not start from zero
+  let fit = 0;
+  { const end28 = t0.getTime() + 28*24*H; let s28 = 0; sess.forEach(e => { if (e.t < end28) s28 += e.L.trimp; }); fit = s28/28; }
+  const out = []; const mlog = [];
+  let si = 0, mi = 0, dayTrimp = 0, curDay = ymd(t0), dayLoads = {};
+  const nH = Math.ceil((t1 - t0)/H);
+  for (let k = 0; k <= nH; k++){
+    const tk = t0.getTime() + k*H; const d = new Date(tk);
+    const hod = d.getHours();
+    const mDay = morningOf(tk, wake); const lg = logs[mDay] || {};
+    const sl = clamp(lg.sleep ?? SLEEP_DEFAULT, 0, 12);
+    const drinks = lg.drinks || 0;
+    const sleepStart = wake - sl; const rel = ((hod + 0.5) - sleepStart + 48) % 24;
+    const asleep = sl > 0 && rel < sl;
+    const today = logs[ymd(d)] || {};
+    // decay
+    SIM_BR.forEach(id => {
+      const b = BR.find(z=>z.id===id);
+      let m = asleep ? b.boost * (1 - 0.12*Math.min(drinks,4)) : awake[id];
+      if (id==="gly" && x.fibre > 30) m *= 0.8;           // damaged muscle refills glycogen slower
+      x[id] *= Math.exp(-m / tau[id]);
+    });
+    // leaks
+    if (!asleep){
+      const stressLoad = [0,10,25,45][today.stress || 0] + (today.sick ? 40 : 0);
+      x.vagal += stressLoad / 16;
+    }
+    if (hod === 21) x.vagal += 12 * drinks; // drinks logged for tomorrow morning happen tonight
+    P = Math.min(P + Q, PMAX);
+    // sessions in this hour
+    while (si < sess.length && sess[si].t < tk + H){
+      const e = sess[si++];
+      if (e.t >= tk - H){ x.vagal += e.L.vagal; x.gly += e.L.gly; x.fibre += e.L.fibre; dayTrimp += e.L.trimp; }
+      const dk = ymd(new Date(e.t)); dayLoads[dk] = (dayLoads[dk]||0) + e.L.trimp;
+    }
+    // measurements in this hour: EKF on x.vagal
+    while (mi < meas.length && meas[mi].t < tk + H){
+      const m = meas[mi++]; if (m.t < tk - H) continue;
+      const M = MODEL[m.kind]; const S = BR[1].S;
+      const dv = x.vagal/(S + x.vagal);
+      if (base[m.kind] === undefined){
+        base[m.kind] = m.y - M.g*dv; nSeen[m.kind]++;
+        mlog.push({...m, pred:null, resid:null, dx:0, readiness:100*(1-dv)}); continue;
+      }
+      const pred = base[m.kind] + M.g*dv;
+      const Hj = M.g * S/((S + x.vagal)**2);
+      const Sinn = Hj*Hj*P + M.R; const K = P*Hj/Sinn; const r = m.y - pred;
+      let dx = K*r; const xb = x.vagal; x.vagal = Math.max(0, x.vagal + dx); dx = x.vagal - xb;
+      P = (1 - K*Hj)*P;
+      const dv2 = x.vagal/(S + x.vagal);
+      base[m.kind] += 0.05 * (m.y - (base[m.kind] + M.g*dv2));
+      nSeen[m.kind]++;
+      mlog.push({...m, pred, resid:r, dx, readiness:100*(1-dv2)});
+    }
+    // day roll for biofitness
+    if (ymd(d) !== curDay){ fit += (dayTrimp - fit)*(1 - Math.exp(-1/42)); dayTrimp = 0; curDay = ymd(d); }
+    const rd = {}; SIM_BR.forEach(id => { const S = BR.find(z=>z.id===id).S; rd[id] = 100*S/(S + x[id]); });
+    out.push({t:tk, rd, x:{...x}, fit});
+  }
+  return {series:out, mlog, base, dayLoads};
+}
+
+/* ---------------- views ---------------- */
+let charts = {};
+function mkChart(id, cfg){ if (charts[id]) charts[id].destroy(); charts[id] = new Chart($(id), cfg); return charts[id]; }
+Chart.defaults.font.family = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';
+Chart.defaults.color = "#6B778C";
+const GRID = "#EBECF0";
+
+function render(){
+  const set = DB.set, now = new Date();
+  const start = new Date(now); start.setDate(start.getDate()-130);
+  const end = new Date(now); end.setDate(end.getDate()+7);
+  const sim = simulate({set, tau:DB.tau, sessions:DB.sessions, logs:DB.logs, cals:DB.cals, start, end});
+  const S = sim.series; const nowIdx = S.findIndex(p => p.t > now.getTime()) - 1;
+  const cur = S[Math.max(0,nowIdx)];
+  window.__sim = sim; window.__cur = cur;
+
+  // meta chips
+  const cutoff42 = now.getTime() - 42*864e5;
+  const recent = DB.sessions.filter(s => parseLocal(s.start).getTime() >= cutoff42);
+  $("meta").innerHTML = [
+    `🏃 ${DB.sessions.length} sessions`, `📒 ${Object.keys(DB.logs).length} log days`,
+    `🎯 ${DB.cals.length} calibrations`, `❤️ ${set.rest}–${set.max} bpm`, `📍 ${(+set.lat).toFixed(2)}, ${(+set.lon).toFixed(2)}`
+  ].map(t=>`<span>${t}</span>`).join("");
+  $("emptyNote").classList.toggle("hidden", DB.sessions.length > 0);
+
+  // tiles
+  const overall = 0.45*cur.rd.vagal + 0.3*cur.rd.fibre + 0.25*cur.rd.gly;
+  const fit = cur.fit; const fitPrev = (S[Math.max(0,nowIdx-28*24)]||cur).fit;
+  const tile = (k,v,s,top) => `<div class="stat" style="border-top-color:${top}"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  $("tiles").innerHTML =
+    tile("🔋 Overall", pill(overall), "weighted: vagal 45, fibre 30, glyco 25", "var(--blue)") +
+    tile("💓 Vagal tone", pill(cur.rd.vagal), "τ "+DB.tau.vagal+" h", css("--c-vagal")) +
+    tile("🍞 Glycogen", pill(cur.rd.gly), "τ "+DB.tau.gly+" h", css("--c-gly")) +
+    tile("🧵 Fibre repair", pill(cur.rd.fibre), "τ "+DB.tau.fibre+" h", css("--c-fibre")) +
+    tile("🫀 Biofitness", fit.toFixed(0), (fit-fitPrev>=0?"▲ ":"▼ ")+Math.abs(fit-fitPrev).toFixed(1)+" vs 4 weeks ago", css("--c-bio"));
+
+  // back to 90
+  const rows90 = SIM_BR.map(id => {
+    const b = BR.find(z=>z.id===id); const nowV = cur.rd[id];
+    let hrs = 0;
+    if (nowV < 90){ const j = S.findIndex((p,i) => i > nowIdx && p.rd[id] >= 90); hrs = j < 0 ? null : (S[j].t - now.getTime())/36e5; }
+    return {b, nowV, hrs};
+  }).sort((a,b) => (b.hrs ?? 1e9) - (a.hrs ?? 1e9));
+  $("back90Body").innerHTML = rows90.map((r,i) => `<tr class="${i===0&&r.hrs>0?"top":""}">
+    <td class="rank">${i+1}</td><td class="nw">${r.b.icon} ${r.b.name}</td>
+    <td class="num">${r.nowV.toFixed(0)}%</td>
+    <td>${barCell(r.nowV,100,css(r.b.color),pill(r.nowV))}</td>
+    <td class="num">${r.hrs===0?"already there":r.hrs==null?"over 7 days":r.hrs.toFixed(0)+" h"}</td>
+    <td class="nw">${r.hrs>0?fmtDT(new Date(now.getTime()+r.hrs*36e5)):"—"}</td></tr>`).join("");
+
+  // figure 1
+  const from28 = now.getTime() - 28*864e5;
+  const step = 3;
+  const pts = S.filter((p,i) => p.t >= from28 && i % step === 0);
+  const past = id => pts.map(p => ({x:p.t, y: p.t <= now.getTime() ? +p.rd[id].toFixed(1) : null}));
+  const fut  = id => pts.map(p => ({x:p.t, y: p.t >= now.getTime()-3*36e5 ? +p.rd[id].toFixed(1) : null}));
+  const loadBars = Object.entries(sim.dayLoads).map(([d,v]) => ({x:parseLocal(d+"T12:00").getTime(), y:+v.toFixed(0)})).filter(p=>p.x>=from28);
+  const dsLine = (id,data,dash) => ({type:"line", label:BR.find(z=>z.id===id).name+(dash?" (projection)":""), data, yAxisID:"y",
+    borderColor:css(BR.find(z=>z.id===id).color), borderDash:dash?[5,4]:[], borderWidth:2, pointRadius:0, tension:.25, spanGaps:false});
+  mkChart("curveChart", {
+    data:{datasets:[
+      ...SIM_BR.map(id => dsLine(id, past(id), false)), ...SIM_BR.map(id => dsLine(id, fut(id), true)),
+      {type:"bar", label:"Session load (TRIMP)", data:loadBars, yAxisID:"y2", backgroundColor:"rgba(137,147,164,.35)", barThickness:6}
+    ]},
+    options:{responsive:true, maintainAspectRatio:false, interaction:{mode:"nearest", axis:"x", intersect:false},
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{type:"linear", min:from28, max:end.getTime(), grid:{color:GRID}, ticks:{maxTicksLimit:10, callback:v=>fmtD(new Date(v))}},
+        y:{min:0, max:100, grid:{color:GRID}, ticks:{callback:v=>v+"%"}, title:{display:true, text:"Readiness, %", color:"#42526E"}},
+        y2:{position:"right", min:0, grid:{display:false}, title:{display:true, text:"Session load, TRIMP", color:"#8993A4"}, ticks:{color:"#8993A4"}}
+      }}
+  });
+
+  renderCal(sim);
+  renderLog();
+  renderSessions(sim, now);
+  const imp = impulseSim();
+  renderBranches(cur, imp);
+  renderImpulse(imp);
+  renderFitness(sim, now);
+  renderPred(cur, sim);
+}
+
+function predictNow(sim, cur){
+  const S = BR[1].S, dv = cur.x.vagal/(S + cur.x.vagal); const b = sim.base;
+  return {
+    end: b.end!=null ? b.end + 12*dv : null,
+    hrr: b.hrr!=null ? b.hrr - 10*dv : null,
+    hrv: b.hrv!=null ? Math.exp(b.hrv - 0.40*dv) : null,
+    readiness: 100*(1-dv)
+  };
+}
+function renderPred(cur, sim){
+  const p = predictNow(sim, cur);
+  const t = (k,v,s) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  $("predBox").innerHTML =
+    t("🔮 Predicted end HR", p.end ? p.end.toFixed(0)+" bpm" : "—", p.end ? "vagal readiness "+p.readiness.toFixed(0)+"%" : "first test sets your baseline") +
+    t("🔮 Predicted 60 s drop", p.hrr ? p.hrr.toFixed(0)+" bpm" : "—", p.hrr ? "bigger drop means more recovered" : "first test sets your baseline") +
+    t("🔮 Predicted HRV", p.hrv ? p.hrv.toFixed(0)+" ms" : "—", p.hrv ? "same source every time" : "first reading sets your baseline");
+}
+
+function renderCal(sim){
+  const KIND = {hrv:"💓 HRV", end:"🔺 Step end HR", hrr:"🔻 60 s HR drop", rhr:"❤️ Resting HR"};
+  const fmtV = (k,v) => v==null ? "—" : k==="hrv" ? Math.exp(v).toFixed(0)+" ms" : v.toFixed(0)+" bpm";
+  const rows = [...sim.mlog].reverse().slice(0, 40);
+  $("calBody").innerHTML = rows.length ? rows.map((m,i) => {
+    const r = m.resid; let rTxt = "baseline set";
+    if (r != null){
+      const rel = m.kind==="hrv" ? r*100 : r; const unit = m.kind==="hrv" ? "%" : " bpm";
+      const good = Math.abs(m.kind==="hrv" ? r/0.12 : r/(m.kind==="rhr"?2.5:4));
+      const c = good < 1 ? "g" : good < 2 ? "y" : "r";
+      rTxt = `<span class="pill ${c}">${rel>=0?"+":""}${rel.toFixed(m.kind==="hrv"?0:1)}${unit}</span>`;
+    }
+    const del = m.src==="step" ? `<button class="sec" style="padding:2px 8px" data-delcal="${m.id}">✕</button>` : "";
+    return `<tr><td class="rank">${i+1}</td><td class="nw">${fmtDT(new Date(m.t))}</td><td class="nw">${KIND[m.kind]}</td>
+      <td class="num">${fmtV(m.kind,m.pred)}</td><td class="num">${m.kind==="hrv"?m.raw.toFixed(0)+" ms":m.raw.toFixed(0)+" bpm"}</td>
+      <td>${rTxt}</td><td class="num">${m.dx? (m.dx>0?"+":"")+m.dx.toFixed(1):"0"}</td><td>${del}</td></tr>`;
+  }).join("") : `<tr><td colspan="8" class="status">No measurements yet. The first one of each kind sets a baseline; corrections start with the second.</td></tr>`;
+
+  const ends = sim.mlog.filter(m => m.kind==="end"); const hrvs = sim.mlog.filter(m => m.kind==="hrv");
+  mkChart("calChart", {
+    type:"line",
+    data:{datasets:[
+      {label:"Step end HR, measured", data:ends.map(m=>({x:m.t,y:m.raw})), borderColor:"#C9372C", backgroundColor:"#C9372C", showLine:false, pointRadius:5, yAxisID:"y"},
+      {label:"Step end HR, predicted", data:ends.filter(m=>m.pred!=null).map(m=>({x:m.t,y:+m.pred.toFixed(1)})), borderColor:"#C9372C", borderDash:[4,3], pointRadius:3, pointStyle:"rectRot", yAxisID:"y"},
+      {label:"HRV, measured", data:hrvs.map(m=>({x:m.t,y:m.raw})), borderColor:"#0C66E4", backgroundColor:"#0C66E4", showLine:false, pointRadius:4, yAxisID:"y2"},
+      {label:"HRV, predicted", data:hrvs.filter(m=>m.pred!=null).map(m=>({x:m.t,y:+Math.exp(m.pred).toFixed(1)})), borderColor:"#0C66E4", borderDash:[4,3], pointRadius:2, yAxisID:"y2"}
+    ]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom", labels:{boxWidth:10, font:{size:11}}}},
+      scales:{x:{type:"linear", grid:{color:GRID}, ticks:{maxTicksLimit:8, callback:v=>fmtD(new Date(v))}},
+        y:{grid:{color:GRID}, title:{display:true, text:"Step-test end HR, bpm", color:"#C9372C"}, ticks:{color:"#C9372C"}},
+        y2:{position:"right", grid:{display:false}, title:{display:true, text:"HRV, ms", color:"#0C66E4"}, ticks:{color:"#0C66E4"}}}}
+  });
+}
+
+function renderLog(){
+  const days = Object.keys(DB.logs).sort().reverse().slice(0, 21);
+  $("logBody").innerHTML = days.length ? days.map((d,i) => { const l = DB.logs[d];
+    const sl = l.sleep ?? SLEEP_DEFAULT; const sv = clamp(sl/8*100,0,100);
+    return `<tr><td class="rank">${i+1}</td><td class="nw">${fmtD(parseLocal(d))}${l.sick?" 🤒":""}</td>
+      <td>${barCell(sl,9,"var(--blue-mid)",`<span class="pill ${cls(sv)}">${sl} h</span>`)}</td>
+      <td class="num">${["0","1","2","3"][l.stress||0]}</td><td class="num">${l.drinks||0}</td>
+      <td class="num">${l.hrv??"—"}</td><td class="num">${l.rhr??"—"}</td>
+      <td><button class="sec" style="padding:2px 8px" data-dellog="${d}">✕</button></td></tr>`; }).join("")
+    : `<tr><td colspan="8" class="status">No days logged. Missing days assume 7.5 h of sleep and no stress.</td></tr>`;
+}
+
+function renderSessions(sim, now){
+  const cutoff = now.getTime() - 42*864e5;
+  const list = DB.sessions.map(s => ({s, L:loads(s, DB.set), t:parseLocal(s.start)})).filter(e => e.t.getTime() >= cutoff);
+  const byType = {}; list.forEach(e => { const k = e.s.type; byType[k] = byType[k] || {n:0, load:0}; byType[k].n++; byType[k].load += e.L.trimp; });
+  const total = list.reduce((a,e)=>a+e.L.trimp, 0) || 1;
+  const types = Object.entries(byType).sort((a,b)=>b[1].load-a[1].load);
+  const PAL = ["#0052CC","#FC5200","#6E5DC6","#00875A","#E2B203","#8993A4","#C9372C"];
+  mkChart("pieType", {type:"doughnut", data:{labels:types.map(([k])=>icon(k)+" "+k), datasets:[{data:types.map(([,v])=>+v.load.toFixed(0)), backgroundColor:PAL, borderColor:"#fff", borderWidth:2}]},
+    options:{responsive:true, maintainAspectRatio:false, cutout:"55%", plugins:{legend:{position:"right", labels:{boxWidth:12}}}}});
+  const maxT = types.length ? types[0][1].load : 1;
+  $("typeBody").innerHTML = types.length ? types.map(([k,v],i) => `<tr class="${i===0?"top":""}"><td class="rank">${i+1}</td><td class="nw">${icon(k)} ${esc(k)}</td>
+    <td class="num">${v.n}</td><td>${barCell(v.load,maxT,PAL[i%PAL.length],v.load.toFixed(0))}</td><td class="num">${(v.load/total*100).toFixed(0)}%</td></tr>`).join("")
+    : `<tr><td colspan="5" class="status">No sessions in the last 42 days.</td></tr>`;
+
+  const ranked = list.sort((a,b)=>b.L.trimp-a.L.trimp);
+  const maxL = ranked.length ? ranked[0].L.trimp : 1;
+  $("sessBody").innerHTML = ranked.length ? ranked.map((e,i) => { const s = e.s; const wx = s.wx||{};
+    const sum = wx.T!=null ? (wx.T + wx.Td) : null;
+    const lc = e.L.trimp >= 150 ? "r" : e.L.trimp >= 80 ? "y" : "g";
+    const sc = sum==null ? "n" : sum >= 150 ? "r" : sum >= 120 ? "y" : "g";
+    return `<tr class="${i===0?"top":""}"><td class="rank">${i+1}</td><td class="nw">${fmtD(e.t)}</td><td class="nw">${icon(s.type)} ${esc(s.name||s.type)}</td>
+      <td class="num">${s.min.toFixed(0)}</td><td class="num">${s.mi?s.mi.toFixed(2):"—"}</td><td class="num">${s.hr?s.hr.toFixed(0):"—"}</td>
+      <td class="num"><span class="pill ${sc}">${sum==null?"—":sum.toFixed(0)}</span></td>
+      <td>${barCell(e.L.trimp,maxL,"var(--blue-mid)",`<span class="pill ${lc}">${e.L.trimp.toFixed(0)}</span>`)}</td>
+      <td class="num">${e.L.fibre.toFixed(0)}</td>
+      <td><button class="sec" style="padding:2px 8px" data-delsess="${esc(s.id)}">✕</button></td></tr>`; }).join("")
+    : `<tr><td colspan="10" class="status">No sessions in the last 42 days.</td></tr>`;
+}
+
+function renderBranches(cur, imp){
+  const debt = SIM_BR.map(id => ({id, v:100-cur.rd[id]}));
+  const totalDebt = debt.reduce((a,d)=>a+d.v,0);
+  mkChart("pieDebt", {type:"doughnut",
+    data:{labels: totalDebt > 0.5 ? SIM_BR.map(id=>{const b=BR.find(z=>z.id===id); return b.icon+" "+b.name;}) : ["Fully recovered"],
+      datasets:[{data: totalDebt > 0.5 ? debt.map(d=>+d.v.toFixed(1)) : [1], backgroundColor: totalDebt > 0.5 ? SIM_BR.map(id=>css(BR.find(z=>z.id===id).color)) : ["#E3FCEF"], borderColor:"#fff", borderWidth:2}]},
+    options:{responsive:true, maintainAspectRatio:false, cutout:"55%", plugins:{legend:{position:"right", labels:{boxWidth:12}},
+      tooltip:{callbacks:{label:c => totalDebt>0.5 ? `${c.label}: ${c.parsed.toFixed(1)} pts missing (${(c.parsed/totalDebt*100).toFixed(0)}%)` : "Nothing missing"}}}}});
+  const fmtTau = h => h < 1 ? (h*60).toFixed(0)+" min" : h < 72 ? h.toFixed(0)+" h" : (h/24).toFixed(0)+" days";
+  $("branchBody").innerHTML = BR.map((b,i) => {
+    const unit = b.id==="pcr" ? "min" : b.id==="bio" ? "days" : "h";
+    const val = b.id==="pcr" ? +(DB.tau.pcr*60).toFixed(1) : b.id==="bio" ? +(DB.tau.bio/24).toFixed(0) : DB.tau[b.id];
+    let today;
+    if (b.id==="pcr") today = `<span class="pill g">full</span> <span class="status">refills in minutes</span>`;
+    else if (b.id==="bio") today = `<span class="pill n">${cur.fit.toFixed(0)} TRIMP/day</span>`;
+    else today = barCell(cur.rd[b.id],100,css(b.color),pill(cur.rd[b.id]),60);
+    const bk = imp.back[b.id];
+    const after = b.id==="pcr" ? "3–5 min" : b.id==="bio" ? "builds, not drains" : bk==null ? "over 9 days" : bk < 48 ? bk.toFixed(0)+" h" : (bk/24).toFixed(1)+" days";
+    return `<tr><td class="rank">${i+1}</td><td class="nw"><b>${b.icon} ${b.name}</b></td>
+      <td class="num nw"><input class="tau" type="number" step="any" min="0.01" data-tau="${b.id}" value="${val}"> ${unit}<br><span class="status">${fmtTau(DB.tau[b.id])}</span></td>
+      <td>${b.phys}</td><td>${b.sense}</td><td class="nw">${after}</td><td>${today}</td></tr>`;
+  }).join("");
+}
+
+const IMP_T0 = new Date(2026,0,5,0,0).getTime();
+const IMP_RACE = new Date(2026,0,5,8,0).getTime();
+function impulseSim(){
+  const start = new Date(2026,0,4,0,0); const end = new Date(2026,0,15,0,0);
+  const hm = {id:"demo", start:localISO(new Date(IMP_RACE)), type:"Run", min:115, hr:152, mi:13.1, elevFt:250, wx:{T:60,Td:50}};
+  const sim = simulate({set:DB.set, tau:DB.tau, sessions:[hm], logs:{}, cals:[], start, end, withMeas:false});
+  const back = {};
+  SIM_BR.forEach(id => { const j = sim.series.findIndex(p => p.t > IMP_RACE + 36e5 && p.rd[id] >= 90); back[id] = j < 0 ? null : (sim.series[j].t - IMP_RACE)/36e5; });
+  return {sim, hm, back, L:loads(hm, DB.set)};
+}
+function renderImpulse(imp){
+  const t0 = new Date(IMP_T0); const sim = imp.sim;
+  const pts = sim.series.filter((p,i)=> i%2===0);
+  const L = imp.L;
+  mkChart("impChart", {type:"line",
+    data:{datasets: SIM_BR.map(id => { const b = BR.find(z=>z.id===id);
+      return {label:b.icon+" "+b.name, data:pts.map(p=>({x:(p.t - t0.getTime())/36e5, y:+p.rd[id].toFixed(1)})), borderColor:css(b.color), borderWidth:2.2, pointRadius:0, tension:.2}; })},
+    options:{responsive:true, maintainAspectRatio:false, interaction:{mode:"nearest", axis:"x", intersect:false},
+      plugins:{legend:{position:"bottom", labels:{boxWidth:12}}, tooltip:{callbacks:{title:it=>"Hour "+it[0].parsed.x.toFixed(0)+" (day "+(it[0].parsed.x/24).toFixed(1)+")"}},
+        subtitle:{display:true, text:`Half marathon: 115 min at 152 bpm, TRIMP ${L.trimp.toFixed(0)}, fibre load ${L.fibre.toFixed(0)}. The steps are nights, when recovery runs faster.`, color:"#6B778C", font:{size:11}}},
+      scales:{x:{type:"linear", min:-12, max:144, ticks:{stepSize:24, callback:v=>"day "+(v/24)}, grid:{color:GRID}, title:{display:true, text:"Time after the race", color:"#42526E"}},
+        y:{min:0, max:100, ticks:{callback:v=>v+"%"}, grid:{color:GRID}, title:{display:true, text:"Readiness, %", color:"#42526E"}}}}
+  });
+}
+
+function renderFitness(sim, now){
+  const from = now.getTime() - 120*864e5;
+  const pts = sim.series.filter(p => p.t >= from && p.t <= now.getTime() && new Date(p.t).getHours()===12).map(p=>({x:p.t, y:+p.fit.toFixed(1)}));
+  const bars = Object.entries(sim.dayLoads).map(([d,v]) => ({x:parseLocal(d+"T12:00").getTime(), y:+v.toFixed(0)})).filter(p=>p.x>=from);
+  mkChart("fitChart", {data:{datasets:[
+      {type:"line", label:"Biofitness", data:pts, borderColor:"#00875A", backgroundColor:"rgba(0,135,90,.08)", fill:true, pointRadius:0, borderWidth:2.5, yAxisID:"y"},
+      {type:"bar", label:"Daily load", data:bars, backgroundColor:"rgba(137,147,164,.45)", barThickness:4, yAxisID:"y2"}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{x:{type:"linear", min:from, max:now.getTime(), grid:{color:GRID}, ticks:{maxTicksLimit:8, callback:v=>fmtD(new Date(v))}},
+        y:{min:0, grid:{color:GRID}, title:{display:true, text:"Biofitness, TRIMP per day", color:"#00875A"}, ticks:{color:"#00875A"}},
+        y2:{position:"right", min:0, grid:{display:false}, title:{display:true, text:"Daily load, TRIMP", color:"#8993A4"}, ticks:{color:"#8993A4"}}}}});
+}
+
+/* ---------------- metronome step test ---------------- */
+let testTimer = null, beatTimer = null, actx = null;
+function click(){
+  $("beat").classList.add("on"); setTimeout(()=>$("beat").classList.remove("on"), 90);
+  if (!$("sound").checked || !actx) return;
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.frequency.value = 1000; g.gain.setValueAtTime(0.25, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.06);
+  o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+0.07);
+}
+function stopTest(msg){
+  clearInterval(testTimer); clearInterval(beatTimer); testTimer = beatTimer = null;
+  if (msg) $("timerSub").textContent = msg;
+}
+$("btnStart").onclick = () => {
+  stopTest();
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch(e) {}
+  const t0 = Date.now(); let phase = "step";
+  $("cTime").value = localISO(new Date());
+  beatTimer = setInterval(click, 625);   // 96 per minute
+  testTimer = setInterval(() => {
+    const el = (Date.now() - t0)/1000;
+    if (phase === "step"){
+      const left = Math.max(0, 180 - el);
+      $("timer").textContent = Math.floor(left/60)+":"+pad(Math.floor(left%60));
+      $("timerSub").textContent = "Step up-up-down-down with the clicks";
+      if (left <= 0){ phase = "rest"; clearInterval(beatTimer); beatTimer = null; $("timerSub").textContent = "Stop. Read HR now, then stand still"; try{ click(); }catch(e){} }
+    } else {
+      const left = Math.max(0, 240 - el);
+      $("timer").textContent = "0:"+pad(Math.floor(left));
+      $("timerSub").textContent = "Note the HR you just read. Stand still, read again at zero";
+      if (left <= 0){ stopTest("Done. Enter both numbers below"); $("timer").textContent = "✓"; $("cEnd").focus(); }
+    }
+  }, 200);
+};
+$("btnStop").onclick = () => { stopTest("Stopped"); $("timer").textContent = "3:00"; };
+
+/* ---------------- forms ---------------- */
+const num = id => { const v = $(id).value; return v === "" ? null : +v; };
+const uid = () => Math.random().toString(36).slice(2, 10);
+function flash(id, msg){ $(id).textContent = msg; setTimeout(()=>{ if ($(id).textContent === msg) $(id).textContent = ""; }, 6000); }
+
+$("btnCal").onclick = () => {
+  const end = num("cEnd"), h60 = num("c60"), hrv = num("cHrv");
+  if (!end){ flash("calStatus","Enter at least the end HR."); return; }
+  if (h60 && h60 >= end){ flash("calStatus","HR after 60 s should be lower than the end HR."); return; }
+  const time = $("cTime").value || localISO(new Date());
+  DB.cals.push({id:uid(), time, hrEnd:end, hr60:h60, hrv});
+  save(); render();
+  const newId = DB.cals[DB.cals.length-1].id;
+  const e = __sim.mlog.find(x => x.id===newId && x.kind==="end");
+  flash("calStatus", e && e.resid!=null ? `Residual ${e.resid>=0?"+":""}${e.resid.toFixed(1)} bpm, vagal state moved ${e.dx>=0?"+":""}${e.dx.toFixed(1)}.` : "Baseline set. Corrections start with the next test.");
+  ["cEnd","c60","cHrv"].forEach(id => $(id).value = "");
+  location.hash = "callog";
+};
+$("btnLog").onclick = () => {
+  const d = $("lDate").value; if (!d){ flash("logStatus","Pick a date."); return; }
+  DB.logs[d] = {sleep:num("lSleep") ?? SLEEP_DEFAULT, stress:+$("lStress").value, drinks:num("lDrinks")||0, hrv:num("lHrv"), rhr:num("lRhr"), sick:$("lSick").checked};
+  save(); render(); flash("logStatus","Saved "+fmtD(parseLocal(d))+".");
+};
+$("btnManual").onclick = () => {
+  const t = $("mTime").value; const min = num("mMin");
+  if (!t || !min){ flash("manStatus","Start time and minutes are needed."); return; }
+  const type = $("mType").value;
+  DB.sessions.push({id:"m"+uid(), src:"manual", start:t, type, name:type, min, hr:num("mHr"), mi:num("mDist"), elevFt:num("mElev"), rpe:num("mRpe"), ecc:$("mEcc").checked, wx:{}});
+  save(); render(); flash("manStatus","Added.");
+};
+document.addEventListener("click", ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  if (b.dataset.delsess){ DB.sessions = DB.sessions.filter(s => s.id !== b.dataset.delsess); save(); render(); }
+  if (b.dataset.dellog){ delete DB.logs[b.dataset.dellog]; save(); render(); }
+  if (b.dataset.delcal){ DB.cals = DB.cals.filter(c => c.id !== b.dataset.delcal); save(); render(); }
+});
+document.addEventListener("change", ev => {
+  const el = ev.target; if (!el.dataset || !el.dataset.tau) return;
+  const id = el.dataset.tau; let v = parseFloat(el.value); if (!(v > 0)) return;
+  DB.tau[id] = id==="pcr" ? v/60 : id==="bio" ? v*24 : v;
+  save(); render();
+});
+
+/* settings */
+function fillSettings(){ $("pRest").value = DB.set.rest; $("pMax").value = DB.set.max; $("pWake").value = DB.set.wake; $("pLat").value = DB.set.lat; $("pLon").value = DB.set.lon; }
+$("btnSaveSet").onclick = () => {
+  const r = num("pRest"), m = num("pMax");
+  if (!r || !m || m <= r + 40){ flash("setStatus","Max HR must be well above resting HR."); return; }
+  DB.set = {rest:r, max:m, wake:$("pWake").value || "06:30", lat:num("pLat") ?? DEF_SET.lat, lon:num("pLon") ?? DEF_SET.lon};
+  save(); render(); flash("setStatus","Saved.");
+};
+$("btnExport").onclick = () => {
+  const copy = JSON.parse(JSON.stringify(DB)); delete copy.strava;
+  const blob = new Blob([JSON.stringify(copy, null, 1)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "recovery-model-"+ymd(new Date())+".json"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+};
+$("fileImport").onchange = ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  f.text().then(t => { const d = JSON.parse(t); const keep = DB.strava; DB = Object.assign(load(), d); DB.strava = keep;
+    DB.set = Object.assign({}, DEF_SET, DB.set); DB.tau = Object.assign({}, DEF_TAU, DB.tau); save(); fillSettings(); render(); flash("setStatus","Imported."); })
+   .catch(() => flash("setStatus","That file is not a backup from this page."));
+};
+$("btnReset").onclick = () => {
+  if (!confirm("Delete every session, log day and calibration stored in this browser? Strava keys are kept.")) return;
+  DB.sessions = []; DB.logs = {}; DB.cals = []; DB.wx = {}; save(); render(); flash("setStatus","Cleared.");
+};
+$("btnDemo").onclick = () => {
+  if (DB.sessions.length && !confirm("Add demo sessions alongside your data? You can delete them from the sessions table.")) return;
+  const now = new Date(); const S = [];
+  for (let k = 56; k >= 1; k--){
+    const d = new Date(now); d.setDate(d.getDate()-k); const dow = d.getDay();
+    const at = (h,m) => { const x = new Date(d); x.setHours(h,m,0,0); return localISO(x); };
+    if (dow === 6) S.push({id:"demo"+k, src:"demo", start:at(7,0), type:"Run", name:"Demo long run", min:88+ (56-k)*0.2, hr:150, mi:9.5+(56-k)*0.01, elevFt:180, wx:{T:62,Td:52}});
+    if (dow === 2 || dow === 4) S.push({id:"demo"+k, src:"demo", start:at(6,45), type:"Run", name:"Demo easy run", min:42, hr:136, mi:4.2, elevFt:90, wx:{T:70,Td:60}});
+    if (dow === 1 || dow === 5) S.push({id:"demor"+k, src:"demo", start:at(18,0), type:"Rings", name:"Demo rings", min:35, rpe:7, ecc:dow===5, wx:{}});
+  }
+  DB.sessions = DB.sessions.concat(S); save(); render(); flash("setStatus","Added "+S.length+" demo sessions.");
+};
+
+/* ---------------- Strava ---------------- */
+const REDIRECT = location.origin + location.pathname;
+function stravaStatus(m){ $("stravaStatus").textContent = m; }
+$("btnConnect").onclick = () => {
+  const id = $("sId").value.trim(), sec = $("sSecret").value.trim();
+  if (!id || !sec){ stravaStatus("Enter the client ID and secret from your Strava API app."); return; }
+  DB.strava.id = id; DB.strava.secret = sec; save();
+  location.href = "https://www.strava.com/oauth/authorize?client_id="+encodeURIComponent(id)+"&response_type=code&approval_prompt=auto&scope=activity:read_all&redirect_uri="+encodeURIComponent(REDIRECT);
+};
+async function tokenCall(params){
+  const r = await fetch("https://www.strava.com/oauth/token", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(params)});
+  if (!r.ok) throw new Error("Strava token "+r.status);
+  const j = await r.json(); DB.strava.access = j.access_token; DB.strava.refresh = j.refresh_token; DB.strava.expires = j.expires_at; save(); return j;
+}
+async function ensureToken(){
+  const s = DB.strava; if (!s.refresh) throw new Error("Not connected yet. Press Connect first.");
+  if (s.access && s.expires && s.expires*1000 > Date.now() + 60e3) return s.access;
+  await tokenCall({client_id:s.id, client_secret:s.secret, refresh_token:s.refresh, grant_type:"refresh_token"}); return DB.strava.access;
+}
+async function handleOAuthReturn(){
+  const q = new URLSearchParams(location.search); const code = q.get("code"); const err = q.get("error");
+  if (!code && !err) return;
+  history.replaceState(null, "", REDIRECT + "#strava");
+  if (err){ stravaStatus("Strava said: "+err); return; }
+  try { stravaStatus("Finishing connection…"); await tokenCall({client_id:DB.strava.id, client_secret:DB.strava.secret, code, grant_type:"authorization_code"}); stravaStatus("Connected. Fetching…"); await fetchStrava(); }
+  catch(e){ stravaStatus("Connection failed: "+e.message); }
+}
+async function fetchStrava(){
+  const tok = await ensureToken();
+  const since = $("sSince").value ? parseLocal($("sSince").value) : new Date(Date.now() - 180*864e5);
+  const after = Math.floor(since.getTime()/1000);
+  let page = 1, got = [], batch;
+  do {
+    stravaStatus("Fetching page "+page+"…");
+    const r = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${after}&per_page=200&page=${page}`, {headers:{Authorization:"Bearer "+tok}});
+    if (r.status === 429) throw new Error("Strava rate limit hit, try again in 15 minutes.");
+    if (!r.ok) throw new Error("Strava activities "+r.status);
+    batch = await r.json(); got = got.concat(batch); page++;
+  } while (batch.length === 200 && page < 20);
+  const ids = new Set(DB.sessions.map(s=>s.id)); let added = 0;
+  got.forEach(a => {
+    const id = "s"+a.id; if (ids.has(id)) return;
+    const ll = a.start_latlng && a.start_latlng.length === 2 ? a.start_latlng : null;
+    DB.sessions.push({id, src:"strava", start:a.start_date_local.slice(0,16), type:a.sport_type || a.type, name:a.name,
+      min:a.moving_time/60, hr:a.has_heartrate ? a.average_heartrate : null, hrMax:a.max_heartrate || null,
+      mi:a.distance/1609.344, elevFt:(a.total_elevation_gain||0)*3.28084, lat:ll?ll[0]:null, lon:ll?ll[1]:null,
+      devTempF:a.average_temp!=null ? a.average_temp*9/5+32 : null, wx:{}});
+    added++;
+  });
+  save(); stravaStatus("Added "+added+" new activities. Looking up weather…");
+  await fillWeather(); render();
+  stravaStatus("Added "+added+" activities, "+got.length+" seen. Weather filled where available.");
+}
+$("btnFetch").onclick = () => fetchStrava().catch(e => stravaStatus(e.message));
+
+/* ---------------- weather (Open-Meteo) ---------------- */
+async function fillWeather(){
+  const need = DB.sessions.filter(s => !s.wx || s.wx.T == null);
+  const groups = {};
+  need.forEach(s => {
+    const lat = s.lat ?? DB.set.lat, lon = s.lon ?? DB.set.lon;
+    const k = (+lat).toFixed(1)+","+(+lon).toFixed(1); (groups[k] = groups[k] || []).push(s);
+  });
+  for (const [k, list] of Object.entries(groups)){
+    const [lat, lon] = k.split(",");
+    const days = list.map(s => s.start.slice(0,10)).sort();
+    const recentCut = ymd(new Date(Date.now() - 80*864e5));
+    const urls = [];
+    if (days[0] < recentCut) urls.push(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${days[0]}&end_date=${days[days.length-1] < recentCut ? days[days.length-1] : recentCut}&hourly=temperature_2m,dew_point_2m&temperature_unit=fahrenheit&timezone=auto`);
+    if (days[days.length-1] >= recentCut) urls.push(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,dew_point_2m&temperature_unit=fahrenheit&past_days=92&forecast_days=1&timezone=auto`);
+    const map = {};
+    for (const u of urls){
+      try { const r = await fetch(u); if (!r.ok) continue; const j = await r.json(); const h = j.hourly || {};
+        (h.time||[]).forEach((t,i) => { if (h.temperature_2m[i] != null) map[t] = [h.temperature_2m[i], h.dew_point_2m[i]]; }); }
+      catch(e){ console.warn("weather", e); }
+    }
+    list.forEach(s => { const key = s.start.slice(0,13)+":00"; const v = map[key]; if (v) s.wx = {T:v[0], Td:v[1]}; });
+  }
+  save();
+}
+
+/* ---------------- init ---------------- */
+(function init(){
+  const now = new Date();
+  $("lDate").value = ymd(now); $("mTime").value = localISO(now); $("cTime").value = localISO(now);
+  const s6 = new Date(now); s6.setMonth(s6.getMonth()-6); $("sSince").value = ymd(s6);
+  if (DB.strava.id) $("sId").value = DB.strava.id; if (DB.strava.secret) $("sSecret").value = DB.strava.secret;
+  if (DB.strava.refresh) stravaStatus("Connected. Press Fetch to pull new activities.");
+  fillSettings(); render(); handleOAuthReturn();
+})();
+</script>
+</body>
+</html>
