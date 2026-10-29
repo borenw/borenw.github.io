@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Breath Rate Monitor</title>
-<meta name="description" content="Live breaths per minute from the AirPods microphone, with labelled clip recording for tuning.">
+<meta name="description" content="Live breaths per minute from the AirPods microphone, with a real-time spectrogram and a per-band breath score for tuning the filter.">
 <style>
 :root{
   --blue:#0052cc; --blue-dark:#0747a6; --blue-light:#deebff; --text:#172b4d; --sub:#5e6c84;
@@ -19,12 +19,17 @@ body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 -apple-system
 .secbar{background:var(--blue-dark);color:#fff;font-weight:600;padding:6px 12px;border-radius:3px;margin:22px 0 10px}
 nav.toc{background:var(--blue-light);border-left:4px solid var(--blue);padding:8px 14px;border-radius:3px;font-size:14px}
 nav.toc ol{margin:4px 0;padding-left:20px}
+nav.toc ul{margin:0;padding-left:18px}
 nav.toc a{color:var(--blue);text-decoration:none}
 .meter{border:1px solid var(--line);border-radius:6px;padding:10px;text-align:center}
 #bpm{font-size:68px;font-weight:700;line-height:1;margin:6px 0;color:var(--blue)}
 #bpm.idle{color:#b3bac5}
 #sub{color:var(--sub);font-size:13px}
-canvas{width:100%;height:180px;background:#fafbfc;border:1px solid var(--line);border-radius:4px;display:block;margin-top:8px}
+canvas{width:100%;background:#fafbfc;border:1px solid var(--line);border-radius:4px;display:block;margin-top:8px}
+#cv{height:170px}
+#spg{height:210px;background:#0d0a26}
+#spc{height:170px;touch-action:pan-y;cursor:ew-resize}
+#scr{height:150px}
 figcaption{font-size:12.5px;color:var(--sub);margin-top:4px}
 figure{margin:12px 0}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0}
@@ -39,19 +44,23 @@ table{width:100%;border-collapse:collapse;font-size:14px}
 th{background:var(--panel);text-align:left;padding:6px 8px;border:1px solid var(--line)}
 td{padding:6px 8px;border:1px solid var(--line);vertical-align:top}
 td.rank{text-align:center;font-weight:600;color:var(--blue);width:2.5em}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
 .status{font-size:13px;color:var(--sub)}
 .ok{color:var(--green);font-weight:600}.warn{color:var(--amber);font-weight:600}
+.band{display:inline-block;background:var(--blue-light);color:var(--blue-dark);border-radius:3px;padding:2px 8px;font-weight:600;font-variant-numeric:tabular-nums}
 footer{margin-top:28px;padding-top:10px;border-top:1px solid var(--line);font-size:13px;color:var(--sub)}
 footer a{color:var(--blue)}
 </style>
 </head>
 <body>
 <div class="wrap">
-<div class="banner"><h1>🫁 Breath Rate Monitor</h1><div class="ver">v0.1 · AirPods mic · first-pass feasibility test</div></div>
+<div class="banner"><h1>🫁 Breath Rate Monitor</h1><div class="ver">v0.2 · AirPods mic · live spectrum for picking the breath band</div></div>
 
 <nav class="toc"><b>Contents</b>
 <ol>
   <li><a href="#live">Live meter</a></li>
+  <li><a href="#spectrum">Spectrum &amp; band tuning</a>
+    <ul><li><a href="#f2">Spectrogram</a></li><li><a href="#f3">Live spectrum with draggable cutoffs</a></li><li><a href="#f4">Breath score per band</a></li></ul></li>
   <li><a href="#controls">Controls &amp; clip recording</a></li>
   <li><a href="#howto">How to test</a></li>
   <li><a href="#how">How it works</a></li>
@@ -65,15 +74,36 @@ footer a{color:var(--blue)}
 </div>
 <figure>
   <canvas id="cv"></canvas>
-  <figcaption><b>Figure 1 · Breath energy, last 10 s.</b> Green: detrended energy in the 150 Hz to 2 kHz band (dB). Amber: adaptive threshold. Red bars: detected breath events.</figcaption>
+  <figcaption><b>Figure 1 · Breath energy, last 10 s.</b> Green: detrended energy in the pass band (dB). Amber: adaptive threshold. Red bars: detected breath events.</figcaption>
 </figure>
 <div class="row">
   <button id="start" class="primary">▶ Start</button>
   <button id="stop">■ Stop</button>
 </div>
 <div class="status">🎧 Mic: <span id="dev">not started</span></div>
+<div class="status">🎚️ Pass band: <span class="band" id="bandtxt">150 Hz to 2000 Hz</span></div>
 
-<div class="secbar" id="controls">2 · Controls &amp; clip recording</div>
+<div class="secbar" id="spectrum">2 · Spectrum &amp; band tuning</div>
+<figure id="f2">
+  <canvas id="spg"></canvas>
+  <figcaption><b>Figure 2 · Spectrogram of the raw mic, last 10 s.</b> Log frequency on the vertical axis, before any filtering. White dashed lines: current cutoffs. Red ticks along the top: detected breaths. A breath shows as a vertical stripe; steady noise shows as a flat horizontal band.</figcaption>
+</figure>
+<figure id="f3">
+  <canvas id="spc"></canvas>
+  <figcaption><b>Figure 3 · Live spectrum (raw mic, dB).</b> Grey: long-term average. Blue: now. Shaded: pass band. <b>Drag sideways</b> near either blue cutoff line to move it; the filter updates live.</figcaption>
+</figure>
+<figure id="f4">
+  <canvas id="scr"></canvas>
+  <figcaption><b>Figure 4 · Breath score per band, last 30 s.</b> How many dB louder each band is just before a detected breath than in the gaps between breaths. Green: consistent across breaths (at least 1 standard deviation). Grey: not reliable. Blue bracket: suggested band.</figcaption>
+</figure>
+<div class="row">
+  <button id="applyBest">🎯 Use suggested band</button>
+  <button id="resetBand">↺ Reset 150 Hz to 2 kHz</button>
+  <button id="spcsv">⬇ Spectrum CSV</button>
+</div>
+<div class="status" id="scoretxt">Score needs at least 4 breaths in the last 30 s.</div>
+
+<div class="secbar" id="controls">3 · Controls &amp; clip recording</div>
 <div class="row"><label>Sensitivity k</label><input id="k" type="range" min="0.5" max="4" step="0.1" value="1.5"><span id="kv" class="val">1.5</span></div>
 <div class="row"><label>Min gap (s)</label><input id="gap" type="range" min="0.4" max="3" step="0.1" value="1.0"><span id="gapv" class="val">1.0</span></div>
 <div class="row"><label><input id="half" type="checkbox"> Inhale and exhale both counted (divide by 2)</label></div>
@@ -87,34 +117,37 @@ footer a{color:var(--blue)}
 </div>
 <div id="log"></div>
 
-<div class="secbar" id="howto">3 · How to test</div>
+<div class="secbar" id="howto">4 · How to test</div>
 <table>
   <tr><th>#</th><th>🧪 Test</th><th>👀 What to look for</th></tr>
   <tr><td class="rank">1</td><td>Sit still, breathe through the mouth, count your own breaths for 60 s.</td><td>Reading matches your count. If it reads about double, tick divide by 2.</td></tr>
-  <tr><td class="rank">2</td><td>Talk for 30 s with the tag set to <i>voice</i> and record a clip.</td><td>How many false events speech makes. This is the main thing to reject later.</td></tr>
-  <tr><td class="rank">3</td><td>Walk indoors, then outdoors, recording <i>breathing-walk</i>.</td><td>Whether footsteps and wind swamp the trace.</td></tr>
-  <tr><td class="rank">4</td><td>Easy jog with two-and-two breathing, recording <i>breathing-run</i>.</td><td>The reading should sit near your step cadence divided by 4.</td></tr>
-  <tr><td class="rank">5</td><td>Save the CSV after each session.</td><td>Clips plus CSV are the data for tuning the filter and threshold.</td></tr>
+  <tr><td class="rank">2</td><td>Watch Figure 2 while breathing slowly and deeply.</td><td>Which frequencies light up with each breath. That is the real breath band on your AirPods.</td></tr>
+  <tr><td class="rank">3</td><td>After 30 s of steady breathing, read Figure 4 and tap Use suggested band.</td><td>Whether the suggested band differs from 150 Hz to 2 kHz, and whether the reading gets steadier.</td></tr>
+  <tr><td class="rank">4</td><td>Talk for 30 s with the tag set to <i>voice</i> and record a clip.</td><td>Where speech sits in Figure 2 compared with breath. That is what a rejection rule has to separate.</td></tr>
+  <tr><td class="rank">5</td><td>Walk, then easy jog, recording <i>breathing-walk</i> and <i>breathing-run</i>.</td><td>Whether footsteps (low, periodic) and wind (broad, flat) overlap the breath band.</td></tr>
+  <tr><td class="rank">6</td><td>Save both CSVs after each session.</td><td>Clips plus CSVs are the data for the next tuning pass.</td></tr>
 </table>
 
-<div class="secbar" id="how">4 · How it works</div>
+<div class="secbar" id="how">5 · How it works</div>
 <table>
   <tr><th>#</th><th>⚙️ Stage</th><th>📐 Detail</th></tr>
   <tr><td class="rank">1</td><td>Capture</td><td>getUserMedia with echo cancellation, noise suppression and auto gain turned off, so the breath hiss is not filtered away.</td></tr>
-  <tr><td class="rank">2</td><td>Band-pass</td><td>High-pass 150 Hz, low-pass 2 kHz. Removes footstrike thump and most hiss above the breath band.</td></tr>
-  <tr><td class="rank">3</td><td>Envelope</td><td>RMS energy every 25 ms in dB, smoothed with a 150 ms time constant.</td></tr>
-  <tr><td class="rank">4</td><td>Detrend</td><td>Subtract a 4 s baseline so slow level changes do not move the threshold.</td></tr>
+  <tr><td class="rank">2</td><td>Spectrum tap</td><td>A second analyser on the raw signal, before the filter: 2048-point FFT every 25 ms, feeding Figures 2 to 4.</td></tr>
+  <tr><td class="rank">3</td><td>Band-pass</td><td>Second-order high-pass and low-pass, default 150 Hz and 2 kHz, adjustable live from Figure 3 or the suggested band.</td></tr>
+  <tr><td class="rank">4</td><td>Envelope</td><td>RMS energy every 25 ms in dB, smoothed with a 150 ms time constant, minus a 4 s baseline.</td></tr>
   <tr><td class="rank">5</td><td>Detect</td><td>Threshold at k times the running standard deviation (8 s), with hysteresis at half the threshold and a minimum gap between events.</td></tr>
-  <tr><td class="rank">6</td><td>Rate</td><td>60 divided by the median interval between events in the last 30 s. The median ignores the odd missed or extra event.</td></tr>
+  <tr><td class="rank">6</td><td>Rate</td><td>60 divided by the median interval between events in the last 30 s.</td></tr>
+  <tr><td class="rank">7</td><td>Band score</td><td>48 log-spaced bands from 60 Hz up. For each band: mean dB in the 0.45 s before each breath peak minus mean dB more than 0.8 s from any peak (the contrast), kept only where the contrast is at least one standard deviation. Suggested band: the highest-contrast band, widened while neighbours reach at least half its contrast.</td></tr>
 </table>
 
-<div class="secbar" id="limits">5 · Known limits</div>
+<div class="secbar" id="limits">6 · Known limits</div>
 <table>
   <tr><th>#</th><th>⚠️ Limit</th><th>🔧 What to do</th></tr>
-  <tr><td class="rank">1</td><td>iOS may still apply its own processing to the AirPods mic stream, which can weaken quiet nasal breathing.</td><td>Test mouth breathing first. If the trace is flat, that is the answer to the feasibility question.</td></tr>
-  <tr><td class="rank">2</td><td>Speech is loud and bursty in the same band, so it reads as fast breathing.</td><td>The voice clips are for building a rejection rule in v0.2.</td></tr>
-  <tr><td class="rank">3</td><td>Safari pauses the page when the screen locks.</td><td>The page asks for a screen wake lock; keep it in the foreground while testing.</td></tr>
-  <tr><td class="rank">4</td><td>Wind outdoors is broadband and can bury the signal.</td><td>Compare indoor and outdoor clips before tuning anything.</td></tr>
+  <tr><td class="rank">1</td><td>The band score uses breaths detected through the current band, so it is biased toward that band.</td><td>Read it with Figure 2. If breaths show clearly outside the band, move the cutoffs there by hand and let the score update.</td></tr>
+  <tr><td class="rank">2</td><td>iOS may still apply its own processing to the AirPods mic, and the Bluetooth mic may be band-limited to about 8 kHz.</td><td>Figure 3 shows it directly: a cliff in the spectrum marks the real bandwidth.</td></tr>
+  <tr><td class="rank">3</td><td>Speech is loud and bursty in the same range, so it reads as fast breathing.</td><td>The voice clips and Figure 2 are for building a rejection rule.</td></tr>
+  <tr><td class="rank">4</td><td>Safari pauses the page when the screen locks.</td><td>The page asks for a screen wake lock; keep it in the foreground while testing.</td></tr>
+  <tr><td class="rank">5</td><td>Wind outdoors is broadband and can bury the signal.</td><td>Compare indoor and outdoor clips before tuning anything.</td></tr>
 </table>
 
 <footer>
@@ -126,15 +159,46 @@ footer a{color:var(--blue)}
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const FRAME_MS=25;
-let ctx=null, stream=null, analyser=null, buf=null, timer=null, mediaRec=null, chunks=[], wakeLock=null;
-let fastE=0, slowE=0, varE=1, t0=0, first=true;
+const FRAME_MS=25, SPAN_S=10, SPG_COLS=SPAN_S*1000/FRAME_MS, SPG_ROWS=128, NB=48, HIST_S=30, HIST_N=HIST_S*1000/FRAME_MS;
+const FMIN=60;
+let ctx=null, stream=null, analyser=null, rawAn=null, hp=null, lp=null, buf=null, spec=null, timer=null, mediaRec=null, chunks=[], wakeLock=null;
+let fastE=0, slowE=0, varE=1, t0=0, first=true, tickN=0;
 let env=[], thr=[], events=[], log=[];
 let above=false, lastPeakT=-10, peakVal=0, peakT=0;
+let hpF=150, lpF=2000;
+let fmax=8000, binHz=23.4, nBins=1024;
+let rowBins=[], bandLo=[], bandHi=[], bandBins=[];
+let spgData=null, spgCol=0, spgOff=null, spgCtx=null, spgImg=null, spgTimes=new Float64Array(SPG_COLS).fill(-1);
+let rangeLo=-100, rangeHi=-40;
+let bandHist=null, histT=new Float64Array(HIST_N).fill(-1e9), histIdx=0;
+let nowSpec=null, avgSpec=null, scores=null, zs=null, best=null;
+const LUT=makeLut();
+
+function makeLut(){
+  const st=[[13,10,38],[59,15,112],[140,41,129],[222,73,104],[254,159,109],[252,253,191]];
+  const out=new Uint8ClampedArray(256*3);
+  for(let i=0;i<256;i++){
+    const x=i/255*(st.length-1), j=Math.min(st.length-2,Math.floor(x)), f=x-j;
+    for(let c=0;c<3;c++) out[i*3+c]=st[j][c]+(st[j+1][c]-st[j][c])*f;
+  }
+  return out;
+}
+const f2u=f=>Math.log(f/FMIN)/Math.log(fmax/FMIN);
+const u2f=u=>FMIN*Math.pow(fmax/FMIN,u);
+const fmtF=f=>f>=1000?(f/1000).toFixed(f>=10000?0:1)+' kHz':Math.round(f)+' Hz';
+
+function setBand(h,l){
+  hpF=Math.max(40,Math.min(h,8000)); lpF=Math.max(hpF*1.3,Math.min(l,fmax));
+  if(hp) hp.frequency.value=hpF;
+  if(lp) lp.frequency.value=lpF;
+  $('bandtxt').textContent=fmtF(hpF)+' to '+fmtF(lpF);
+}
 
 $('k').oninput=e=>$('kv').textContent=e.target.value;
 $('gap').oninput=e=>$('gapv').textContent=e.target.value;
 $('half').onchange=()=>{ if(ctx) updateRate((performance.now()-t0)/1000); };
+$('resetBand').onclick=()=>setBand(150,2000);
+$('applyBest').onclick=()=>{ if(best) setBand(best[0],best[1]); else alert('No suggestion yet: breathe steadily for about 30 s first.'); };
 
 $('start').onclick=async()=>{
   if(ctx) return;
@@ -149,24 +213,54 @@ $('start').onclick=async()=>{
   const isAir=/airpod/i.test(label);
   $('dev').innerHTML=label.replace(/[<>&]/g,'')+' · '+ctx.sampleRate+' Hz '+(isAir?'<span class="ok">✓ AirPods</span>':'<span class="warn">(not AirPods?)</span>');
   const src=ctx.createMediaStreamSource(stream);
-  const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=150;
-  const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2000;
+  hp=ctx.createBiquadFilter(); hp.type='highpass';
+  lp=ctx.createBiquadFilter(); lp.type='lowpass';
   analyser=ctx.createAnalyser(); analyser.fftSize=1024;
+  rawAn=ctx.createAnalyser(); rawAn.fftSize=2048; rawAn.smoothingTimeConstant=0.2;
   src.connect(hp); hp.connect(lp); lp.connect(analyser);
+  src.connect(rawAn);
   buf=new Float32Array(analyser.fftSize);
-  t0=performance.now(); first=true; varE=1; env=[]; thr=[]; events=[]; log=[];
-  above=false; lastPeakT=-10;
+  nBins=rawAn.frequencyBinCount; spec=new Float32Array(nBins);
+  binHz=ctx.sampleRate/rawAn.fftSize;
+  fmax=Math.min(ctx.sampleRate/2,10000);
+  setBand(hpF,lpF);
+  setupBins();
+  t0=performance.now(); first=true; varE=1; env=[]; thr=[]; events=[]; log=[]; tickN=0;
+  above=false; lastPeakT=-10; best=null; scores=null;
   try{ if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen'); }catch(e){}
   timer=setInterval(tick,FRAME_MS);
   requestAnimationFrame(draw);
 };
+
+function setupBins(){
+  const kOf=f=>Math.max(1,Math.min(nBins-1,Math.round(f/binHz)));
+  rowBins=[];
+  for(let r=0;r<SPG_ROWS;r++){
+    const fa=u2f(1-(r+1)/SPG_ROWS), fb=u2f(1-r/SPG_ROWS);
+    let a=kOf(fa), b=kOf(fb); if(b<a) b=a;
+    rowBins.push([a,b]);
+  }
+  bandLo=[]; bandHi=[]; bandBins=[];
+  for(let i=0;i<NB;i++){
+    const fl=u2f(i/NB), fh=u2f((i+1)/NB);
+    bandLo.push(fl); bandHi.push(fh);
+    let a=Math.ceil(fl/binHz), b=Math.floor(fh/binHz);
+    if(b<a){ a=b=kOf(Math.sqrt(fl*fh)); }
+    bandBins.push([Math.max(1,a),Math.min(nBins-1,b)]);
+  }
+  spgData=new Uint8Array(SPG_COLS*SPG_ROWS); spgCol=0; spgTimes.fill(-1);
+  spgOff=document.createElement('canvas'); spgOff.width=SPG_COLS; spgOff.height=SPG_ROWS;
+  spgCtx=spgOff.getContext('2d'); spgImg=spgCtx.createImageData(SPG_COLS,SPG_ROWS);
+  bandHist=new Float32Array(HIST_N*NB); histT.fill(-1e9); histIdx=0;
+  nowSpec=new Float32Array(nBins).fill(-120); avgSpec=new Float32Array(nBins).fill(-120);
+}
 
 $('stop').onclick=()=>{
   clearInterval(timer);
   if(mediaRec&&mediaRec.state==='recording') mediaRec.stop();
   if(stream) stream.getTracks().forEach(t=>t.stop());
   if(ctx) ctx.close();
-  ctx=null; stream=null;
+  ctx=null; stream=null; hp=null; lp=null;
   if(wakeLock){ try{wakeLock.release();}catch(e){} wakeLock=null; }
   $('bpm').classList.add('idle');
 };
@@ -189,9 +283,69 @@ function tick(){
     if(d<th*0.5){ above=false; lastPeakT=peakT; events.push(peakT); }
   }
   env.push([t,d]); thr.push(th);
-  if(env.length>400){ env.shift(); thr.shift(); }
-  log.push([t.toFixed(3),e.toFixed(2),d.toFixed(2),th.toFixed(2)]);
+  if(env.length>SPG_COLS){ env.shift(); thr.shift(); }
+  log.push([t.toFixed(3),e.toFixed(2),d.toFixed(2),th.toFixed(2),hpF.toFixed(0),lpF.toFixed(0)]);
+  spectrumTick(t);
+  if(++tickN%10===0) computeScores(t);
   updateRate(t);
+}
+
+function spectrumTick(t){
+  rawAn.getFloatFrequencyData(spec);
+  for(let k=0;k<nBins;k++){
+    const v=isFinite(spec[k])?spec[k]:-140;
+    nowSpec[k]+=(v-nowSpec[k])*0.4;
+    avgSpec[k]+=(v-avgSpec[k])*0.01;
+  }
+  // bands
+  let bmin=1e9, bmax=-1e9;
+  const base=histIdx*NB;
+  for(let i=0;i<NB;i++){
+    const [a,b]=bandBins[i]; let p=0;
+    for(let k=a;k<=b;k++){ const v=isFinite(spec[k])?spec[k]:-140; p+=Math.pow(10,v/10); }
+    const db=10*Math.log10(p/(b-a+1)+1e-14);
+    bandHist[base+i]=db;
+    if(db<bmin) bmin=db; if(db>bmax) bmax=db;
+  }
+  histT[histIdx]=t; histIdx=(histIdx+1)%HIST_N;
+  rangeLo+=(bmin-rangeLo)*0.02; rangeHi+=(bmax+3-rangeHi)*0.02;
+  // spectrogram column
+  const span=Math.max(10,rangeHi-rangeLo), off=spgCol*SPG_ROWS;
+  for(let r=0;r<SPG_ROWS;r++){
+    const [a,b]=rowBins[r]; let m=-200;
+    for(let k=a;k<=b;k++){ const v=spec[k]; if(v>m) m=v; }
+    spgData[off+r]=Math.max(0,Math.min(255,Math.round((m-rangeLo)/span*255)));
+  }
+  spgTimes[spgCol]=t; spgCol=(spgCol+1)%SPG_COLS;
+}
+
+function computeScores(t){
+  const ev=events.filter(x=>t-x<HIST_S);
+  if(ev.length<4){ scores=null; best=null; $('scoretxt').textContent='Score needs at least 4 breaths in the last 30 s ('+ev.length+' so far).'; return; }
+  const sN=new Float64Array(NB), sF=new Float64Array(NB), sA=new Float64Array(NB), sA2=new Float64Array(NB);
+  let nN=0, nF=0, nA=0;
+  for(let j=0;j<HIST_N;j++){
+    const tj=histT[j]; if(t-tj>HIST_S||tj<0) continue;
+    let near=false, far=true;
+    for(const p of ev){ const d=tj-p; if(d>-0.45&&d<0.1) near=true; if(Math.abs(d)<0.8) far=false; }
+    const base=j*NB;
+    for(let i=0;i<NB;i++){ const v=bandHist[base+i]; sA[i]+=v; sA2[i]+=v*v; if(near) sN[i]+=v; else if(far) sF[i]+=v; }
+    nA++; if(near) nN++; else if(far) nF++;
+  }
+  if(nN<10||nF<10){ $('scoretxt').textContent='Score needs more time between breaths to compare against.'; return; }
+  scores=new Float32Array(NB); zs=new Float32Array(NB);
+  for(let i=0;i<NB;i++){
+    const m=sA[i]/nA, sd=Math.sqrt(Math.max(1e-6,sA2[i]/nA-m*m));
+    scores[i]=sN[i]/nN-sF[i]/nF;      // contrast, dB
+    zs[i]=scores[i]/sd;               // consistency
+  }
+  let im=-1; for(let i=0;i<NB;i++) if(zs[i]>=1&&(im<0||scores[i]>scores[im])) im=i;
+  if(im<0){ best=null; $('scoretxt').textContent='No band clearly follows the breaths yet.'; return; }
+  let a=im, b=im; const half=scores[im]*0.5;
+  while(a>0&&scores[a-1]>=half&&zs[a-1]>=1) a--;
+  while(b<NB-1&&scores[b+1]>=half&&zs[b+1]>=1) b++;
+  best=[bandLo[a],bandHi[b]];
+  $('scoretxt').innerHTML='Suggested band: <span class="band">'+fmtF(best[0])+' to '+fmtF(best[1])+'</span> · breaths are '+scores[im].toFixed(1)+' dB above the gaps at '+fmtF(Math.sqrt(bandLo[im]*bandHi[im]))+' · '+ev.length+' breaths';
 }
 
 function updateRate(t){
@@ -206,24 +360,126 @@ function updateRate(t){
   $('bpm').classList.remove('idle');
 }
 
+function prep(id){
+  const c=$(id), g=c.getContext('2d'), dpr=window.devicePixelRatio||1;
+  const W=c.width=Math.round(c.clientWidth*dpr), H=c.height=Math.round(c.clientHeight*dpr);
+  return {c,g,dpr,W,H};
+}
+const TICKS=[100,200,500,1000,2000,5000,10000];
+
+function drawEnergy(){
+  const {g,dpr,W,H}=prep('cv');
+  if(env.length<2) return;
+  const tEnd=env[env.length-1][0];
+  let mx=6; for(const p of env) mx=Math.max(mx,Math.abs(p[1])); for(const v of thr) mx=Math.max(mx,v);
+  const X=t=>W-(tEnd-t)/SPAN_S*W, Y=v=>H/2-v/mx*(H/2-4);
+  g.fillStyle='rgba(222,53,11,0.45)';
+  for(const m of events){ if(tEnd-m<SPAN_S) g.fillRect(X(m)-2*dpr,0,4*dpr,H); }
+  g.strokeStyle='#dfe1e6'; g.lineWidth=dpr; g.beginPath(); g.moveTo(0,H/2); g.lineTo(W,H/2); g.stroke();
+  g.strokeStyle='#ff991f'; g.beginPath();
+  env.forEach((p,i)=>{ const y=Y(thr[i]); i?g.lineTo(X(p[0]),y):g.moveTo(X(p[0]),y); }); g.stroke();
+  g.strokeStyle='#36b37e'; g.lineWidth=2*dpr; g.beginPath();
+  env.forEach((p,i)=>{ i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1])); }); g.stroke();
+}
+
+function drawSpectrogram(){
+  const {g,dpr,W,H}=prep('spg');
+  const px=spgImg.data;
+  for(let x=0;x<SPG_COLS;x++){
+    const col=(spgCol+x)%SPG_COLS, off=col*SPG_ROWS;
+    for(let r=0;r<SPG_ROWS;r++){
+      const v=spgData[off+r]*3, o=(r*SPG_COLS+x)*4;
+      px[o]=LUT[v]; px[o+1]=LUT[v+1]; px[o+2]=LUT[v+2]; px[o+3]=255;
+    }
+  }
+  spgCtx.putImageData(spgImg,0,0);
+  const L=38*dpr;
+  g.imageSmoothingEnabled=true;
+  g.drawImage(spgOff,L,0,W-L,H);
+  const Y=f=>(1-f2u(f))*H;
+  g.fillStyle='#fff'; g.font=(10*dpr)+'px -apple-system,sans-serif'; g.textBaseline='middle';
+  for(const f of TICKS){ if(f>fmax) continue; const y=Y(f); g.fillText(fmtF(f).replace(' ',''),2*dpr,y); g.fillRect(L-4*dpr,y,4*dpr,dpr); }
+  g.strokeStyle='#fff'; g.setLineDash([6*dpr,4*dpr]); g.lineWidth=1.5*dpr;
+  for(const f of [hpF,lpF]){ const y=Y(f); g.beginPath(); g.moveTo(L,y); g.lineTo(W,y); g.stroke(); }
+  g.setLineDash([]);
+  const newest=spgTimes[(spgCol-1+SPG_COLS)%SPG_COLS];
+  g.fillStyle='#ff5630';
+  for(const m of events){ const a=newest-m; if(a>=0&&a<SPAN_S){ const x=W-a/SPAN_S*(W-L); g.fillRect(x-1.5*dpr,0,3*dpr,8*dpr); } }
+}
+
+function freqAxis(g,dpr,W,H,L,B){
+  const X=f=>L+f2u(f)*(W-L);
+  g.fillStyle='#5e6c84'; g.font=(10*dpr)+'px -apple-system,sans-serif'; g.textAlign='center'; g.textBaseline='top';
+  g.strokeStyle='#ebecf0'; g.lineWidth=dpr;
+  for(const f of TICKS){ if(f>fmax) continue; const x=X(f); g.beginPath(); g.moveTo(x,0); g.lineTo(x,H-B); g.stroke(); g.fillText(fmtF(f).replace(' ',''),x,H-B+3*dpr); }
+  g.textAlign='left';
+  return X;
+}
+
+function drawSpectrum(){
+  const {g,dpr,W,H}=prep('spc');
+  const L=6*dpr, B=16*dpr, X=freqAxis(g,dpr,W,H,L,B);
+  g.fillStyle='rgba(0,82,204,0.10)'; g.fillRect(X(hpF),0,X(lpF)-X(hpF),H-B);
+  let lo=1e9, hi=-1e9;
+  for(let k=1;k<nBins;k++){ const f=k*binHz; if(f<FMIN||f>fmax) continue; lo=Math.min(lo,nowSpec[k],avgSpec[k]); hi=Math.max(hi,nowSpec[k],avgSpec[k]); }
+  lo=Math.max(lo,hi-80); const Y=v=>(H-B)*(1-(v-lo)/(hi-lo+1e-6))*0.92+(H-B)*0.04;
+  const line=(arr,col,w)=>{ g.strokeStyle=col; g.lineWidth=w*dpr; g.beginPath(); let st=false;
+    for(let x=L;x<W;x+=dpr){ const f=u2f((x-L)/(W-L)); const k=Math.round(f/binHz); if(k<1||k>=nBins) continue; const y=Y(arr[k]); st?g.lineTo(x,y):g.moveTo(x,y); st=true; } g.stroke(); };
+  line(avgSpec,'#a5adba',1.5); line(nowSpec,'#0052cc',1.5);
+  g.strokeStyle='#0052cc'; g.lineWidth=2*dpr;
+  for(const f of [hpF,lpF]){ const x=X(f); g.beginPath(); g.moveTo(x,0); g.lineTo(x,H-B); g.stroke(); g.fillStyle='#0052cc'; g.fillRect(x-5*dpr,0,10*dpr,10*dpr); }
+  g.fillStyle='#172b4d'; g.fillText(Math.round(hi)+' dB',L+3*dpr,2*dpr); g.fillText(Math.round(lo)+' dB',L+3*dpr,H-B-14*dpr);
+}
+
+function drawScores(){
+  const {g,dpr,W,H}=prep('scr');
+  const L=6*dpr, B=16*dpr, X=freqAxis(g,dpr,W,H,L,B);
+  g.fillStyle='rgba(0,82,204,0.10)'; g.fillRect(X(hpF),0,X(lpF)-X(hpF),H-B);
+  const y0=(H-B)*0.7;
+  g.strokeStyle='#c1c7d0'; g.beginPath(); g.moveTo(L,y0); g.lineTo(W,y0); g.stroke();
+  if(!scores){ g.fillStyle='#97a0af'; g.fillText('waiting for breaths…',L+6*dpr,8*dpr); return; }
+  let mx=1; for(const s of scores) mx=Math.max(mx,Math.abs(s));
+  const sc=(y0-6*dpr)/mx;
+  for(let i=0;i<NB;i++){
+    const xa=X(bandLo[i])+0.5*dpr, xb=X(bandHi[i])-0.5*dpr, s=scores[i];
+    g.fillStyle=zs[i]>=1&&s>0?'#36b37e':s<0?'#ffbdad':'#c1c7d0';
+    const h=Math.max(-((H-B)-y0-2*dpr),Math.min(s*sc,y0)); g.fillRect(xa,y0-Math.max(h,0),xb-xa,Math.abs(h));
+  }
+  if(best){
+    const xa=X(best[0]), xb=X(best[1]);
+    g.strokeStyle='#0747a6'; g.setLineDash([4*dpr,3*dpr]); g.lineWidth=1.5*dpr;
+    g.strokeRect(xa,2*dpr,xb-xa,H-B-4*dpr); g.setLineDash([]);
+  }
+  g.fillStyle='#172b4d'; g.fillText('+'+mx.toFixed(1)+' dB',L+3*dpr,2*dpr);
+}
+
 function draw(){
   if(!ctx) return;
-  const c=$('cv'), g=c.getContext('2d'), dpr=window.devicePixelRatio||1;
-  const W=c.width=c.clientWidth*dpr, H=c.height=c.clientHeight*dpr;
-  g.clearRect(0,0,W,H);
-  if(env.length>1){
-    const tEnd=env[env.length-1][0], span=10;
-    let mx=6; for(const p of env) mx=Math.max(mx,Math.abs(p[1])); for(const v of thr) mx=Math.max(mx,v);
-    const X=t=>W-(tEnd-t)/span*W, Y=v=>H/2-v/mx*(H/2-4);
-    g.fillStyle='rgba(222,53,11,0.45)';
-    for(const m of events){ if(tEnd-m<span) g.fillRect(X(m)-2*dpr,0,4*dpr,H); }
-    g.strokeStyle='#dfe1e6'; g.lineWidth=dpr; g.beginPath(); g.moveTo(0,H/2); g.lineTo(W,H/2); g.stroke();
-    g.strokeStyle='#ff991f'; g.beginPath();
-    env.forEach((p,i)=>{ const y=Y(thr[i]); i?g.lineTo(X(p[0]),y):g.moveTo(X(p[0]),y); }); g.stroke();
-    g.strokeStyle='#36b37e'; g.lineWidth=2*dpr; g.beginPath();
-    env.forEach((p,i)=>{ i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1])); }); g.stroke();
-  }
+  drawEnergy(); drawSpectrogram(); drawSpectrum(); drawScores();
   requestAnimationFrame(draw);
+}
+
+// drag cutoffs on Figure 3
+let dragging=null;
+const spcEl=$('spc');
+function spcFreq(ev){
+  const r=spcEl.getBoundingClientRect(), L=6;
+  const u=Math.max(0,Math.min(1,(ev.clientX-r.left-L)/(r.width-L)));
+  return u2f(u);
+}
+spcEl.addEventListener('pointerdown',ev=>{
+  const f=spcFreq(ev);
+  const dh=Math.abs(Math.log(f/hpF)), dl=Math.abs(Math.log(f/lpF));
+  dragging=dh<dl?'hp':'lp';
+  try{ spcEl.setPointerCapture(ev.pointerId); }catch(e){}
+  moveDrag(f);
+});
+spcEl.addEventListener('pointermove',ev=>{ if(dragging) moveDrag(spcFreq(ev)); });
+const endDrag=()=>{ dragging=null; };
+spcEl.addEventListener('pointerup',endDrag); spcEl.addEventListener('pointercancel',endDrag);
+function moveDrag(f){
+  if(dragging==='hp') setBand(Math.min(f,lpF/1.3),lpF);
+  else setBand(hpF,Math.max(f,hpF*1.3));
 }
 
 $('rec').onclick=()=>{
@@ -247,12 +503,24 @@ $('rec').onclick=()=>{
   $('rec').textContent='■ Stop clip';
 };
 
+function saveBlob(text,name){
+  const b=new Blob([text],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; a.click();
+}
 $('csv').onclick=()=>{
   if(!log.length){ alert('Nothing recorded yet'); return; }
-  const rows=['t_s,energy_db,detrended_db,threshold_db'].concat(log.map(r=>r.join(',')));
+  const rows=['t_s,energy_db,detrended_db,threshold_db,hp_hz,lp_hz'].concat(log.map(r=>r.join(',')));
   rows.push(''); rows.push('event_t_s'); events.forEach(x=>rows.push(x.toFixed(3)));
-  const b=new Blob([rows.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='breath_'+Date.now()+'.csv'; a.click();
+  saveBlob(rows.join('\n'),'breath_'+Date.now()+'.csv');
+};
+$('spcsv').onclick=()=>{
+  if(!bandHist){ alert('Tap Start first'); return; }
+  const rows=['band_lo_hz,band_hi_hz,avg_db,breath_score'];
+  for(let i=0;i<NB;i++){
+    const [a,b]=bandBins[i]; let p=0; for(let k=a;k<=b;k++) p+=Math.pow(10,avgSpec[k]/10);
+    rows.push([bandLo[i].toFixed(1),bandHi[i].toFixed(1),(10*Math.log10(p/(b-a+1)+1e-14)).toFixed(2),scores?scores[i].toFixed(3):''].join(','));
+  }
+  saveBlob(rows.join('\n'),'breath_spectrum_'+Date.now()+'.csv');
 };
 </script>
 </body>
